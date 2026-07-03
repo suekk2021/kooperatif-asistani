@@ -1,15 +1,19 @@
 {
-  "name": "on-muhasebe",
+  "name": "kooperatif-asistani",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/genai": "^2.10.0",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.0",
     "next": "16.2.10",
+    "openai": "^6.45.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Suluova Üreten Eller Kadın Kooperatifi — kimlik renkleri */
+  --ink: #2a2419;
+  --ink-soft: #5b5240;
+  --paper: #f3efe4;
+  --card: #ffffff;
+  --line: #e3ddcb;
+
+  --pine: #3f5744;
+  --pine-deep: #2b3d31;
+
+  --ochre: #c17f17;
+  --ochre-deep: #8c5a0f;
+
+  --income: #2f7a4f;
+  --expense: #b0402e;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-baslik: var(--font-baslik);
+  --font-govde: var(--font-govde);
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-line: var(--line);
+
+  --color-pine: var(--pine);
+  --color-pine-deep: var(--pine-deep);
+
+  --color-ochre: var(--ochre);
+  --color-ochre-deep: var(--ochre-deep);
+
+  --color-income: var(--income);
+  --color-expense: var(--expense);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  /* Varsayılan 16px yerine biraz daha büyük - telefonda okunurluk için
+     (Tailwind'in rem tabanlı boyutları buna göre orantılı büyür). */
+  font-size: 17.5px;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-govde), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.font-baslik {
+  font-family: var(--font-baslik), system-ui, sans-serif;
+  text-wrap: balance;
+}
+
+/* Tutar/tarih gibi rakamlar hep hizali dursun */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }

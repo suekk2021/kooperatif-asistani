@@ -32,9 +32,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.local.example
 
 # vercel
 .vercel
+
+# supabase cli local cache (baglanti bilgisi icerir)
+supabase/.temp
 
 # typescript
 *.tsbuildinfo
