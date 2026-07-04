@@ -4,6 +4,33 @@ import type { OcrSaglayici } from "@/types/database";
 
 export type MedyaParcasi = { base64: string; mimeType: string };
 
+/**
+ * OpenAI'nin strict json_schema modu, Gemini'nin responseSchema'sindan iki noktada farklidir:
+ * (1) additionalProperties:false her seviyede sart, (2) "required" properties'teki TUM
+ * anahtarlari icermeli - orijinalde zorunlu olmayanlar ise turune null eklenerek opsiyonel
+ * kalir. Ayni semayi iki saglayicida da kullanabilmek icin bu donusumu burada otomatik yapiyoruz.
+ */
+function openAiIcinStrictSemaUret(sema: Record<string, unknown>): Record<string, unknown> {
+  const properties = (sema.properties as Record<string, Record<string, unknown>>) ?? {};
+  const zorunluOlanlar = new Set((sema.required as string[]) ?? []);
+
+  const yeniProperties: Record<string, unknown> = {};
+  for (const [ad, tanim] of Object.entries(properties)) {
+    if (zorunluOlanlar.has(ad)) {
+      yeniProperties[ad] = tanim;
+    } else {
+      yeniProperties[ad] = { ...tanim, type: [tanim.type as string, "null"] };
+    }
+  }
+
+  return {
+    ...sema,
+    properties: yeniProperties,
+    required: Object.keys(properties),
+    additionalProperties: false,
+  };
+}
+
 export type YapayZekaAyarlari = {
   saglayici: OcrSaglayici;
   apiKey: string;
@@ -47,12 +74,14 @@ export async function jsonUret(
     content.push({ type: "image_url", image_url: { url: `data:${medya.mimeType};base64,${medya.base64}` } });
   }
 
+  const openaiSemasi = openAiIcinStrictSemaUret(sema);
+
   const response = await client.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [{ role: "user", content }],
     response_format: {
       type: "json_schema",
-      json_schema: { name: "cikarim", schema: sema, strict: true },
+      json_schema: { name: "cikarim", schema: openaiSemasi, strict: true },
     },
   });
 
