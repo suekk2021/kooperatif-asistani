@@ -13,7 +13,13 @@ import type { Hatirlatici } from "@/types/database";
 type HatirlaticiVerisi = Pick<
   Hatirlatici,
   "id" | "baslik" | "hatirlatma_tarihi" | "tamamlandi" | "telegram_gonderen"
->;
+> & {
+  profiller: { ad_soyad: string } | null;
+};
+
+function kimEkledi(hatirlatici: HatirlaticiVerisi): string | null {
+  return hatirlatici.telegram_gonderen ?? hatirlatici.profiller?.ad_soyad ?? null;
+}
 
 function HatirlaticiSatiri({ hatirlatici }: { hatirlatici: HatirlaticiVerisi }) {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
@@ -117,7 +123,7 @@ function HatirlaticiSatiri({ hatirlatici }: { hatirlatici: HatirlaticiVerisi }) 
           </p>
           <p className="text-xs text-ink-soft/70">
             {hatirlatici.hatirlatma_tarihi}
-            {hatirlatici.telegram_gonderen && ` · ${hatirlatici.telegram_gonderen}`}
+            {kimEkledi(hatirlatici) && ` · ${kimEkledi(hatirlatici)}`}
           </p>
           {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
         </div>

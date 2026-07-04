@@ -6,8 +6,13 @@ export default async function HatirlaticilarPage() {
   const supabase = await createClient();
   const { data: hatirlaticilar } = await supabase
     .from("hatirlaticilar")
-    .select("id, baslik, hatirlatma_tarihi, tamamlandi, telegram_gonderen")
+    .select("id, baslik, hatirlatma_tarihi, tamamlandi, telegram_gonderen, profiller(ad_soyad)")
     .order("hatirlatma_tarihi", { ascending: true });
+
+  const hatirlaticilarDuz = (hatirlaticilar ?? []).map((h) => ({
+    ...h,
+    profiller: Array.isArray(h.profiller) ? (h.profiller[0] ?? null) : h.profiller,
+  }));
 
   return (
     <div className="space-y-6">
@@ -41,7 +46,7 @@ export default async function HatirlaticilarPage() {
 
       <div className="rounded-xl border border-line bg-card p-5">
         <h2 className="text-sm font-semibold text-ink">Tüm Hatırlatıcılar</h2>
-        <HatirlaticilarListesi hatirlaticilar={hatirlaticilar ?? []} />
+        <HatirlaticilarListesi hatirlaticilar={hatirlaticilarDuz} />
       </div>
     </div>
   );

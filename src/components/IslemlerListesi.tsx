@@ -6,7 +6,13 @@ import { TarihAraligiFiltresi, type TarihAraligi } from "@/components/TarihArali
 import { AyGezici } from "@/components/AyGezici";
 import type { Islem, IslemTuru } from "@/types/database";
 
-type IslemVerisi = Pick<Islem, "id" | "tur" | "tutar" | "tarih" | "aciklama" | "kategori" | "telegram_gonderen">;
+type IslemVerisi = Pick<Islem, "id" | "tur" | "tutar" | "tarih" | "aciklama" | "kategori" | "telegram_gonderen"> & {
+  profiller: { ad_soyad: string } | null;
+};
+
+function kimEkledi(islem: IslemVerisi): string | null {
+  return islem.telegram_gonderen ?? islem.profiller?.ad_soyad ?? null;
+}
 
 function formatTL(tutar: number) {
   return new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(tutar);
@@ -117,7 +123,7 @@ function IslemSatiri({ islem }: { islem: IslemVerisi }) {
         <p className="text-ink">{islem.aciklama}</p>
         <p className="text-xs text-ink-soft/70">
           {islem.tarih} {islem.kategori ? `· ${islem.kategori}` : ""}
-          {islem.telegram_gonderen ? ` · ${islem.telegram_gonderen}` : ""}
+          {kimEkledi(islem) ? ` · ${kimEkledi(islem)}` : ""}
         </p>
         {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
       </div>
