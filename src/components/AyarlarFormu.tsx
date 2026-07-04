@@ -14,6 +14,7 @@ export function AyarlarFormu({
   muhasebeciEmail,
   kurumAdi,
   logoUrl,
+  asistanPromptu,
   baskanMi,
 }: {
   mevcutSaglayici: OcrSaglayici;
@@ -23,6 +24,7 @@ export function AyarlarFormu({
   muhasebeciEmail: string;
   kurumAdi: string;
   logoUrl: string | null;
+  asistanPromptu: string;
   baskanMi: boolean;
 }) {
   const [saglayici, setSaglayici] = useState<OcrSaglayici>(mevcutSaglayici);
@@ -151,6 +153,21 @@ export function AyarlarFormu({
           rows={3}
           defaultValue={telegramChatIdler}
           placeholder={"123456789\n987654321"}
+          className="w-full rounded-md border border-line px-3 py-2 text-sm"
+        />
+      </div>
+
+      <div className="border-t border-line pt-4">
+        <p className="mb-2 text-sm font-medium text-ink-soft">Asistan Kişiliği (opsiyonel)</p>
+        <p className="mb-3 text-xs text-ink-soft">
+          Telegram asistanının nasıl davranmasını istediğinizi buraya yazın (ör. &quot;daha resmi konuş&quot;,
+          &quot;kısa cevaplar ver&quot;, &quot;şu konularda da bilgi ver&quot;). Boş bırakılırsa varsayılan üslup kullanılır.
+        </p>
+        <textarea
+          name="asistan_promptu"
+          rows={3}
+          defaultValue={asistanPromptu}
+          placeholder="Örn: Cevaplarında daha resmi bir dil kullan, kısa ve öz konuş."
           className="w-full rounded-md border border-line px-3 py-2 text-sm"
         />
       </div>

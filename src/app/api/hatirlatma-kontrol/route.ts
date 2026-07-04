@@ -3,8 +3,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { telegramMesajGonder, chatIdListesiCikar } from "@/lib/telegram";
 import { bugunIstanbul } from "@/lib/tarih";
 
-// Vercel Cron bu adresi gunluk cagirir (bkz. vercel.json). Gunu gelmis ve
-// henuz bildirilmemis hatirlaticilar icin Telegram mesaji gonderir.
+// Bu adres, gunu gelmis ve henuz tamamlanmamis hatirlaticilar icin Telegram mesaji gonderir.
+// Vercel Cron (Hobby planda gunde 1 kez, bkz. vercel.json) ve/veya harici bir cron servisi
+// (ör. cron-job.org, 2 saatte bir) bu adresi cagirabilir. Kasitli olarak "tek seferlik" degil:
+// Baskan hatirlaticiyi uygulamadan "tamamlandi" isaretleyene kadar her cagrida tekrar gonderilir -
+// yogunluktan unutulan bir hatirlaticinin sessizce kaybolmamasi icin.
 export async function GET(request: NextRequest) {
   const yetki = request.headers.get("authorization");
   if (yetki !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -29,15 +32,14 @@ export async function GET(request: NextRequest) {
     .from("hatirlaticilar")
     .select("id, baslik, hatirlatma_tarihi")
     .eq("tamamlandi", false)
-    .eq("telegram_gonderildi", false)
     .lte("hatirlatma_tarihi", bugun);
 
   if (!hatirlaticilar || hatirlaticilar.length === 0) {
-    return NextResponse.json({ mesaj: "Bugün gönderilecek hatırlatıcı yok." });
+    return NextResponse.json({ mesaj: "Gönderilecek hatırlatıcı yok." });
   }
 
   for (const h of hatirlaticilar) {
-    const metin = `🔔 <b>Hatırlatıcı</b>\n${h.baslik}\nTarih: ${h.hatirlatma_tarihi}`;
+    const metin = `🔔 <b>Hatırlatıcı</b>\n${h.baslik}\nTarih: ${h.hatirlatma_tarihi}\n\nTamamlandığında uygulamadan işaretlemeyi unutmayın, aksi halde hatırlatmaya devam edilir.`;
     for (const chatId of aliciListesi) {
       await telegramMesajGonder(ayarlar.telegram_bot_token, chatId, metin);
     }

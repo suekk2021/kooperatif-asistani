@@ -12,6 +12,7 @@ export type Ayarlar = {
   muhasebeci_email: string | null;
   kurum_adi: string;
   logo_url: string | null;
+  asistan_promptu: string | null;
   updated_at: string;
 };
 

@@ -36,6 +36,7 @@ export default async function AyarlarPage() {
             muhasebeciEmail={durum.muhasebeciEmail}
             kurumAdi={durum.kurumAdi}
             logoUrl={durum.logoUrl}
+            asistanPromptu={durum.asistanPromptu}
             baskanMi={buradaBaskanMi}
           />
         </div>

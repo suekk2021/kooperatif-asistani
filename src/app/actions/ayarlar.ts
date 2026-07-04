@@ -14,7 +14,7 @@ export async function ayarDurumuGetir() {
   const { data } = await supabase
     .from("ayarlar")
     .select(
-      "ocr_saglayici, gemini_api_key, openai_api_key, telegram_bot_token, telegram_chat_id, muhasebeci_email, kurum_adi, logo_url"
+      "ocr_saglayici, gemini_api_key, openai_api_key, telegram_bot_token, telegram_chat_id, muhasebeci_email, kurum_adi, logo_url, asistan_promptu"
     )
     .eq("id", true)
     .single();
@@ -28,6 +28,7 @@ export async function ayarDurumuGetir() {
     muhasebeciEmail: data?.muhasebeci_email ?? "",
     kurumAdi: data?.kurum_adi ?? "Suluova Üreten Eller Kadın Kooperatifi",
     logoUrl: data?.logo_url ?? null,
+    asistanPromptu: data?.asistan_promptu ?? "",
   };
 }
 
@@ -57,6 +58,7 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
   const telegramChatIdler = String(formData.get("telegram_chat_id") ?? "").trim();
   const muhasebeciEmail = String(formData.get("muhasebeci_email") ?? "").trim();
   const kurumAdi = String(formData.get("kurum_adi") ?? "").trim();
+  const asistanPromptu = String(formData.get("asistan_promptu") ?? "").trim();
   const geminiSil = formData.get("gemini_api_key_sil") === "1";
   const openaiSil = formData.get("openai_api_key_sil") === "1";
 
@@ -78,9 +80,10 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
 
   const guncelleme: Record<string, unknown> = {
     ocr_saglayici: ocrSaglayici,
-    // Bu alan tam gorunur/duzenlenebilir bir liste oldugu icin (sifre gibi maskelenmiyor),
+    // Bu alanlar tam gorunur/duzenlenebilir oldugu icin (sifre gibi maskelenmiyor),
     // bos birakilirsa gercekten temizlenmesi istenmis demektir.
     telegram_chat_id: telegramChatIdler || null,
+    asistan_promptu: asistanPromptu || null,
   };
   // Diger alanlar (anahtarlar) icin: bos birakilan alan mevcut degeri SILMEZ,
   // sadece ilgili "sil" kutusu isaretliyse temizlenir.

@@ -30,17 +30,35 @@ const ASISTAN_SEMASI = {
     cevap: {
       type: "string",
       description:
-        "Kullanıcıya verilecek doğal, sıcak, kısa cevap. Asla sayısal mali veri (tutar, bakiye vb.) UYDURMA - onları sen değil sistem ekler.",
+        "Kullanıcıya verilecek cevap. Sıcak ama SOMUT ve BİLGİLENDİRİCİ ol - 'nasıl yardımcı olabilirim' gibi " +
+        "muğlak, geri sorulu cümlelerle geçiştirme. 'Sen kimsin/ne yapabilirsin' gibi bir soruya kim olduğunu " +
+        "ve tam olarak hangi 4 şeyi yapabildiğini (özet, hatırlatıcı, not, fiş okuma) somut örneklerle anlat. " +
+        "Asla sayısal mali veri (tutar, bakiye vb.) UYDURMA - onları sen değil sistem ekler.",
     },
   },
   required: ["niyet", "cevap"],
 } as const;
 
-function asistanPromptOlustur(girdiMetni: string) {
+const ASISTAN_KIMLIGI =
+  `Sen ${KURUM_ADI}'nin Telegram üzerinden çalışan kişisel asistanısın. Başkan ve Ön Muhasebe Sorumlusu ` +
+  `seninle kendi Telegram hesaplarından doğrudan konuşuyor. Sıcak ama net, öz ve kendinden emin bir üslubun var - ` +
+  `belirsiz, geçiştirici, "nasıl yardımcı olabilirim" tarzı boş cümleler kurmazsın; ne yapabildiğini somut olarak bilirsin.\n\n` +
+  `Yapabildiklerin, tam olarak dört şey:\n` +
+  `1) ÖZET: "özet" veya "durum" yazınca bu ayın gerçek gelir/gider/net rakamlarını ve yaklaşan hatırlatıcıları anında verirsin.\n` +
+  `2) HATIRLATICI: "15 Temmuz'da kira ödemesi hatırlat" gibi tarihli bir talebi otomatik kaydedersin, günü gelince Telegram'dan haber verirsin.\n` +
+  `3) NOT: tarihsiz, serbest bir bilgiyi not olarak kaydedersin.\n` +
+  `4) FİŞ/FATURA OKUMA: gönderilen bir fotoğrafı okuyup tutar/tarih/açıklama/kategoriyi çıkarıp gelir-gider kaydına otomatik işlersin; sesli mesajları da anlayıp aynı şekilde işlersin.\n\n` +
+  `"Sen kimsin", "ne yapabilirsin", "yeteneklerin ne" gibi bir soru geldiğinde bu dört maddeyi somut, kısa örneklerle ` +
+  `anlat - genel geçer bir "asistanım, size yardımcı olurum" cevabı verme.`;
+
+function asistanPromptOlustur(girdiMetni: string, ozelPrompt: string | null | undefined) {
+  const ekTalimat = ozelPrompt?.trim()
+    ? `\n\nBaşkan'ın senin için verdiği ek talimat (buna öncelik ver): "${ozelPrompt.trim()}"`
+    : "";
   return (
-    `Sen ${KURUM_ADI}'nin Telegram üzerinden çalışan sanal asistanısın. Sıcak, kısa, saygılı bir üslupla ` +
-    `Türkçe konuş. Bugünün tarihi ${bugunIstanbul()} (YYYY-MM-DD, İstanbul saatiyle). Kullanıcının mesajını ` +
-    `sınıflandır ve uygun alanları doldur. Kullanıcının mesajı: "${girdiMetni}"`
+    `${ASISTAN_KIMLIGI}${ekTalimat}\n\n` +
+    `Bugünün tarihi ${bugunIstanbul()} (YYYY-MM-DD, İstanbul saatiyle). Kullanıcının mesajını sınıflandır ve ` +
+    `uygun alanları doldur. Kullanıcının mesajı: "${girdiMetni}"`
   );
 }
 
@@ -128,7 +146,7 @@ export async function POST(request: NextRequest) {
   const supabase = createAdminClient();
   const { data: ayarlar } = await supabase
     .from("ayarlar")
-    .select("telegram_bot_token, telegram_chat_id, ocr_saglayici, gemini_api_key, openai_api_key")
+    .select("telegram_bot_token, telegram_chat_id, ocr_saglayici, gemini_api_key, openai_api_key, asistan_promptu")
     .eq("id", true)
     .single();
 
@@ -176,7 +194,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: true });
       }
 
-      const cikarim = await jsonUret(yzAyarlari, asistanPromptOlustur(mesaj.text), ASISTAN_SEMASI);
+      const cikarim = await jsonUret(
+        yzAyarlari,
+        asistanPromptOlustur(mesaj.text, ayarlar.asistan_promptu),
+        ASISTAN_SEMASI
+      );
       await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim));
       return NextResponse.json({ ok: true });
     }
@@ -194,13 +216,13 @@ export async function POST(request: NextRequest) {
         // Gemini sesi dogrudan anlayabiliyor - tek istekte transkript + siniflandirma.
         cikarim = await jsonUret(
           yzAyarlari,
-          asistanPromptOlustur("(sesli mesaj - ekli ses dosyasını dinleyip anla)"),
+          asistanPromptOlustur("(sesli mesaj - ekli ses dosyasını dinleyip anla)", ayarlar.asistan_promptu),
           ASISTAN_SEMASI,
           { base64, mimeType }
         );
       } else {
         const metin = await sesiMetneCevir(yzAyarlari.apiKey, base64, mimeType);
-        cikarim = await jsonUret(yzAyarlari, asistanPromptOlustur(metin), ASISTAN_SEMASI);
+        cikarim = await jsonUret(yzAyarlari, asistanPromptOlustur(metin, ayarlar.asistan_promptu), ASISTAN_SEMASI);
       }
 
       await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim));
