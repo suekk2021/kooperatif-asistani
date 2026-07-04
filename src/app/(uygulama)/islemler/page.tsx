@@ -6,7 +6,7 @@ export default async function IslemlerPage() {
   const supabase = await createClient();
   const { data: islemler } = await supabase
     .from("islemler")
-    .select("id, tur, tutar, tarih, aciklama, kategori")
+    .select("id, tur, tutar, tarih, aciklama, kategori, telegram_gonderen")
     .order("tarih", { ascending: false });
 
   return (

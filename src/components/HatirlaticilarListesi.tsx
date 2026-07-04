@@ -10,7 +10,10 @@ import { TarihAraligiFiltresi, type TarihAraligi } from "@/components/TarihArali
 import { AyGezici } from "@/components/AyGezici";
 import type { Hatirlatici } from "@/types/database";
 
-type HatirlaticiVerisi = Pick<Hatirlatici, "id" | "baslik" | "hatirlatma_tarihi" | "tamamlandi">;
+type HatirlaticiVerisi = Pick<
+  Hatirlatici,
+  "id" | "baslik" | "hatirlatma_tarihi" | "tamamlandi" | "telegram_gonderen"
+>;
 
 function HatirlaticiSatiri({ hatirlatici }: { hatirlatici: HatirlaticiVerisi }) {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
@@ -112,7 +115,10 @@ function HatirlaticiSatiri({ hatirlatici }: { hatirlatici: HatirlaticiVerisi }) 
           <p className={hatirlatici.tamamlandi ? "text-sm text-ink-soft/70 line-through" : "text-sm text-ink"}>
             {hatirlatici.baslik}
           </p>
-          <p className="text-xs text-ink-soft/70">{hatirlatici.hatirlatma_tarihi}</p>
+          <p className="text-xs text-ink-soft/70">
+            {hatirlatici.hatirlatma_tarihi}
+            {hatirlatici.telegram_gonderen && ` · ${hatirlatici.telegram_gonderen}`}
+          </p>
           {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
         </div>
       </div>

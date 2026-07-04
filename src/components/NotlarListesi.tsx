@@ -7,7 +7,7 @@ import { AyGezici } from "@/components/AyGezici";
 import { gunIstanbul } from "@/lib/tarih";
 import type { Not } from "@/types/database";
 
-type NotSatiriVerisi = Pick<Not, "id" | "icerik" | "kaynak" | "created_at">;
+type NotSatiriVerisi = Pick<Not, "id" | "icerik" | "kaynak" | "created_at" | "telegram_gonderen">;
 
 function formatZamanIstanbul(iso: string) {
   return new Date(iso).toLocaleString("tr-TR", {
@@ -87,6 +87,7 @@ function NotSatiri({ not }: { not: NotSatiriVerisi }) {
       <div className="mt-1 flex items-center justify-between">
         <p className="text-xs text-ink-soft/70">
           {formatZamanIstanbul(not.created_at)} · {not.kaynak === "telegram" ? "Telegram" : "Web"}
+          {not.telegram_gonderen && ` · ${not.telegram_gonderen}`}
         </p>
         <div className="flex gap-3">
           <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">

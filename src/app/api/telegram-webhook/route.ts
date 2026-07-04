@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { telegramMesajGonder, telegramDosyaIndir, chatIdListesiCikar } from "@/lib/telegram";
+import { telegramMesajGonder, telegramDosyaIndir, chatIdListesiCikar, telegramGondereniBul } from "@/lib/telegram";
 import { jsonUret, sesiMetneCevir, type YapayZekaAyarlari } from "@/lib/ai";
 import { fisVerisiCikar } from "@/lib/fis";
 import { bugunIstanbul, ayBasiIstanbul } from "@/lib/tarih";
@@ -94,7 +94,8 @@ async function ozetMetniOlustur(supabase: ReturnType<typeof createAdminClient>) 
 
 async function siniflandirmaSonucunuIsle(
   supabase: ReturnType<typeof createAdminClient>,
-  cikarim: Record<string, unknown>
+  cikarim: Record<string, unknown>,
+  gonderenIsim: string
 ): Promise<string> {
   const niyet = cikarim.niyet;
   const cevap = typeof cikarim.cevap === "string" ? cikarim.cevap : "Anladım.";
@@ -109,6 +110,7 @@ async function siniflandirmaSonucunuIsle(
       hatirlatma_tarihi: String(cikarim.hatirlatici_tarihi),
       tamamlandi: false,
       olusturan: null,
+      telegram_gonderen: gonderenIsim,
     });
     return cevap;
   }
@@ -118,6 +120,7 @@ async function siniflandirmaSonucunuIsle(
       icerik: String(cikarim.not_icerik),
       kaynak: "telegram",
       olusturan: null,
+      telegram_gonderen: gonderenIsim,
     });
     return cevap;
   }
@@ -164,6 +167,7 @@ export async function POST(request: NextRequest) {
 
   const botToken = ayarlar.telegram_bot_token;
   const chatId = gelenChatId;
+  const gonderenIsim = telegramGondereniBul(ayarlar.telegram_chat_id, gelenChatId) ?? gelenChatId;
   const yzAyarlari: YapayZekaAyarlari | null =
     ayarlar.ocr_saglayici === "gemini" && ayarlar.gemini_api_key
       ? { saglayici: "gemini", apiKey: ayarlar.gemini_api_key }
@@ -199,7 +203,7 @@ export async function POST(request: NextRequest) {
         asistanPromptOlustur(mesaj.text, ayarlar.asistan_promptu),
         ASISTAN_SEMASI
       );
-      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim));
+      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim));
       return NextResponse.json({ ok: true });
     }
 
@@ -225,7 +229,7 @@ export async function POST(request: NextRequest) {
         cikarim = await jsonUret(yzAyarlari, asistanPromptOlustur(metin, ayarlar.asistan_promptu), ASISTAN_SEMASI);
       }
 
-      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim));
+      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim));
       return NextResponse.json({ ok: true });
     }
 
@@ -254,6 +258,7 @@ export async function POST(request: NextRequest) {
         fis_gorsel_url: null,
         ocr_ham_metin: null,
         olusturan: null,
+        telegram_gonderen: gonderenIsim,
       });
 
       await telegramMesajGonder(

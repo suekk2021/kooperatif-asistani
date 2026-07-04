@@ -145,14 +145,15 @@ export function AyarlarFormu({
         <p className="mb-2 text-sm font-medium text-ink-soft">Telegram Bildirimi</p>
         <p className="mb-3 text-xs text-ink-soft">
           Hatırlatıcı günü geldiğinde ve &quot;özet&quot; yazınca bilgi alacak kişilerin Telegram Chat ID&apos;leri.
-          Her satıra bir kişi yaz (Başkan, Ön Muhasebe Sorumlusu vb.) — hepsi bota kendi Telegram&apos;ından
-          yazabilir.
+          Her satıra bir kişi yaz, opsiyonel olarak isim etiketiyle (<code>chat_id:İsim</code>) — hepsi bota kendi
+          Telegram&apos;ından yazabilir, isim etiketi verilirse o kişinin eklediği kayıtlarda (fiş, hatırlatıcı, not)
+          kim tarafından eklendiği görünür.
         </p>
         <textarea
           name="telegram_chat_id"
           rows={3}
           defaultValue={telegramChatIdler}
-          placeholder={"123456789\n987654321"}
+          placeholder={"123456789:Başkan Eyüp\n987654321:Ön Muhasebe Ayşe"}
           className="w-full rounded-md border border-line px-3 py-2 text-sm"
         />
       </div>

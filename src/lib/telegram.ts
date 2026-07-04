@@ -1,10 +1,32 @@
-/** "123, 456\n789" gibi serbest yazilmis bir metinden gecerli chat ID listesini cikarir. */
-export function chatIdListesiCikar(metin: string | null | undefined): string[] {
+/**
+ * "123456789:Başkan Eyüp\n987654321:Ön Muhasebe Ayşe" gibi, her satirda opsiyonel
+ * bir isim etiketi tasiyabilen serbest metni { chatId, isim } listesine cevirir.
+ * Etiket verilmemisse isim null kalir.
+ */
+function chatIdSatirlariniAyristir(metin: string | null | undefined): Array<{ chatId: string; isim: string | null }> {
   if (!metin) return [];
   return metin
     .split(/[\n,]/)
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+    .map((satir) => satir.trim())
+    .filter((satir) => satir.length > 0)
+    .map((satir) => {
+      const ikiNoktaIndex = satir.indexOf(":");
+      if (ikiNoktaIndex === -1) return { chatId: satir, isim: null };
+      const chatId = satir.slice(0, ikiNoktaIndex).trim();
+      const isim = satir.slice(ikiNoktaIndex + 1).trim();
+      return { chatId, isim: isim || null };
+    });
+}
+
+/** "123, 456:İsim\n789" gibi serbest yazilmis bir metinden gecerli chat ID listesini cikarir. */
+export function chatIdListesiCikar(metin: string | null | undefined): string[] {
+  return chatIdSatirlariniAyristir(metin).map((s) => s.chatId);
+}
+
+/** Verilen chat ID'nin Ayarlar'da bir isim etiketiyle kayitli olup olmadigini bulur. */
+export function telegramGondereniBul(metin: string | null | undefined, chatId: string): string | null {
+  const eslesen = chatIdSatirlariniAyristir(metin).find((s) => s.chatId === chatId);
+  return eslesen?.isim ?? null;
 }
 
 export async function telegramMesajGonder(botToken: string, chatId: string, metin: string) {

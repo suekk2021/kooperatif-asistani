@@ -6,7 +6,7 @@ export default async function HatirlaticilarPage() {
   const supabase = await createClient();
   const { data: hatirlaticilar } = await supabase
     .from("hatirlaticilar")
-    .select("id, baslik, hatirlatma_tarihi, tamamlandi")
+    .select("id, baslik, hatirlatma_tarihi, tamamlandi, telegram_gonderen")
     .order("hatirlatma_tarihi", { ascending: true });
 
   return (

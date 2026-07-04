@@ -5,7 +5,7 @@ export default async function NotlarPage() {
   const supabase = await createClient();
   const { data: notlar } = await supabase
     .from("notlar")
-    .select("id, icerik, kaynak, created_at")
+    .select("id, icerik, kaynak, created_at, telegram_gonderen")
     .order("created_at", { ascending: false });
 
   return (

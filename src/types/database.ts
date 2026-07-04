@@ -38,6 +38,7 @@ export type Islem = {
   fis_gorsel_url: string | null;
   ocr_ham_metin: string | null;
   olusturan: string | null;
+  telegram_gonderen?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -49,6 +50,7 @@ export type Hatirlatici = {
   tamamlandi: boolean;
   telegram_gonderildi: boolean;
   olusturan: string | null;
+  telegram_gonderen?: string | null;
   created_at: string;
 };
 
@@ -57,6 +59,7 @@ export type Not = {
   icerik: string;
   kaynak: "telegram" | "web";
   olusturan: string | null;
+  telegram_gonderen?: string | null;
   created_at: string;
 };
 
