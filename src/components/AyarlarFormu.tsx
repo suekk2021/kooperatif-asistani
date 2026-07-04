@@ -31,6 +31,14 @@ export function AyarlarFormu({
     bosSonuc
   );
 
+  // Kayit basarili olup sunucudan guncel deger geldiginde ekrani onunla senkronla -
+  // aksi halde form, az once kaydedilen degeri degil eski state'i gostermeye devam eder.
+  const [oncekiMevcutSaglayici, setOncekiMevcutSaglayici] = useState(mevcutSaglayici);
+  if (mevcutSaglayici !== oncekiMevcutSaglayici) {
+    setOncekiMevcutSaglayici(mevcutSaglayici);
+    setSaglayici(mevcutSaglayici);
+  }
+
   if (!baskanMi) {
     return (
       <p className="text-sm text-ink-soft">
@@ -107,6 +115,12 @@ export function AyarlarFormu({
           placeholder={geminiAnahtarVar ? "•••••••• (değiştirmek için yeni değer gir)" : "AIza... veya AQ...."}
           className="w-full rounded-md border border-line px-3 py-2 text-sm"
         />
+        {geminiAnahtarVar && (
+          <label className="flex items-center gap-2 pt-1 text-xs text-ink-soft">
+            <input type="checkbox" name="gemini_api_key_sil" value="1" />
+            Kayıtlı Gemini anahtarını sil
+          </label>
+        )}
       </div>
 
       <div className="space-y-1">
@@ -117,6 +131,12 @@ export function AyarlarFormu({
           placeholder={openaiAnahtarVar ? "•••••••• (değiştirmek için yeni değer gir)" : "sk-..."}
           className="w-full rounded-md border border-line px-3 py-2 text-sm"
         />
+        {openaiAnahtarVar && (
+          <label className="flex items-center gap-2 pt-1 text-xs text-ink-soft">
+            <input type="checkbox" name="openai_api_key_sil" value="1" />
+            Kayıtlı OpenAI anahtarını sil
+          </label>
+        )}
       </div>
 
       <div className="border-t border-line pt-4">

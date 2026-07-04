@@ -57,6 +57,8 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
   const telegramChatIdler = String(formData.get("telegram_chat_id") ?? "").trim();
   const muhasebeciEmail = String(formData.get("muhasebeci_email") ?? "").trim();
   const kurumAdi = String(formData.get("kurum_adi") ?? "").trim();
+  const geminiSil = formData.get("gemini_api_key_sil") === "1";
+  const openaiSil = formData.get("openai_api_key_sil") === "1";
 
   // Yanlislikla baska bir sifre/deger yapistirilmasini onlemek icin, kaydetmeden once
   // anahtari gercek bir API istegiyle test ediyoruz - "kayitli" gorunup calismamasi riskini
@@ -80,9 +82,18 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
     // bos birakilirsa gercekten temizlenmesi istenmis demektir.
     telegram_chat_id: telegramChatIdler || null,
   };
-  // Diger alanlar (anahtarlar) icin: bos birakilan alan mevcut degeri SILMEZ.
-  if (geminiKey) guncelleme.gemini_api_key = geminiKey;
-  if (openaiKey) guncelleme.openai_api_key = openaiKey;
+  // Diger alanlar (anahtarlar) icin: bos birakilan alan mevcut degeri SILMEZ,
+  // sadece ilgili "sil" kutusu isaretliyse temizlenir.
+  if (geminiSil) {
+    guncelleme.gemini_api_key = null;
+  } else if (geminiKey) {
+    guncelleme.gemini_api_key = geminiKey;
+  }
+  if (openaiSil) {
+    guncelleme.openai_api_key = null;
+  } else if (openaiKey) {
+    guncelleme.openai_api_key = openaiKey;
+  }
   if (muhasebeciEmail) guncelleme.muhasebeci_email = muhasebeciEmail;
   if (kurumAdi) guncelleme.kurum_adi = kurumAdi;
 
