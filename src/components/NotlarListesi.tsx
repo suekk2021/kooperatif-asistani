@@ -7,7 +7,9 @@ import { AyGezici } from "@/components/AyGezici";
 import { gunIstanbul } from "@/lib/tarih";
 import type { Not } from "@/types/database";
 
-type NotSatiriVerisi = Pick<Not, "id" | "icerik" | "kaynak" | "created_at" | "telegram_gonderen">;
+type NotSatiriVerisi = Pick<Not, "id" | "icerik" | "kaynak" | "created_at" | "telegram_gonderen"> & {
+  hedef: { ad_soyad: string } | null;
+};
 
 function formatZamanIstanbul(iso: string) {
   return new Date(iso).toLocaleString("tr-TR", {
@@ -20,7 +22,7 @@ function formatZamanIstanbul(iso: string) {
   });
 }
 
-function NotSatiri({ not }: { not: NotSatiriVerisi }) {
+function NotSatiri({ not, duzenlenebilir }: { not: NotSatiriVerisi; duzenlenebilir: boolean }) {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [icerik, setIcerik] = useState(not.icerik);
   const [kaydediliyor, kaydetBaslat] = useTransition();
@@ -88,22 +90,31 @@ function NotSatiri({ not }: { not: NotSatiriVerisi }) {
         <p className="text-xs text-ink-soft/70">
           {formatZamanIstanbul(not.created_at)} · {not.kaynak === "telegram" ? "Telegram" : "Web"}
           {not.telegram_gonderen && ` · ${not.telegram_gonderen}`}
+          {not.hedef && ` · Kime: ${not.hedef.ad_soyad}`}
         </p>
-        <div className="flex gap-3">
-          <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
-            Düzenle
-          </button>
-          <button onClick={sil} disabled={kaydediliyor} className="text-xs text-expense/70 hover:text-expense">
-            Sil
-          </button>
-        </div>
+        {duzenlenebilir && (
+          <div className="flex gap-3">
+            <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
+              Düzenle
+            </button>
+            <button onClick={sil} disabled={kaydediliyor} className="text-xs text-expense/70 hover:text-expense">
+              Sil
+            </button>
+          </div>
+        )}
       </div>
       {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
     </li>
   );
 }
 
-export function NotlarListesi({ notlar }: { notlar: NotSatiriVerisi[] }) {
+export function NotlarListesi({
+  notlar,
+  duzenlenebilir,
+}: {
+  notlar: NotSatiriVerisi[];
+  duzenlenebilir: boolean;
+}) {
   const [arama, setArama] = useState("");
   const [tarihAraligi, setTarihAraligi] = useState<TarihAraligi>({ baslangic: "", bitis: "" });
 
@@ -137,7 +148,7 @@ export function NotlarListesi({ notlar }: { notlar: NotSatiriVerisi[] }) {
           </li>
         )}
         {filtrelenmis.map((not) => (
-          <NotSatiri key={not.id} not={not} />
+          <NotSatiri key={not.id} not={not} duzenlenebilir={duzenlenebilir} />
         ))}
       </ul>
     </div>

@@ -38,6 +38,9 @@ export default async function UygulamaLayout({ children }: { children: React.Rea
             <Link href="/islemler" className="hover:text-white">
               Gelir / Gider
             </Link>
+            <Link href="/musteriler" className="hover:text-white">
+              Müşteriler
+            </Link>
             <Link href="/hatirlaticilar" className="hover:text-white">
               Hatırlatıcılar
             </Link>

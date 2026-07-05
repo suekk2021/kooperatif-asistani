@@ -1,4 +1,4 @@
-export type KullaniciRolu = "baskan" | "on_muhasebe";
+export type KullaniciRolu = "baskan" | "on_muhasebe" | "izleyici";
 export type IslemTuru = "gelir" | "gider";
 export type OcrSaglayici = "gemini" | "openai";
 
@@ -25,6 +25,7 @@ export type Profil = {
   id: string;
   ad_soyad: string;
   rol: KullaniciRolu;
+  telegram_chat_id?: string | null;
   created_at: string;
 };
 
@@ -39,6 +40,20 @@ export type Islem = {
   ocr_ham_metin: string | null;
   olusturan: string | null;
   telegram_gonderen?: string | null;
+  odendi?: boolean;
+  dekont_url?: string | null;
+  musteri_id?: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Musteri = {
+  id: string;
+  ad_soyad: string;
+  telefon: string | null;
+  adres: string | null;
+  notlar: string | null;
+  olusturan: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -60,6 +75,7 @@ export type Not = {
   kaynak: "telegram" | "web";
   olusturan: string | null;
   telegram_gonderen?: string | null;
+  hedef_kullanici_id?: string | null;
   created_at: string;
 };
 

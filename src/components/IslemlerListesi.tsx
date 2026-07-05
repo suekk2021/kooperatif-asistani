@@ -1,13 +1,27 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
-import { islemGuncelle, islemSil } from "@/app/actions/islemler";
+import { useMemo, useRef, useState, useTransition } from "react";
+import Link from "next/link";
+import { islemGuncelle, islemSil, islemOdendiDegistir, islemDekontYukle } from "@/app/actions/islemler";
 import { TarihAraligiFiltresi, type TarihAraligi } from "@/components/TarihAraligiFiltresi";
 import { AyGezici } from "@/components/AyGezici";
-import type { Islem, IslemTuru } from "@/types/database";
+import type { Islem, IslemTuru, Musteri } from "@/types/database";
 
-type IslemVerisi = Pick<Islem, "id" | "tur" | "tutar" | "tarih" | "aciklama" | "kategori" | "telegram_gonderen"> & {
+type IslemVerisi = Pick<
+  Islem,
+  | "id"
+  | "tur"
+  | "tutar"
+  | "tarih"
+  | "aciklama"
+  | "kategori"
+  | "telegram_gonderen"
+  | "odendi"
+  | "dekont_url"
+  | "musteri_id"
+> & {
   profiller: { ad_soyad: string } | null;
+  musteri: { ad_soyad: string } | null;
 };
 
 function kimEkledi(islem: IslemVerisi): string | null {
@@ -18,21 +32,38 @@ function formatTL(tutar: number) {
   return new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(tutar);
 }
 
-function IslemSatiri({ islem }: { islem: IslemVerisi }) {
+function IslemSatiri({
+  islem,
+  duzenlenebilir,
+  musteriler,
+}: {
+  islem: IslemVerisi;
+  duzenlenebilir: boolean;
+  musteriler: Musteri[];
+}) {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [tur, setTur] = useState<IslemTuru>(islem.tur);
   const [tutar, setTutar] = useState(String(islem.tutar));
   const [tarih, setTarih] = useState(islem.tarih);
   const [aciklama, setAciklama] = useState(islem.aciklama);
   const [kategori, setKategori] = useState(islem.kategori ?? "");
+  const [musteriId, setMusteriId] = useState(islem.musteri_id ?? "");
   const [islemYapiliyor, islemBaslat] = useTransition();
   const [hata, setHata] = useState<string | null>(null);
+  const dosyaInputRef = useRef<HTMLInputElement>(null);
 
   function kaydet() {
     setHata(null);
     islemBaslat(async () => {
       try {
-        await islemGuncelle(islem.id, { tur, tutar: Number(tutar), tarih, aciklama, kategori: kategori || null });
+        await islemGuncelle(islem.id, {
+          tur,
+          tutar: Number(tutar),
+          tarih,
+          aciklama,
+          kategori: kategori || null,
+          musteriId: musteriId || null,
+        });
         setDuzenlemeModu(false);
       } catch (e) {
         setHata(e instanceof Error ? e.message : "Kaydedilemedi.");
@@ -47,6 +78,34 @@ function IslemSatiri({ islem }: { islem: IslemVerisi }) {
         await islemSil(islem.id);
       } catch (e) {
         setHata(e instanceof Error ? e.message : "Silinemedi.");
+      }
+    });
+  }
+
+  function odendiDegistir() {
+    setHata(null);
+    islemBaslat(async () => {
+      try {
+        await islemOdendiDegistir(islem.id, !islem.odendi);
+      } catch (e) {
+        setHata(e instanceof Error ? e.message : "Güncellenemedi.");
+      }
+    });
+  }
+
+  function dekontSecildi(e: React.ChangeEvent<HTMLInputElement>) {
+    const dosya = e.target.files?.[0];
+    if (!dosya) return;
+    setHata(null);
+    const formData = new FormData();
+    formData.set("dekont", dosya);
+    islemBaslat(async () => {
+      try {
+        await islemDekontYukle(islem.id, formData);
+      } catch (err) {
+        setHata(err instanceof Error ? err.message : "Dekont yüklenemedi.");
+      } finally {
+        if (dosyaInputRef.current) dosyaInputRef.current.value = "";
       }
     });
   }
@@ -89,6 +148,18 @@ function IslemSatiri({ islem }: { islem: IslemVerisi }) {
             placeholder="Açıklama"
             className="rounded-md border border-line px-3 py-2 text-sm"
           />
+          <select
+            value={musteriId}
+            onChange={(e) => setMusteriId(e.target.value)}
+            className="rounded-md border border-line px-3 py-2 text-sm"
+          >
+            <option value="">Müşteri (ops.)</option>
+            {musteriler.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.ad_soyad}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="mt-2 flex gap-2">
           <button
@@ -104,6 +175,7 @@ function IslemSatiri({ islem }: { islem: IslemVerisi }) {
               setTutar(String(islem.tutar));
               setTarih(islem.tarih);
               setAciklama(islem.aciklama);
+              setMusteriId(islem.musteri_id ?? "");
               setKategori(islem.kategori ?? "");
               setDuzenlemeModu(false);
             }}
@@ -118,34 +190,95 @@ function IslemSatiri({ islem }: { islem: IslemVerisi }) {
   }
 
   return (
-    <li className="flex items-center justify-between py-2 text-sm">
-      <div>
-        <p className="text-ink">{islem.aciklama}</p>
-        <p className="text-xs text-ink-soft/70">
-          {islem.tarih} {islem.kategori ? `· ${islem.kategori}` : ""}
-          {kimEkledi(islem) ? ` · ${kimEkledi(islem)}` : ""}
-        </p>
-        {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
+    <li className="py-2 text-sm">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-ink">{islem.aciklama}</p>
+          <p className="text-xs text-ink-soft/70">
+            {islem.tarih} {islem.kategori ? `· ${islem.kategori}` : ""}
+            {kimEkledi(islem) ? ` · ${kimEkledi(islem)}` : ""}
+            {islem.musteri && islem.musteri_id && (
+              <>
+                {" · "}
+                <Link href={`/musteriler/${islem.musteri_id}`} className="text-violet hover:underline">
+                  {islem.musteri.ad_soyad}
+                </Link>
+              </>
+            )}
+          </p>
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
+          <span className={islem.tur === "gelir" ? "text-income" : "text-expense"}>
+            {islem.tur === "gelir" ? "+" : "-"}
+            {formatTL(islem.tutar)}
+          </span>
+          {duzenlenebilir && (
+            <>
+              <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
+                Düzenle
+              </button>
+              <button onClick={sil} disabled={islemYapiliyor} className="text-xs text-expense/70 hover:text-expense">
+                Sil
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <div className="flex shrink-0 items-center gap-3">
-        <span className={islem.tur === "gelir" ? "text-income" : "text-expense"}>
-          {islem.tur === "gelir" ? "+" : "-"}
-          {formatTL(islem.tutar)}
-        </span>
-        <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
-          Düzenle
-        </button>
-        <button onClick={sil} disabled={islemYapiliyor} className="text-xs text-expense/70 hover:text-expense">
-          Sil
-        </button>
-      </div>
+
+      {islem.tur === "gider" && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+          <button
+            onClick={odendiDegistir}
+            disabled={islemYapiliyor || !duzenlenebilir}
+            className={`rounded-full px-2.5 py-1 font-medium disabled:cursor-not-allowed ${
+              islem.odendi ? "bg-income/10 text-income" : "bg-paper text-ink-soft hover:bg-line"
+            }`}
+          >
+            {islem.odendi ? "✓ Ödendi" : "Ödenmedi"}
+          </button>
+
+          {islem.dekont_url && (
+            <a
+              href={islem.dekont_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-violet hover:underline"
+            >
+              📎 Dekontu Gör
+            </a>
+          )}
+
+          {duzenlenebilir && (
+            <label className="cursor-pointer text-ink-soft hover:text-ink">
+              {islem.dekont_url ? "Dekontu Değiştir" : "Dekont Yükle"}
+              <input
+                ref={dosyaInputRef}
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={dekontSecildi}
+                disabled={islemYapiliyor}
+                className="hidden"
+              />
+            </label>
+          )}
+        </div>
+      )}
+      {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
     </li>
   );
 }
 
 type Filtre = "hepsi" | "gelir" | "gider";
 
-export function IslemlerListesi({ islemler }: { islemler: IslemVerisi[] }) {
+export function IslemlerListesi({
+  islemler,
+  duzenlenebilir,
+  musteriler,
+}: {
+  islemler: IslemVerisi[];
+  duzenlenebilir: boolean;
+  musteriler: Musteri[];
+}) {
   const [filtre, setFiltre] = useState<Filtre>("hepsi");
   const [arama, setArama] = useState("");
   const [tarihAraligi, setTarihAraligi] = useState<TarihAraligi>({ baslangic: "", bitis: "" });
@@ -202,7 +335,7 @@ export function IslemlerListesi({ islemler }: { islemler: IslemVerisi[] }) {
           <li className="py-3 text-sm text-ink-soft/70">Bu filtrede işlem yok.</li>
         )}
         {filtrelenmis.map((islem) => (
-          <IslemSatiri key={islem.id} islem={islem} />
+          <IslemSatiri key={islem.id} islem={islem} duzenlenebilir={duzenlenebilir} musteriler={musteriler} />
         ))}
       </ul>
 

@@ -4,15 +4,16 @@ import { useRef, useState, useTransition } from "react";
 import { fisiOku } from "@/app/actions/ocr";
 import { islemEkle } from "@/app/actions/islemler";
 import { bugunIstanbul as bugun } from "@/lib/tarih";
-import type { IslemTuru } from "@/types/database";
+import type { IslemTuru, Musteri } from "@/types/database";
 
-export function YeniIslemFormu() {
+export function YeniIslemFormu({ musteriler }: { musteriler: Musteri[] }) {
   const [tur, setTur] = useState<IslemTuru>("gider");
   const [tutar, setTutar] = useState("");
   const [tarih, setTarih] = useState(bugun());
   const [aciklama, setAciklama] = useState("");
   const [kategori, setKategori] = useState("");
   const [fisGorselUrl, setFisGorselUrl] = useState("");
+  const [musteriId, setMusteriId] = useState("");
 
   const [ocrOkuyor, ocrBaslat] = useTransition();
   const [ocrHata, setOcrHata] = useState<string | null>(null);
@@ -54,6 +55,7 @@ export function YeniIslemFormu() {
       formData.set("aciklama", aciklama);
       formData.set("kategori", kategori);
       formData.set("fis_gorsel_url", fisGorselUrl);
+      formData.set("musteri_id", musteriId);
 
       try {
         await islemEkle(formData);
@@ -61,6 +63,7 @@ export function YeniIslemFormu() {
         setAciklama("");
         setKategori("");
         setFisGorselUrl("");
+        setMusteriId("");
         setTarih(bugun());
         if (kameraInputRef.current) kameraInputRef.current.value = "";
         if (galeriInputRef.current) galeriInputRef.current.value = "";
@@ -165,6 +168,18 @@ export function YeniIslemFormu() {
           placeholder="Açıklama"
           className="col-span-1 rounded-md border border-line px-3 py-2 text-sm"
         />
+        <select
+          value={musteriId}
+          onChange={(e) => setMusteriId(e.target.value)}
+          className="col-span-1 rounded-md border border-line px-3 py-2 text-sm"
+        >
+          <option value="">Müşteri (ops.)</option>
+          {musteriler.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.ad_soyad}
+            </option>
+          ))}
+        </select>
         <button
           type="submit"
           disabled={gonderiliyor}

@@ -55,9 +55,9 @@ export async function kullaniciEkle(formData: FormData): Promise<KullaniciSonuc>
   }
 
   // Tetikleyici (handle_new_user) profili otomatik olusturur (varsayilan rol: on_muhasebe).
-  // Secilen rol baskan ise burada guncelliyoruz.
-  if (rol === "baskan" && data.user) {
-    await admin.from("profiller").update({ rol: "baskan" }).eq("id", data.user.id);
+  // Secilen rol varsayilandan farkliysa burada guncelliyoruz.
+  if (rol !== "on_muhasebe" && data.user) {
+    await admin.from("profiller").update({ rol }).eq("id", data.user.id);
   }
 
   revalidatePath("/ayarlar");
@@ -78,6 +78,25 @@ export async function kullaniciRolGuncelle(id: string, rol: KullaniciRolu): Prom
 
   revalidatePath("/ayarlar");
   return { basarili: "Rol güncellendi." };
+}
+
+export async function kullaniciTelegramGuncelle(id: string, chatId: string): Promise<KullaniciSonuc> {
+  if (!(await baskanMi())) {
+    return { hata: "Telegram Chat ID değiştirmeyi sadece Başkan yapabilir." };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiller")
+    .update({ telegram_chat_id: chatId.trim() || null })
+    .eq("id", id);
+
+  if (error) {
+    return { hata: error.message };
+  }
+
+  revalidatePath("/ayarlar");
+  return { basarili: "Telegram Chat ID güncellendi." };
 }
 
 export async function kullaniciSil(id: string): Promise<KullaniciSonuc> {

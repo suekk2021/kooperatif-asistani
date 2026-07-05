@@ -4,6 +4,7 @@ import { useActionState, useState, useTransition } from "react";
 import {
   kullaniciEkle,
   kullaniciRolGuncelle,
+  kullaniciTelegramGuncelle,
   kullaniciSil,
   type KullaniciSonuc,
 } from "@/app/actions/kullanicilar";
@@ -12,7 +13,9 @@ import type { KullaniciRolu, Profil } from "@/types/database";
 const bosSonuc: KullaniciSonuc = {};
 
 function rolEtiketi(rol: KullaniciRolu) {
-  return rol === "baskan" ? "Başkan" : "Ön Muhasebe Sorumlusu";
+  if (rol === "baskan") return "Başkan";
+  if (rol === "on_muhasebe") return "Ön Muhasebe Sorumlusu";
+  return "İzleyici";
 }
 
 function KullaniciSatiri({
@@ -27,12 +30,24 @@ function KullaniciSatiri({
   const [islemYapiliyor, islemBaslat] = useTransition();
   const [hata, setHata] = useState<string | null>(null);
   const [silindi, setSilindi] = useState(false);
+  const [chatId, setChatId] = useState(kullanici.telegram_chat_id ?? "");
+  const [chatIdKaydedildi, setChatIdKaydedildi] = useState(false);
 
   function rolDegistir(yeniRol: KullaniciRolu) {
     setHata(null);
     islemBaslat(async () => {
       const sonuc = await kullaniciRolGuncelle(kullanici.id, yeniRol);
       if (sonuc.hata) setHata(sonuc.hata);
+    });
+  }
+
+  function chatIdKaydet() {
+    setHata(null);
+    setChatIdKaydedildi(false);
+    islemBaslat(async () => {
+      const sonuc = await kullaniciTelegramGuncelle(kullanici.id, chatId);
+      if (sonuc.hata) setHata(sonuc.hata);
+      else setChatIdKaydedildi(true);
     });
   }
 
@@ -51,37 +66,61 @@ function KullaniciSatiri({
   if (silindi) return null;
 
   return (
-    <li className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
-      <div>
-        <p className="text-ink">
-          {kullanici.ad_soyad} {kendisiMi && <span className="text-xs text-ink-soft/70">(sen)</span>}
-        </p>
-        {hata && <p className="text-xs text-expense">{hata}</p>}
+    <li className="flex flex-col gap-2 py-2 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="text-ink">
+            {kullanici.ad_soyad} {kendisiMi && <span className="text-xs text-ink-soft/70">(sen)</span>}
+          </p>
+          {hata && <p className="text-xs text-expense">{hata}</p>}
+        </div>
+        <div className="flex items-center gap-2">
+          {baskanMi ? (
+            <select
+              value={kullanici.rol}
+              disabled={islemYapiliyor || kendisiMi}
+              onChange={(e) => rolDegistir(e.target.value as KullaniciRolu)}
+              className="rounded-md border border-line bg-card px-2 py-1 text-xs text-ink-soft disabled:opacity-50"
+            >
+              <option value="baskan">Başkan</option>
+              <option value="on_muhasebe">Ön Muhasebe Sorumlusu</option>
+              <option value="izleyici">İzleyici</option>
+            </select>
+          ) : (
+            <span className="text-xs text-ink-soft/70">{rolEtiketi(kullanici.rol)}</span>
+          )}
+          {baskanMi && !kendisiMi && (
+            <button
+              onClick={sil}
+              disabled={islemYapiliyor}
+              className="text-xs text-expense/70 hover:text-expense disabled:opacity-50"
+            >
+              Sil
+            </button>
+          )}
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        {baskanMi ? (
-          <select
-            value={kullanici.rol}
-            disabled={islemYapiliyor || kendisiMi}
-            onChange={(e) => rolDegistir(e.target.value as KullaniciRolu)}
-            className="rounded-md border border-line bg-card px-2 py-1 text-xs text-ink-soft disabled:opacity-50"
-          >
-            <option value="baskan">Başkan</option>
-            <option value="on_muhasebe">Ön Muhasebe Sorumlusu</option>
-          </select>
-        ) : (
-          <span className="text-xs text-ink-soft/70">{rolEtiketi(kullanici.rol)}</span>
-        )}
-        {baskanMi && !kendisiMi && (
+      {baskanMi && (
+        <div className="flex items-center gap-2 pl-0">
+          <input
+            value={chatId}
+            onChange={(e) => {
+              setChatId(e.target.value);
+              setChatIdKaydedildi(false);
+            }}
+            placeholder="Telegram Chat ID (not bildirimleri için)"
+            className="flex-1 rounded-md border border-line px-2 py-1 text-xs"
+          />
           <button
-            onClick={sil}
+            onClick={chatIdKaydet}
             disabled={islemYapiliyor}
-            className="text-xs text-expense/70 hover:text-expense disabled:opacity-50"
+            className="rounded-md border border-line px-2 py-1 text-xs text-ink-soft hover:bg-paper disabled:opacity-50"
           >
-            Sil
+            Kaydet
           </button>
-        )}
-      </div>
+          {chatIdKaydedildi && <span className="text-xs text-income">Kaydedildi</span>}
+        </div>
+      )}
     </li>
   );
 }
@@ -112,7 +151,7 @@ export function KullanicilarYonetimi({
       {baskanMi && (
         <form action={action} className="mt-4 space-y-3 border-t border-line pt-4">
           <p className="text-xs text-ink-soft">
-            Ön Muhasebe Sorumlusu (ya da ikinci bir Başkan) için yeni hesap oluştur.
+            Ön Muhasebe Sorumlusu, İzleyici (sadece görüntüleme) ya da ikinci bir Başkan için yeni hesap oluştur.
           </p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <input
@@ -139,6 +178,7 @@ export function KullanicilarYonetimi({
             <select name="rol" defaultValue="on_muhasebe" className="rounded-md border border-line px-3 py-2 text-sm">
               <option value="on_muhasebe">Ön Muhasebe Sorumlusu</option>
               <option value="baskan">Başkan</option>
+              <option value="izleyici">İzleyici</option>
             </select>
           </div>
           <button

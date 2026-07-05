@@ -21,7 +21,13 @@ function kimEkledi(hatirlatici: HatirlaticiVerisi): string | null {
   return hatirlatici.telegram_gonderen ?? hatirlatici.profiller?.ad_soyad ?? null;
 }
 
-function HatirlaticiSatiri({ hatirlatici }: { hatirlatici: HatirlaticiVerisi }) {
+function HatirlaticiSatiri({
+  hatirlatici,
+  duzenlenebilir,
+}: {
+  hatirlatici: HatirlaticiVerisi;
+  duzenlenebilir: boolean;
+}) {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [baslik, setBaslik] = useState(hatirlatici.baslik);
   const [tarih, setTarih] = useState(hatirlatici.hatirlatma_tarihi);
@@ -107,9 +113,9 @@ function HatirlaticiSatiri({ hatirlatici }: { hatirlatici: HatirlaticiVerisi }) 
       <div className="flex items-start gap-3">
         <button
           onClick={tamamlandiDegistir}
-          disabled={islemYapiliyor}
+          disabled={islemYapiliyor || !duzenlenebilir}
           aria-label={hatirlatici.tamamlandi ? "Tamamlanmadı olarak işaretle" : "Tamamlandı olarak işaretle"}
-          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs transition-colors ${
+          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
             hatirlatici.tamamlandi
               ? "border-pine bg-pine text-white"
               : "border-line bg-card hover:border-ochre"
@@ -128,21 +134,29 @@ function HatirlaticiSatiri({ hatirlatici }: { hatirlatici: HatirlaticiVerisi }) 
           {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
         </div>
       </div>
-      <div className="flex shrink-0 gap-3">
-        <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
-          Düzenle
-        </button>
-        <button onClick={sil} disabled={islemYapiliyor} className="text-xs text-expense/70 hover:text-expense">
-          Sil
-        </button>
-      </div>
+      {duzenlenebilir && (
+        <div className="flex shrink-0 gap-3">
+          <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
+            Düzenle
+          </button>
+          <button onClick={sil} disabled={islemYapiliyor} className="text-xs text-expense/70 hover:text-expense">
+            Sil
+          </button>
+        </div>
+      )}
     </li>
   );
 }
 
 type Filtre = "hepsi" | "aktif" | "tamamlanan";
 
-export function HatirlaticilarListesi({ hatirlaticilar }: { hatirlaticilar: HatirlaticiVerisi[] }) {
+export function HatirlaticilarListesi({
+  hatirlaticilar,
+  duzenlenebilir,
+}: {
+  hatirlaticilar: HatirlaticiVerisi[];
+  duzenlenebilir: boolean;
+}) {
   const [filtre, setFiltre] = useState<Filtre>("aktif");
   const [tarihAraligi, setTarihAraligi] = useState<TarihAraligi>({ baslangic: "", bitis: "" });
 
@@ -179,7 +193,7 @@ export function HatirlaticilarListesi({ hatirlaticilar }: { hatirlaticilar: Hati
           <li className="py-3 text-sm text-ink-soft/70">Bu filtrede hatırlatıcı yok.</li>
         )}
         {filtrelenmis.map((h) => (
-          <HatirlaticiSatiri key={h.id} hatirlatici={h} />
+          <HatirlaticiSatiri key={h.id} hatirlatici={h} duzenlenebilir={duzenlenebilir} />
         ))}
       </ul>
     </div>
