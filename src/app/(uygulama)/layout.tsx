@@ -47,6 +47,9 @@ export default async function UygulamaLayout({ children }: { children: React.Rea
             <Link href="/notlar" className="hover:text-white">
               Notlar
             </Link>
+            <Link href="/raporlar" className="hover:text-white">
+              Rapor
+            </Link>
           </nav>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
