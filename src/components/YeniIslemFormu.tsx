@@ -6,14 +6,23 @@ import { islemEkle } from "@/app/actions/islemler";
 import { bugunIstanbul as bugun } from "@/lib/tarih";
 import type { IslemTuru, Musteri } from "@/types/database";
 
-export function YeniIslemFormu({ musteriler }: { musteriler: Musteri[] }) {
+export function YeniIslemFormu({
+  musteriler = [],
+  sabitMusteriId,
+  baslik = "Yeni İşlem",
+}: {
+  musteriler?: Musteri[];
+  /** Verilirse müşteri seçilemez, işlem doğrudan bu müşteriye bağlanır (ör. müşteri kartından ekleme). */
+  sabitMusteriId?: string;
+  baslik?: string;
+}) {
   const [tur, setTur] = useState<IslemTuru>("gider");
   const [tutar, setTutar] = useState("");
   const [tarih, setTarih] = useState(bugun());
   const [aciklama, setAciklama] = useState("");
   const [kategori, setKategori] = useState("");
   const [fisGorselUrl, setFisGorselUrl] = useState("");
-  const [musteriId, setMusteriId] = useState("");
+  const [musteriId, setMusteriId] = useState(sabitMusteriId ?? "");
 
   const [ocrOkuyor, ocrBaslat] = useTransition();
   const [ocrHata, setOcrHata] = useState<string | null>(null);
@@ -63,7 +72,7 @@ export function YeniIslemFormu({ musteriler }: { musteriler: Musteri[] }) {
         setAciklama("");
         setKategori("");
         setFisGorselUrl("");
-        setMusteriId("");
+        setMusteriId(sabitMusteriId ?? "");
         setTarih(bugun());
         if (kameraInputRef.current) kameraInputRef.current.value = "";
         if (galeriInputRef.current) galeriInputRef.current.value = "";
@@ -75,7 +84,7 @@ export function YeniIslemFormu({ musteriler }: { musteriler: Musteri[] }) {
 
   return (
     <div className="rounded-xl border border-line bg-card p-5">
-      <h2 className="text-sm font-semibold text-ink">Yeni İşlem</h2>
+      <h2 className="text-sm font-semibold text-ink">{baslik}</h2>
 
       <div className="mt-3 rounded-md bg-paper p-3">
         <div className="flex flex-wrap gap-2">
@@ -168,18 +177,20 @@ export function YeniIslemFormu({ musteriler }: { musteriler: Musteri[] }) {
           placeholder="Açıklama"
           className="col-span-1 rounded-md border border-line px-3 py-2 text-sm"
         />
-        <select
-          value={musteriId}
-          onChange={(e) => setMusteriId(e.target.value)}
-          className="col-span-1 rounded-md border border-line px-3 py-2 text-sm"
-        >
-          <option value="">Müşteri (ops.)</option>
-          {musteriler.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.ad_soyad}
-            </option>
-          ))}
-        </select>
+        {!sabitMusteriId && (
+          <select
+            value={musteriId}
+            onChange={(e) => setMusteriId(e.target.value)}
+            className="col-span-1 rounded-md border border-line px-3 py-2 text-sm"
+          >
+            <option value="">Müşteri (ops.)</option>
+            {musteriler.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.ad_soyad}
+              </option>
+            ))}
+          </select>
+        )}
         <button
           type="submit"
           disabled={gonderiliyor}

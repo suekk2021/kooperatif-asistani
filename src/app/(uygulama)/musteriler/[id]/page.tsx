@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { mevcutRol, duzenlemeYetkisiVarMi } from "@/lib/rol";
 import { musteriGetir } from "@/app/actions/musteriler";
 import { MusteriDetayFormu } from "@/components/MusteriDetayFormu";
+import { YeniIslemFormu } from "@/components/YeniIslemFormu";
 
 function formatTL(tutar: number) {
   return new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(tutar);
@@ -56,12 +57,16 @@ export default async function MusteriDetayPage({ params }: { params: Promise<{ i
         </p>
       </div>
 
+      {duzenlenebilir && (
+        <YeniIslemFormu sabitMusteriId={id} baslik="Bu Müşteriye Gelir/Gider Ekle" />
+      )}
+
       <div className="rounded-xl border border-line bg-card p-5">
         <h2 className="mb-3 text-sm font-semibold text-ink">Bu Müşteriyle İlgili İşlemler</h2>
         <ul className="divide-y divide-line">
           {liste.length === 0 && (
             <li className="py-3 text-sm text-ink-soft/70">
-              Bu müşteriye bağlı işlem yok. Gelir/Gider sayfasından işlem eklerken bu müşteriyi seçebilirsin.
+              Bu müşteriye bağlı işlem yok. Yukarıdan ekleyebilir ya da Gelir/Gider sayfasından işlem eklerken bu müşteriyi seçebilirsin.
             </li>
           )}
           {liste.map((i) => (

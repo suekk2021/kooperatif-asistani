@@ -44,6 +44,7 @@ export async function islemEkle(formData: FormData): Promise<void> {
 
   revalidatePath("/islemler");
   revalidatePath("/dashboard");
+  if (musteriId) revalidatePath(`/musteriler/${musteriId}`);
 }
 
 export type IslemGuncelleGirdi = {
@@ -85,6 +86,7 @@ export async function islemGuncelle(id: string, girdi: IslemGuncelleGirdi): Prom
 
   revalidatePath("/islemler");
   revalidatePath("/dashboard");
+  if (girdi.musteriId) revalidatePath(`/musteriler/${girdi.musteriId}`);
 }
 
 export async function islemSil(id: string): Promise<void> {
