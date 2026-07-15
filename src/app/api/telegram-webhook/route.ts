@@ -167,6 +167,19 @@ export async function POST(request: NextRequest) {
 
   const botToken = ayarlar.telegram_bot_token;
   const chatId = gelenChatId;
+
+  // Odeme gecikmesi gibi durumlarda hizmeti tamamen duraklatmak icin (bkz.
+  // hazirlik-hizmet-durduruldu.html). HIZMET_DURDURULDU=true iken normal is
+  // akisi hic islenmez, sadece sabit bir bilgilendirme yaniti donulur.
+  if (process.env.HIZMET_DURDURULDU === "true") {
+    await telegramMesajGonder(
+      botToken,
+      chatId,
+      "⏸️ Hizmetiniz geçici olarak durdurulmuştur.\n\nSistemin kullandığı yapay zeka araçları ve sunucu hizmet sağlayıcısına yapılan ödemede yaşanan gecikme nedeniyle erişiminiz durdurulmuştur. Gerekli ödeme tamamlandığında hizmetiniz yeniden aktif hale getirilecektir.\n\nSorularınız için lütfen ilgili yetkiliyle iletişime geçin."
+    );
+    return NextResponse.json({ ok: true });
+  }
+
   const gonderenIsim = telegramGondereniBul(ayarlar.telegram_chat_id, gelenChatId) ?? gelenChatId;
   const yzAyarlari: YapayZekaAyarlari | null =
     ayarlar.ocr_saglayici === "gemini" && ayarlar.gemini_api_key

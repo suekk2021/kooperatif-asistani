@@ -80,6 +80,9 @@ async function hedefeTelegramBildirimiGonder(
     .single();
 
   if (!hedef?.telegram_chat_id) return;
+  // Odeme gecikmesi gibi durumlarda hizmeti tamamen duraklatmak icin (bkz.
+  // telegram-webhook/route.ts ve hatirlatma-kontrol/route.ts).
+  if (process.env.HIZMET_DURDURULDU === "true") return;
 
   const { data: gonderen } = await supabase.from("profiller").select("ad_soyad").eq("id", gonderenId).single();
   const { data: ayarlar } = await supabase.from("ayarlar").select("telegram_bot_token").eq("id", true).single();

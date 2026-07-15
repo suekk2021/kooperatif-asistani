@@ -14,6 +14,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ hata: "Yetkisiz." }, { status: 401 });
   }
 
+  // Odeme gecikmesi gibi durumlarda hizmeti tamamen duraklatmak icin (bkz.
+  // hazirlik-hizmet-durduruldu.html ve telegram-webhook/route.ts).
+  if (process.env.HIZMET_DURDURULDU === "true") {
+    return NextResponse.json({ mesaj: "Hizmet geçici olarak durduruldu, hatırlatıcı gönderilmedi." });
+  }
+
   const supabase = createAdminClient();
   const { data: ayarlar } = await supabase
     .from("ayarlar")
