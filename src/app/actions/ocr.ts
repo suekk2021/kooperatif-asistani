@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { fisVerisiCikar } from "@/lib/fis";
 import type { IslemTuru } from "@/types/database";
 
@@ -29,7 +30,8 @@ export async function fisiOku(formData: FormData): Promise<FisOkumaSonucu> {
     return { hata: "Bir fiş fotoğrafı seçmelisin." };
   }
 
-  const { data: ayarlar } = await supabase
+  // API anahtarları tarayıcıya kapalı; sadece sunucu okur (migration 20261110230000).
+  const { data: ayarlar } = await createAdminClient()
     .from("ayarlar")
     .select("ocr_saglayici, gemini_api_key, openai_api_key")
     .eq("id", true)

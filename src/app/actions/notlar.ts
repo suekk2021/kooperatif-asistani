@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { telegramMesajGonder } from "@/lib/telegram";
 
 export async function notGuncelle(id: string, icerik: string): Promise<void> {
@@ -82,7 +83,8 @@ async function hedefeTelegramBildirimiGonder(
   if (!hedef?.telegram_chat_id) return;
 
   const { data: gonderen } = await supabase.from("profiller").select("ad_soyad").eq("id", gonderenId).single();
-  const { data: ayarlar } = await supabase.from("ayarlar").select("telegram_bot_token").eq("id", true).single();
+  // Bot anahtarı tarayıcıya kapalı; sadece sunucu okur (migration 20261110230000).
+  const { data: ayarlar } = await createAdminClient().from("ayarlar").select("telegram_bot_token").eq("id", true).single();
 
   if (!ayarlar?.telegram_bot_token) return;
 

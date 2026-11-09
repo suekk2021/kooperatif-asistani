@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { anahtarGecerliMi } from "@/lib/ai";
 import { yoneticiMi } from "@/lib/rol";
 import type { KullaniciRolu, OcrSaglayici } from "@/types/database";
@@ -12,13 +13,31 @@ export type AyarlarSonuc = { hata?: string; basarili?: string };
 // ve anahtarin girilip girilmedigi (has-key) bilgisi doner.
 export async function ayarDurumuGetir() {
   const supabase = await createClient();
-  const { data } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  // Anahtar sütunları tarayıcıya kapalı (migration 20261110230000); sadece sunucu servis
+  // anahtarıyla okur, dışarıya yalnızca "girilmiş mi" bilgisi döner.
+  const { data } = await createAdminClient()
     .from("ayarlar")
     .select(
       "ocr_saglayici, gemini_api_key, openai_api_key, telegram_bot_token, telegram_chat_id, muhasebeci_email, kurum_adi, logo_url, asistan_promptu"
     )
     .eq("id", true)
     .single();
+  if (!user) {
+    return {
+      ocrSaglayici: "gemini" as OcrSaglayici,
+      geminiAnahtarVar: false,
+      openaiAnahtarVar: false,
+      telegramAyarliMi: false,
+      telegramChatIdler: "",
+      muhasebeciEmail: "",
+      kurumAdi: "Suluova Üreten Eller Kadın Kooperatifi",
+      logoUrl: null,
+      asistanPromptu: "",
+    };
+  }
 
   return {
     ocrSaglayici: (data?.ocr_saglayici ?? "gemini") as OcrSaglayici,
