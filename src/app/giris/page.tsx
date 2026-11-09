@@ -11,28 +11,23 @@ export default async function GirisPage({
   const kurum = await kurumKimligiGetir();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-pine px-4">
+    <div className="flex min-h-screen items-center justify-center bg-pine-deep px-4">
       <form
         action={girisYap}
         className="w-full max-w-sm space-y-5 rounded-2xl border border-line bg-card p-8 shadow-xl shadow-black/10"
       >
         <div className="flex flex-col items-center text-center">
-          {kurum.logo_url ? (
-            <Image
-              src={kurum.logo_url}
-              alt={kurum.kurum_adi}
-              width={64}
-              height={64}
-              className="mb-3 h-16 w-16 rounded-full object-cover"
-              unoptimized
-            />
-          ) : (
-            <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-ochre/15 text-2xl">
-              🧺
-            </div>
-          )}
-          <h1 className="font-baslik text-xl font-bold text-ink">Kooperatif Asistanı</h1>
-          <p className="mt-1 text-sm text-ink-soft">{kurum.kurum_adi}</p>
+          <Image
+            src={kurum.logo_url ?? "/logo.png"}
+            alt={kurum.kurum_adi}
+            width={72}
+            height={72}
+            className="mb-3 h-[72px] w-[72px] rounded-full bg-white object-cover p-0.5"
+            unoptimized
+          />
+          <h1 className="text-2xl font-extrabold tracking-[4px] text-ink">İMECE</h1>
+          <p className="mt-1 text-sm font-semibold text-ink-soft">{kurum.kurum_adi}</p>
+          <p className="mt-0.5 text-xs text-ink-soft">Üretim · Muhasebe · İş Takibi</p>
         </div>
 
         {hata && (

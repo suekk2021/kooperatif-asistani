@@ -14,7 +14,8 @@ export default async function NotlarPage() {
       .from("notlar")
       .select("id, icerik, kaynak, created_at, telegram_gonderen, hedef_kullanici_id, hedef:profiller!hedef_kullanici_id(ad_soyad)")
       .order("created_at", { ascending: false }),
-    supabase.from("profiller").select("id, ad_soyad").order("ad_soyad", { ascending: true }),
+    // Teknik destek hesabı operasyonda kişi olarak seçilmez (bkz. lib/roller.ts).
+    supabase.from("profiller").select("id, ad_soyad").neq("rol", "destek").order("ad_soyad", { ascending: true }),
   ]);
 
   const notlarDuz = (notlar ?? []).map((n) => ({

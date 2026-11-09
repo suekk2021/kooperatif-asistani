@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { anahtarGecerliMi } from "@/lib/ai";
-import type { OcrSaglayici } from "@/types/database";
+import { yoneticiMi } from "@/lib/rol";
+import type { KullaniciRolu, OcrSaglayici } from "@/types/database";
 
 export type AyarlarSonuc = { hata?: string; basarili?: string };
 
@@ -48,8 +49,8 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
     .eq("id", user.id)
     .single();
 
-  if (profil?.rol !== "baskan") {
-    return { hata: "Bu ayarları sadece Başkan değiştirebilir." };
+  if (!yoneticiMi((profil?.rol as KullaniciRolu) ?? null)) {
+    return { hata: "Bu ayarları sadece Başkan veya Operasyon yöneticisi değiştirebilir." };
   }
 
   const ocrSaglayici = String(formData.get("ocr_saglayici") ?? "gemini") as OcrSaglayici;

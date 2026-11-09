@@ -2,15 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { telegramMesajGonder, telegramDosyaIndir, chatIdListesiCikar, telegramGondereniBul } from "@/lib/telegram";
 import { jsonUret, sesiMetneCevir, type YapayZekaAyarlari } from "@/lib/ai";
-import { fisVerisiCikar } from "@/lib/fis";
-import { bugunIstanbul, ayBasiIstanbul } from "@/lib/tarih";
+import { bugunIstanbul } from "@/lib/tarih";
 
 const KURUM_ADI = "Suluova Üreten Eller Kadın Kooperatifi";
-const KARSILAMA = `Merhaba! Ben ${KURUM_ADI}'nin sanal asistanıyım. Size nasıl yardımcı olabilirim?\n\nBana şunları yapabilirsiniz:\n• "özet" yazıp bu ayın durumunu sorabilirsiniz\n• Bir hatırlatıcıyı yazılı ya da sesli olarak söyleyebilirsiniz ("15 Temmuz'da kira ödemesi hatırlat" gibi)\n• Serbest bir not bırakabilirsiniz\n• Bir fiş/fatura fotoğrafı gönderip otomatik kaydettirebilirsiniz`;
-
-function formatTL(tutar: number) {
-  return new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(tutar);
-}
+const KARSILAMA = `Merhaba! Ben ${KURUM_ADI}'nin sanal asistanıyım. Size nasıl yardımcı olabilirim?\n\nBana şunları yapabilirsiniz:\n• "özet" yazıp genel durumu sorabilirsiniz\n• Bir hatırlatıcıyı yazılı ya da sesli olarak söyleyebilirsiniz ("15 Temmuz'da kira ödemesi hatırlat" gibi)\n• Serbest bir not bırakabilirsiniz\n• (Yakında) fatura fotoğrafı gönderip alış kaydı oluşturabileceksiniz`;
 
 const ASISTAN_SEMASI = {
   type: "object",
@@ -32,7 +27,7 @@ const ASISTAN_SEMASI = {
       description:
         "Kullanıcıya verilecek cevap. Sıcak ama SOMUT ve BİLGİLENDİRİCİ ol - 'nasıl yardımcı olabilirim' gibi " +
         "muğlak, geri sorulu cümlelerle geçiştirme. 'Sen kimsin/ne yapabilirsin' gibi bir soruya kim olduğunu " +
-        "ve tam olarak hangi 4 şeyi yapabildiğini (özet, hatırlatıcı, not, fiş okuma) somut örneklerle anlat. " +
+        "ve tam olarak hangi 4 şeyi yapabildiğini (özet, hatırlatıcı, not, sesli mesaj) somut örneklerle anlat. " +
         "Asla sayısal mali veri (tutar, bakiye vb.) UYDURMA - onları sen değil sistem ekler.",
     },
   },
@@ -43,11 +38,11 @@ const ASISTAN_KIMLIGI =
   `Sen ${KURUM_ADI}'nin Telegram üzerinden çalışan kişisel asistanısın. Başkan ve Ön Muhasebe Sorumlusu ` +
   `seninle kendi Telegram hesaplarından doğrudan konuşuyor. Sıcak ama net, öz ve kendinden emin bir üslubun var - ` +
   `belirsiz, geçiştirici, "nasıl yardımcı olabilirim" tarzı boş cümleler kurmazsın; ne yapabildiğini somut olarak bilirsin.\n\n` +
-  `Yapabildiklerin, tam olarak dört şey:\n` +
-  `1) ÖZET: "özet" veya "durum" yazınca bu ayın gerçek gelir/gider/net rakamlarını ve yaklaşan hatırlatıcıları anında verirsin.\n` +
+  `Yapabildiklerin:\n` +
+  `1) ÖZET: "özet" veya "durum" yazınca kayıtlı kart sayılarını ve yaklaşan hatırlatıcıları anında verirsin.\n` +
   `2) HATIRLATICI: "15 Temmuz'da kira ödemesi hatırlat" gibi tarihli bir talebi otomatik kaydedersin, günü gelince Telegram'dan haber verirsin.\n` +
   `3) NOT: tarihsiz, serbest bir bilgiyi not olarak kaydedersin.\n` +
-  `4) FİŞ/FATURA OKUMA: gönderilen bir fotoğrafı okuyup tutar/tarih/açıklama/kategoriyi çıkarıp gelir-gider kaydına otomatik işlersin; sesli mesajları da anlayıp aynı şekilde işlersin.\n\n` +
+  `4) SESLİ MESAJ: hatırlatıcı ve notları sesli mesajdan da anlarsın. Fatura fotoğrafından alış kaydı yakında açılacak; şu an fotoğraf işlemezsin, sorulursa bunu dürüstçe söyle.\n\n` +
   `"Sen kimsin", "ne yapabilirsin", "yeteneklerin ne" gibi bir soru geldiğinde bu dört maddeyi somut, kısa örneklerle ` +
   `anlat - genel geçer bir "asistanım, size yardımcı olurum" cevabı verme.`;
 
@@ -62,10 +57,17 @@ function asistanPromptOlustur(girdiMetni: string, ozelPrompt: string | null | un
   );
 }
 
+// İMECE geçişi: para/stok özeti Kasa ve Alış ekranları bitince eklenecek; şimdilik
+// kayıtlı kart sayıları ve hatırlatıcılar.
 async function ozetMetniOlustur(supabase: ReturnType<typeof createAdminClient>) {
-  const ayBasiStr = ayBasiIstanbul();
-  const [{ data: buAyIslemler }, { data: yaklasanHatirlaticilar }] = await Promise.all([
-    supabase.from("islemler").select("tur, tutar").gte("tarih", ayBasiStr),
+  const say = (tablo: string, tur?: string) => {
+    const sorgu = supabase.from(tablo).select("id", { count: "exact", head: true }).eq("aktif", true);
+    return (tur ? sorgu.eq("tur", tur) : sorgu).then((r) => r.count ?? 0);
+  };
+  const [musteri, tedarikci, stokKarti, { data: yaklasanHatirlaticilar }] = await Promise.all([
+    say("cariler", "musteri"),
+    say("cariler", "tedarikci"),
+    say("stok_kartlari"),
     supabase
       .from("hatirlaticilar")
       .select("baslik, hatirlatma_tarihi")
@@ -74,19 +76,14 @@ async function ozetMetniOlustur(supabase: ReturnType<typeof createAdminClient>) 
       .limit(5),
   ]);
 
-  const gelir = (buAyIslemler ?? []).filter((i) => i.tur === "gelir").reduce((t, i) => t + i.tutar, 0);
-  const gider = (buAyIslemler ?? []).filter((i) => i.tur === "gider").reduce((t, i) => t + i.tutar, 0);
-  const net = gelir - gider;
-
   const hatirlaticiSatirlari = (yaklasanHatirlaticilar ?? [])
     .map((h) => `• ${h.baslik} (${h.hatirlatma_tarihi})`)
     .join("\n");
 
   return (
-    `📊 <b>Bu Ay Özet</b>\n` +
-    `Gelir: ${formatTL(gelir)}\n` +
-    `Gider: ${formatTL(gider)}\n` +
-    `Net: ${formatTL(net)}\n\n` +
+    `📊 <b>İMECE Özet</b>\n` +
+    `Müşteri: ${musteri} · Tedarikçi: ${tedarikci} · Stok kartı: ${stokKarti}\n` +
+    `Kasa, alacak ve fire özeti yeni ekranlar tamamlanınca burada olacak.\n\n` +
     `🔔 <b>Yaklaşan Hatırlatıcılar</b>\n` +
     (hatirlaticiSatirlari || "Yaklaşan hatırlatıcı yok.")
   );
@@ -168,18 +165,6 @@ export async function POST(request: NextRequest) {
   const botToken = ayarlar.telegram_bot_token;
   const chatId = gelenChatId;
 
-  // Odeme gecikmesi gibi durumlarda hizmeti tamamen duraklatmak icin (bkz.
-  // hazirlik-hizmet-durduruldu.html). HIZMET_DURDURULDU=true iken normal is
-  // akisi hic islenmez, sadece sabit bir bilgilendirme yaniti donulur.
-  if (process.env.HIZMET_DURDURULDU === "true") {
-    await telegramMesajGonder(
-      botToken,
-      chatId,
-      "⏸️ Hizmetiniz geçici olarak durdurulmuştur.\n\nSistemin kullandığı yapay zeka araçları ve sunucu hizmet sağlayıcısına yapılan ödemede yaşanan gecikme nedeniyle erişiminiz durdurulmuştur. Gerekli ödeme tamamlandığında hizmetiniz yeniden aktif hale getirilecektir.\n\nSorularınız için lütfen ilgili yetkiliyle iletişime geçin."
-    );
-    return NextResponse.json({ ok: true });
-  }
-
   const gonderenIsim = telegramGondereniBul(ayarlar.telegram_chat_id, gelenChatId) ?? gelenChatId;
   const yzAyarlari: YapayZekaAyarlari | null =
     ayarlar.ocr_saglayici === "gemini" && ayarlar.gemini_api_key
@@ -246,40 +231,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
+    // Eski gelir/gider kaydı kaldırıldı; fatura fotoğrafı Alış ekranı bitince
+    // "alış taslağı"na dönüşecek.
     if (mesaj.photo && mesaj.photo.length > 0) {
-      if (!yzAyarlari) {
-        await telegramMesajGonder(botToken, chatId, "Fiş okumak için Ayarlar'dan bir API anahtarı eklemelisiniz.");
-        return NextResponse.json({ ok: true });
-      }
-
-      // Telegram ayni fotografi birden fazla cozunurlukte gonderir, sonuncusu (en buyugu) alinir.
-      const enBuyukFoto = mesaj.photo[mesaj.photo.length - 1];
-      const { base64, mimeType } = await telegramDosyaIndir(botToken, enBuyukFoto.file_id);
-      const fis = await fisVerisiCikar(yzAyarlari, base64, mimeType);
-
-      if (!fis.tutar || !fis.tarih || !fis.aciklama) {
-        await telegramMesajGonder(botToken, chatId, "Fişi okuyamadım, tutarı/tarihi net seçemedim. Web panelinden elle girer misiniz?");
-        return NextResponse.json({ ok: true });
-      }
-
-      await supabase.from("islemler").insert({
-        tur: fis.tur,
-        tutar: fis.tutar,
-        tarih: fis.tarih,
-        aciklama: fis.aciklama,
-        kategori: fis.kategori ?? null,
-        fis_gorsel_url: null,
-        ocr_ham_metin: null,
-        olusturan: null,
-        telegram_gonderen: gonderenIsim,
-      });
-
       await telegramMesajGonder(
         botToken,
         chatId,
-        `✅ Fişi kaydettim.\n${fis.tur === "gelir" ? "Gelir" : "Gider"}: ${formatTL(fis.tutar)}\nTarih: ${fis.tarih}\nAçıklama: ${fis.aciklama}${
-          fis.kategori ? `\nKategori: ${fis.kategori}` : ""
-        }`
+        "📷 Fatura fotoğrafından kayıt, yeni Alış ekranı tamamlanınca açılacak. Şimdilik faturayı web panelinden girebilirsiniz."
       );
       return NextResponse.json({ ok: true });
     }

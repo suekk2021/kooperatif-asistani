@@ -9,18 +9,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Odeme gecikmesi gibi durumlarda web panelini tamamen kilitler - oturum
-  // kontrolunden ONCE calisir, giris sayfasi dahil butun sayfalarda gecerlidir.
-  // Hazir sayfaya (public/hizmet-durduruldu.html) yonlendirir. O sayfanin
-  // kendisi icin asagidaki oturum kontrolune hic girmeden direkt gecilir,
-  // aksi halde /giris'e tekrar yonlendirilip sonsuz donguye giriyordu.
-  if (process.env.HIZMET_DURDURULDU === "true") {
-    if (request.nextUrl.pathname === "/hizmet-durduruldu.html") {
-      return NextResponse.next();
-    }
-    return NextResponse.redirect(new URL("/hizmet-durduruldu.html", request.url));
-  }
-
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

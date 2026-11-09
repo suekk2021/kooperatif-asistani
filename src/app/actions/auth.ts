@@ -14,7 +14,7 @@ export async function girisYap(formData: FormData) {
     redirect(`/giris?hata=${encodeURIComponent(error.message)}`);
   }
 
-  redirect("/dashboard");
+  redirect("/panel");
 }
 
 export async function cikisYap() {

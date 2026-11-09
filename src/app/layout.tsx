@@ -1,24 +1,27 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Work_Sans } from "next/font/google";
+import { Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const baslikFontu = Bricolage_Grotesque({
-  variable: "--font-baslik",
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+const govdeFontu = Manrope({
+  variable: "--font-govde",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-const govdeFontu = Work_Sans({
-  variable: "--font-govde",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const kodFontu = JetBrains_Mono({
+  variable: "--font-kod",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Kooperatif Asistanı — Suluova Üreten Eller Kadın Kooperatifi",
-  description:
-    "Suluova Üreten Eller Kadın Kooperatifi için gelir-gider, hatırlatıcı ve Telegram asistanlı yönetim programı.",
+  title: "İMECE · Suluova Üreten Eller",
+  description: "Suluova Üreten Eller Kadın Kooperatifi — üretim, muhasebe ve iş takibi.",
+  icons: { icon: "/logo.png" },
 };
+
+// Sayfa çizilmeden önce tema seçilsin (aksi halde karanlık modda bir an beyaz parlar).
+const temaBetigi = `(function(){var t=null;try{t=localStorage.getItem('imece-tema')}catch(e){}if(!t)t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)})();`;
 
 export default function RootLayout({
   children,
@@ -26,11 +29,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="tr"
-      className={`${baslikFontu.variable} ${govdeFontu.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-paper text-ink">{children}</body>
+    <html lang="tr" className={`${govdeFontu.variable} ${kodFontu.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: temaBetigi }} />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

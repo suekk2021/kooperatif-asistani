@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { rolBilgisi } from "@/lib/roller";
 import type { KullaniciRolu } from "@/types/database";
 
 /** Giris yapan kullanicinin rolunu dondurur (yoksa null). */
@@ -13,7 +14,12 @@ export async function mevcutRol(): Promise<KullaniciRolu | null> {
   return (data?.rol as KullaniciRolu) ?? null;
 }
 
-/** Izleyici disindaki roller kayit ekleyip duzenleyebilir/silebilir. */
+/** Kayıt girebilen roller (izleyici ve muhasebeci hariç). Veritabanında yazabilir() ile aynı. */
 export function duzenlemeYetkisiVarMi(rol: KullaniciRolu | null): boolean {
-  return rol !== null && rol !== "izleyici";
+  return Boolean(rolBilgisi(rol)?.yazar);
+}
+
+/** Kişi ekleyen, ayarları değiştiren roller (başkan, operasyon). Veritabanında yonetici_mi() ile aynı. */
+export function yoneticiMi(rol: KullaniciRolu | null): boolean {
+  return Boolean(rolBilgisi(rol)?.yonetici);
 }

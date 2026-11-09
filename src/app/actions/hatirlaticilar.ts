@@ -32,7 +32,7 @@ export async function hatirlaticiEkle(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/hatirlaticilar");
-  revalidatePath("/dashboard");
+  revalidatePath("/panel");
 }
 
 export async function hatirlaticiTamamlandiDegistir(id: string, tamamlandi: boolean): Promise<void> {
@@ -44,7 +44,7 @@ export async function hatirlaticiTamamlandiDegistir(id: string, tamamlandi: bool
   }
 
   revalidatePath("/hatirlaticilar");
-  revalidatePath("/dashboard");
+  revalidatePath("/panel");
 }
 
 export async function hatirlaticiGuncelle(
@@ -67,7 +67,7 @@ export async function hatirlaticiGuncelle(
   }
 
   revalidatePath("/hatirlaticilar");
-  revalidatePath("/dashboard");
+  revalidatePath("/panel");
 }
 
 export async function hatirlaticiSil(id: string): Promise<void> {
@@ -79,5 +79,5 @@ export async function hatirlaticiSil(id: string): Promise<void> {
   }
 
   revalidatePath("/hatirlaticilar");
-  revalidatePath("/dashboard");
+  revalidatePath("/panel");
 }

@@ -1,62 +1,37 @@
 @import "tailwindcss";
+@import "./imece.css";
 
-:root {
-  /* Suluova Üreten Eller Kadın Kooperatifi — kimlik renkleri */
-  --ink: #2a2419;
-  --ink-soft: #5b5240;
-  --paper: #f3efe4;
-  --card: #ffffff;
-  --line: #e3ddcb;
-
-  --pine: #3f5744;
-  --pine-deep: #2b3d31;
-
-  --ochre: #c17f17;
-  --ochre-deep: #8c5a0f;
-
-  --income: #2f7a4f;
-  --expense: #b0402e;
-}
-
+/* Notlar, Hatırlatıcılar, Ayarlar gibi eski (Tailwind ile yazılmış) ekranlar
+   yeni İMECE renklerini kullansın diye eski adlar yeni değişkenlere bağlandı. */
 @theme inline {
-  --font-baslik: var(--font-baslik);
+  --font-baslik: var(--font-govde);
   --font-govde: var(--font-govde);
 
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-paper: var(--paper);
-  --color-card: var(--card);
-  --color-line: var(--line);
+  --color-ink: var(--metin);
+  --color-ink-soft: var(--soluk);
+  --color-paper: var(--zemin);
+  --color-card: var(--kart);
+  --color-line: var(--cizgi);
 
-  --color-pine: var(--pine);
-  --color-pine-deep: var(--pine-deep);
+  --color-pine: var(--mavi);
+  --color-pine-deep: var(--lacivert);
 
-  --color-ochre: var(--ochre);
-  --color-ochre-deep: var(--ochre-deep);
+  --color-ochre: var(--amber);
+  --color-ochre-deep: var(--amber);
 
-  --color-income: var(--income);
-  --color-expense: var(--expense);
+  --color-income: var(--turkuaz);
+  --color-expense: var(--mercan);
 }
 
-html {
-  /* Varsayılan 16px yerine biraz daha büyük - telefonda okunurluk için
-     (Tailwind'in rem tabanlı boyutları buna göre orantılı büyür). */
-  font-size: 17.5px;
+/* Karanlık modda --mavi açık tona döner (yazı/bağlantı için); düğme zemininde
+   beyaz yazı okunsun diye taslaktaki gibi koyu mavi kalır. */
+[data-theme="dark"] .bg-pine {
+  background-color: #1d63b8;
+}
+[data-theme="dark"] .hover\:bg-pine-deep:hover {
+  background-color: #2a72cc;
 }
 
-body {
-  font-family: var(--font-govde), system-ui, sans-serif;
-}
-
-h1,
-h2,
-h3,
-.font-baslik {
-  font-family: var(--font-baslik), system-ui, sans-serif;
-  text-wrap: balance;
-}
-
-/* Tutar/tarih gibi rakamlar hep hizali dursun */
 .tabular {
   font-variant-numeric: tabular-nums;
 }

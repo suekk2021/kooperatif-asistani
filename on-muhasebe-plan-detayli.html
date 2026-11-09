@@ -1,0 +1,358 @@
+<style>
+  :root {
+    --ink: #1E2A1B;
+    --ink-soft: #3E4C3A;
+    --sage: #5E6E58;
+    --paper: #EEF1E8;
+    --card: #FBFCF8;
+    --line: #D6DCCC;
+    --pine: #2F6E4F;
+    --pine-deep: #1F4E37;
+    --gold: #C8912B;
+    --income: #2E7D5B;
+    --expense: #B5432E;
+    --font-head: "Segoe UI", -apple-system, Roboto, system-ui, sans-serif;
+    --font-body: "Segoe UI", -apple-system, Roboto, system-ui, sans-serif;
+    --font-ledger: Georgia, "Times New Roman", serif;
+    --font-mono: "Consolas", "Cascadia Code", ui-monospace, monospace;
+    --wrap: 850px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 96px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fade { opacity: 0; transform: translateY(8px); animation: rise .6s ease forwards; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+  }
+
+  /* COVER */
+  .cover { padding: 72px 0 38px; border-bottom: 2px solid var(--pine); }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--pine); margin: 0 0 20px;
+  }
+  .cover h1 {
+    font-family: var(--font-head); font-weight: 800;
+    font-size: clamp(2.3rem, 6vw, 3.6rem); line-height: 1.05;
+    letter-spacing: -0.02em; margin: 0 0 10px; text-wrap: balance;
+  }
+  .cover .sub { font-size: 1.14rem; color: var(--ink-soft); max-width: 46ch; margin: 0 0 30px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--font-mono); font-size: .72rem; padding: 6px 12px;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--sage);
+  }
+  .chip b { color: var(--ink); font-weight: 600; }
+
+  section { padding-top: 54px; }
+  .sec-label {
+    font-family: var(--font-mono); font-size: .72rem; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--sage); display: flex; align-items: center; gap: 12px; margin: 0 0 16px;
+  }
+  .sec-label::before { content: ""; width: 22px; height: 2px; background: var(--gold); }
+  h2 {
+    font-family: var(--font-head); font-weight: 800;
+    font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1.12;
+    letter-spacing: -0.01em; margin: 0 0 16px; text-wrap: balance;
+  }
+  p { margin: 0 0 16px; max-width: 66ch; }
+  .lead { font-size: 1.05rem; color: var(--ink-soft); }
+  strong { color: var(--ink); }
+
+  /* BALANCE STRIP */
+  .ledger-strip {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+    background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin-top: 8px;
+  }
+  @media (max-width: 560px) { .ledger-strip { grid-template-columns: 1fr; } }
+  .ledger-cell { background: var(--card); padding: 20px 22px; }
+  .ledger-cell .k { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--sage); margin-bottom: 8px; }
+  .ledger-cell .v { font-family: var(--font-ledger); font-size: 1.9rem; font-variant-numeric: tabular-nums; line-height: 1; }
+  .ledger-cell.inc .v { color: var(--income); }
+  .ledger-cell.exp .v { color: var(--expense); }
+  .ledger-cell.net { background: #FCF7EA; }
+  .ledger-cell.net .v { color: var(--gold); }
+  .ledger-cell .note { font-size: .78rem; color: var(--sage); margin-top: 6px; }
+
+  /* SPLIT */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .split { grid-template-columns: 1fr; } }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+  .panel h3 { margin: 0 0 12px; font-size: .82rem; font-family: var(--font-mono); letter-spacing: .06em; text-transform: uppercase; }
+  .panel.is { border-top: 3px solid var(--income); }
+  .panel.is h3 { color: var(--income); }
+  .panel.not { border-top: 3px solid var(--expense); }
+  .panel.not h3 { color: var(--expense); }
+  .panel ul { margin: 0; padding-left: 18px; }
+  .panel li { margin-bottom: 9px; }
+  .panel li:last-child { margin-bottom: 0; }
+
+  /* MODULES */
+  .mod { display: grid; grid-template-columns: 52px 1fr; gap: 20px; padding: 22px 0; border-top: 1px solid var(--line); }
+  .mod:last-child { border-bottom: 1px solid var(--line); }
+  .mod-n {
+    font-family: var(--font-ledger); font-size: 1.9rem; font-weight: 700;
+    color: var(--pine); line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  .mod h3 { margin: 2px 0 6px; font-size: 1.16rem; font-family: var(--font-head); font-weight: 700; }
+  .mod p { margin: 0 0 12px; color: var(--ink-soft); font-size: .96rem; }
+  .cap { display: flex; flex-wrap: wrap; gap: 7px; }
+  .cap span {
+    font-size: .8rem; background: rgba(47,110,79,.07); color: var(--pine-deep);
+    border: 1px solid rgba(47,110,79,.16); padding: 4px 10px; border-radius: 7px;
+  }
+  .tag-wait { background: #FCF3DF !important; color: #916213 !important; border-color: rgba(200,145,43,.35) !important; }
+
+  /* FLOW */
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 10px; }
+  .flow-step {
+    flex: 1 1 120px; background: var(--card); border: 1px solid var(--line);
+    border-radius: 11px; padding: 14px 14px; text-align: center; position: relative;
+  }
+  .flow-step .fn { font-family: var(--font-mono); font-size: .62rem; color: var(--sage); letter-spacing: .08em; }
+  .flow-step .ft { font-weight: 700; font-size: .92rem; margin-top: 4px; }
+  .flow-step .fd { font-size: .76rem; color: var(--sage); margin-top: 3px; }
+  .flow-arrow { align-self: center; color: var(--pine); font-weight: 700; }
+  @media (max-width: 560px) { .flow-arrow { transform: rotate(90deg); } }
+
+  /* ARCH / ROLES row */
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .duo { grid-template-columns: 1fr; } }
+  .role-card { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--pine); border-radius: 11px; padding: 16px 18px; }
+  .role-card h4 { margin: 0 0 6px; font-size: 1rem; }
+  .role-card p { margin: 0; font-size: .88rem; color: var(--ink-soft); }
+
+  /* IDENTITY */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 12px; }
+  .sw { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); }
+  .sw .fill { height: 68px; }
+  .sw .info { padding: 9px 12px; }
+  .sw .name { font-size: .8rem; font-weight: 600; }
+  .sw .hex { font-family: var(--font-mono); font-size: .7rem; color: var(--sage); text-transform: uppercase; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; min-width: 460px; }
+  th, td { text-align: left; padding: 13px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--sage); background: #F4F6EF; }
+  tr:last-child td { border-bottom: none; }
+  .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .cost-total td { background: #F4F6EF; font-weight: 700; }
+
+  /* WAIT CALLOUT */
+  .wait {
+    background: #FCF6E7; border: 1px solid rgba(200,145,43,.4);
+    border-left: 5px solid var(--gold); border-radius: 12px; padding: 20px 24px; margin-top: 8px;
+  }
+  .wait h3 { margin: 0 0 8px; font-size: 1.02rem; color: #8f6212; }
+  .wait p { margin: 0; font-size: .94rem; color: #6d5211; }
+
+  /* NEXT */
+  .callout { background: linear-gradient(180deg,#2F6E4F,#1F4E37); color: #EAF3EC; border-radius: 16px; padding: 32px; margin-top: 20px; }
+  .callout .sec-label { color: #A9CBB6; }
+  .callout .sec-label::before { background: var(--gold); }
+  .callout h2 { color: #fff; }
+  .callout p { color: #CFE2D5; }
+  .callout .step { font-family: var(--font-mono); font-size: .92rem; color: #fff; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); border-radius: 10px; padding: 13px 17px; margin-top: 10px; }
+
+  .foot { margin-top: 46px; padding-top: 20px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--sage); }
+</style>
+
+<div class="page">
+
+  <header class="cover fade">
+    <p class="eyebrow">Suluova Kooperatifi · Proje Planı · Taslak · 3 Temmuz 2026</p>
+    <h1>Ön Muhasebe Sistemi</h1>
+    <p class="sub">Muhasebeciye gitmeden önce “elimizde ne var, ne durumdayız?” sorusunu net cevaplayan bir kontrol paneli.</p>
+    <div class="chips">
+      <span class="chip"><b>Durum:</b>&nbsp;Planlama</span>
+      <span class="chip"><b>Kurum:</b>&nbsp;Suluova Kooperatifi</span>
+      <span class="chip"><b>Stack:</b>&nbsp;Next.js + Supabase + Vercel</span>
+      <span class="chip"><b>Klasör:</b>&nbsp;on-muhasebe/</span>
+    </div>
+  </header>
+
+  <section>
+    <p class="sec-label">Ne yapıyor</p>
+    <h2>Tek cümlede</h2>
+    <p class="lead">Kooperatifin <strong>günlük gelir-giderini, fiş/fatura kaydını ve hatırlatıcılarını</strong> tek bir web uygulamasında toplar; ay sonunda mali müşavire vereceğin raporu tek tuşla çıkarır.</p>
+    <p>Bu bir <strong>muhasebe yazılımı değil</strong> — resmi beyanname/e-fatura işi muhasebecinin. Bu sistem, o işi kolaylaştıran, aradaki “kayıt tutma ve derli toplu tutma” boşluğunu dolduran pratik bir araç. Kimin, hangi parayı, ne için aldığını/verdiğini kaybetmeden takip etmek için.</p>
+    <div class="ledger-strip">
+      <div class="ledger-cell inc"><div class="k">Bu Ay Gelir</div><div class="v">— ₺</div><div class="note">örnek gösterim</div></div>
+      <div class="ledger-cell exp"><div class="k">Bu Ay Gider</div><div class="v">— ₺</div><div class="note">örnek gösterim</div></div>
+      <div class="ledger-cell net"><div class="k">Net Bakiye</div><div class="v">— ₺</div><div class="note">her zaman görünür</div></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Sınırlar</p>
+    <h2>Ne olduğu, ne olmadığı</h2>
+    <div class="split">
+      <div class="panel is">
+        <h3>Bunu yapar</h3>
+        <ul>
+          <li>Fiş/faturayı <strong>fotoğraftan okuyup</strong> kaydeder</li>
+          <li>Gelir-gideri ve <strong>net bakiyeyi</strong> anlık gösterir</li>
+          <li>Tarihli <strong>hatırlatıcılar</strong> (Telegram bildirimi)</li>
+          <li>Ay sonu <strong>muhasebeci raporu</strong> üretir</li>
+        </ul>
+      </div>
+      <div class="panel not">
+        <h3>Bunu yapmaz (şimdilik)</h3>
+        <ul>
+          <li>Resmî <strong>e-fatura / GİB</strong> entegrasyonu yok</li>
+          <li>Beyanname/vergi hesabı yapmaz — o muhasebecinin işi</li>
+          <li>Suluova sosyal medya yazılımıyla <strong>entegre değil</strong> (ileride olabilir)</li>
+          <li>Muhasebeciye <strong>doğrudan hesap erişimi</strong> vermez</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">İçerik</p>
+    <h2>Beş modül</h2>
+
+    <div class="mod">
+      <div class="mod-n">1</div>
+      <div>
+        <h3>Fiş / Fatura Girişi</h3>
+        <p>Telefonla fotoğraf çek — sistem tutar, tarih ve açıklamayı otomatik okusun; onayla, kaydet. OCR yanılırsa elle düzelt.</p>
+        <div class="cap"><span>Fotoğraf → OCR</span><span>Onayla / düzelt</span><span>Gelir veya Gider etiketi</span><span>Elle giriş de var</span></div>
+      </div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-n">2</div>
+      <div>
+        <h3>Gelir / Gider Takibi</h3>
+        <p>Tüm kayıtlar tarih sıralı listelenir, net bakiye her an görünür. Aya ve kategoriye göre süz.</p>
+        <div class="cap"><span>Tarih sıralı liste</span><span>Anlık net bakiye</span><span>Ay / kategori filtresi</span></div>
+      </div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-n">3</div>
+      <div>
+        <h3>Not & Hatırlatıcı</h3>
+        <p>“15 Temmuz’da ceviz ödemesi” gibi tarihli not gir; günü gelince Telegram’dan başkana ve yetkiliye bildirim düşer.</p>
+        <div class="cap"><span>Tarihli not</span><span>Telegram bildirimi</span><span>Başkan + yetkili</span></div>
+      </div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-n">4</div>
+      <div>
+        <h3>Aylık Muhasebeci Raporu</h3>
+        <p>Ay sonunda tek tıkla rapor. Formatın (PDF/Excel ve içindeki kalemler) <strong>muhasebeciden gelecek bilgiye bağlı</strong> — o yüzden bu modül en sona.</p>
+        <div class="cap"><span>Tek tıkla rapor</span><span>PDF / Excel</span><span class="tag-wait">⏳ Muhasebeci formatı bekleniyor</span></div>
+      </div>
+    </div>
+
+    <div class="mod">
+      <div class="mod-n">5</div>
+      <div>
+        <h3>Dashboard (Ana Ekran)</h3>
+        <p>Bu ayın gelir/gider/net özeti, son işlemler ve yaklaşan hatırlatıcılar tek ekranda.</p>
+        <div class="cap"><span>Aylık özet</span><span>Son işlemler</span><span>Yaklaşan hatırlatıcılar</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Nasıl işliyor</p>
+    <h2>Bir fişin yolculuğu</h2>
+    <div class="flow">
+      <div class="flow-step"><div class="fn">01</div><div class="ft">Fotoğraf</div><div class="fd">telefonla çek</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">02</div><div class="ft">OCR okur</div><div class="fd">tutar · tarih · açıklama</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">03</div><div class="ft">Onayla</div><div class="fd">düzelt / etiketle</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">04</div><div class="ft">Kayıt</div><div class="fd">bakiye güncellenir</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="fn">05</div><div class="ft">Rapor</div><div class="fd">ay sonu derlenir</div></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Kim kullanıyor</p>
+    <h2>İki rol</h2>
+    <div class="duo">
+      <div class="role-card"><h4>Başkan</h4><p>Her şeyi görür, rapor alır, notları yönetir. Genel kontrol onda.</p></div>
+      <div class="role-card"><h4>Ön Muhasebe Sorumlusu</h4><p>Fiş/fatura girer, kayıtları düzenler. Günlük veriyi bu rol besler.</p></div>
+    </div>
+    <p style="font-size:.9rem;color:var(--sage);margin-top:14px">Roller geliştirme sırasında detaylandırılacak — kimin neyi silebileceği/değiştirebileceği gibi yetki ayrımı baştan netleşmeli.</p>
+  </section>
+
+  <section>
+    <p class="sec-label">Kimlik</p>
+    <h2>Renk paleti önerisi</h2>
+    <p>Tarım kooperatifine yakışan, defter/hasat çağrışımlı bir yön: koyu çam yeşili ana renk, hasat sarısı vurgular için. Gelir yeşil, gider kiremit kırmızısı — para hareketini renkle de okuyabilesin diye. Bu doküman da o paleti kullanıyor.</p>
+    <div class="swatches">
+      <div class="sw"><div class="fill" style="background:#2F6E4F"></div><div class="info"><div class="name">Çam Yeşili</div><div class="hex">#2F6E4F</div></div></div>
+      <div class="sw"><div class="fill" style="background:#C8912B"></div><div class="info"><div class="name">Hasat Sarısı</div><div class="hex">#C8912B</div></div></div>
+      <div class="sw"><div class="fill" style="background:#2E7D5B"></div><div class="info"><div class="name">Gelir Yeşili</div><div class="hex">#2E7D5B</div></div></div>
+      <div class="sw"><div class="fill" style="background:#B5432E"></div><div class="info"><div class="name">Gider Kiremiti</div><div class="hex">#B5432E</div></div></div>
+      <div class="sw"><div class="fill" style="background:#EEF1E8;border-bottom:1px solid #D6DCCC"></div><div class="info"><div class="name">Defter Zemini</div><div class="hex">#EEF1E8</div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Fon & maliyet</p>
+    <h2>Aylık kaba tahmin</h2>
+    <p>Suluova projesiyle aynı altyapıyı (Vercel + Supabase) paylaştığı için ek maliyet düşük. Asıl değişken, fiş okuma (OCR) için harcanan işlem — ama kooperatifin fiş hacmi az olduğundan bu da mütevazı kalır.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Kalem</th><th>Ne için</th><th class="num">Aylık (₺ yaklaşık)</th></tr></thead>
+        <tbody>
+          <tr><td>Supabase</td><td>Veritabanı — ücretsiz katman büyük ihtimalle yeter</td><td class="num">0 – 250</td></tr>
+          <tr><td>Vercel</td><td>Barındırma — hobi/küçük kullanım ücretsiz</td><td class="num">0</td></tr>
+          <tr><td>OCR / fiş okuma</td><td>Fotoğraftan tutar-tarih okuma (düşük hacim)</td><td class="num">50 – 300</td></tr>
+          <tr><td>Telegram bildirimi</td><td>Bot ücretsiz</td><td class="num">0</td></tr>
+          <tr class="cost-total"><td>Toplam</td><td>Kooperatif ölçeği</td><td class="num">≈ 50 – 550</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.9rem;color:var(--sage);margin-top:14px">Asıl “maliyet” yine para değil zaman. Modül 1, 2, 3, 5 nispeten hızlı; Modül 4 (rapor) muhasebeci formatı gelince yapılacak.</p>
+  </section>
+
+  <section>
+    <p class="sec-label">Bekleyen karar</p>
+    <h2>İşi bekleten tek şey</h2>
+    <div class="wait">
+      <h3>⏳ Muhasebeci Rapor Formatı</h3>
+      <p>Mali müşavirin hangi formatı (PDF/Excel) ve hangi kalemleri istediği öğrenilmeden <strong>sadece Modül 4</strong> tasarlanamıyor. Ama diğer dört modül buna bağlı değil — yani beklerken boş durmaya gerek yok.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="sec-label">Sıralama</p>
+    <h2>İki aşamada</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Aşama</th><th>Kapsam</th><th>Bağımlılık</th></tr></thead>
+        <tbody>
+          <tr><td><strong>A — Çekirdek</strong></td><td>Modül 1, 2, 3, 5 · fiş girişi, gelir-gider, hatırlatıcı, dashboard</td><td>Yok — hemen başlanabilir</td></tr>
+          <tr><td><strong>B — Rapor & ince ayar</strong></td><td>Modül 4 · muhasebeci raporu, yetki detayları, cila</td><td>Muhasebeci formatı</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="callout">
+    <p class="sec-label">Sıradaki adım</p>
+    <h2>Formatı beklerken başlayabiliriz</h2>
+    <p>Rapor formatı gelene kadar oturup beklemek yerine, ona <strong>bağlı olmayan çekirdeği</strong> (fiş girişi + gelir-gider + dashboard) kurmaya başlamak en mantıklısı — hem senin “çözüm üret” yaklaşımına uygun, hem format geldiğinde sistem zaten ayakta olur.</p>
+    <div class="step">→ Aşama A: Fiş girişi + gelir-gider takibi + dashboard. Paralelde: muhasebeciden rapor formatını iste.</div>
+    <p style="margin-top:20px;margin-bottom:0">Hazır olduğunda “işe dönelim” de, Aşama A’nın veritabanı şemasından başlayalım.</p>
+  </div>
+
+  <p class="foot">Suluova Kooperatifi · Ön Muhasebe Sistemi — plan taslağı, 3 Temmuz 2026. Yaşayan belge; muhasebeci formatı gelince ve kararlar netleştikçe güncellenir.</p>
+
+</div>

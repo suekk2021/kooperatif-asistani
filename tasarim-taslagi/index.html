@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>İmece · Suluova Üreten Eller · Üretim, Muhasebe ve İş Takibi (Tasarım Taslağı)</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script>
+(function () {
+  var t = null;
+  try { t = localStorage.getItem('imece-tema'); } catch (e) {}
+  if (!t) t = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<style>
+:root{
+  --lacivert:#132b4f; --lacivert-2:#1b3a66; --mavi:#1d63b8; --mavi-acik:#e8f0fb;
+  --turkuaz:#13897f; --turkuaz-acik:#e3f4f2; --mercan:#c8473d; --mercan-acik:#fbeceb;
+  --amber:#a86a00; --amber-acik:#fdf3e1; --zemin:#f5f6fa; --kart:#ffffff;
+  --cizgi:#e4e7ef; --metin:#141c2b; --soluk:#5a6478; --pin:#e2574c;
+  --golge:0 1px 2px rgba(19,43,79,.05),0 4px 16px rgba(19,43,79,.06);
+}
+/* KARANLIK MOD */
+:root[data-theme="dark"]{
+  --lacivert:#0b1528; --lacivert-2:#9fc1ee; --mavi:#6aa6f2; --mavi-acik:rgba(106,166,242,.14);
+  --turkuaz:#45c7b8; --turkuaz-acik:rgba(69,199,184,.14); --mercan:#f2877d; --mercan-acik:rgba(242,135,125,.14);
+  --amber:#e7ac45; --amber-acik:rgba(231,172,69,.13); --zemin:#0f1729; --kart:#162036;
+  --cizgi:#26314a; --metin:#e7ecf5; --soluk:#9ba7bf;
+  --golge:0 1px 2px rgba(0,0,0,.25),0 6px 20px rgba(0,0,0,.25);
+  color-scheme:dark;
+}
+[data-theme="dark"] .yan{border-right:1px solid var(--cizgi)}
+[data-theme="dark"] .yan nav button.aktif{background:#1d63b8;color:#fff}
+[data-theme="dark"] .ustbar{background:rgba(15,23,41,.9)}
+[data-theme="dark"] .ara,[data-theme="dark"] .btn-cizgi,[data-theme="dark"] .alan input,[data-theme="dark"] .alan select,
+[data-theme="dark"] .secim button,[data-theme="dark"] .is-kart,[data-theme="dark"] .b-bot,[data-theme="dark"] .telefon-ekran,
+[data-theme="dark"] .cekmece{background:var(--kart);border-color:var(--cizgi)}
+[data-theme="dark"] .btn-cizgi:hover{border-color:#3a4766}
+[data-theme="dark"] .btn-ana{background:#1d63b8}
+[data-theme="dark"] .btn-ana:hover{background:#2a72cc}
+[data-theme="dark"] th{background:#1a2540}
+[data-theme="dark"] td,[data-theme="dark"] .uyari-satir,[data-theme="dark"] .yetenek{border-color:#212b42}
+[data-theme="dark"] .e-gri,[data-theme="dark"] .cubuk{background:#24304a}
+[data-theme="dark"] .kolon{background:#121b2e}
+[data-theme="dark"] .sohbet{background:#111a2c}
+[data-theme="dark"] .b-ben{background:#1d63b8}
+[data-theme="dark"] .muh{background:#131f36;border-color:#30456b}
+[data-theme="dark"] .muh .kart-bas{border-bottom-color:#26385a}
+[data-theme="dark"] .not{border-color:#5a4520;color:#f0cf93}
+[data-theme="dark"] .soru-kutu{border-color:#5a2f2b}
+[data-theme="dark"] .aciklama-btn{border-color:#5a4520;color:#f0cf93}
+[data-theme="dark"] .aciklama-btn.acik{color:#1b1204}
+[data-theme="dark"] .nokta{border-color:var(--kart)}
+[data-theme="dark"] .pin{box-shadow:0 0 0 3px var(--zemin)}
+[data-theme="dark"] .telefon{background:#05090f}
+[data-theme="dark"] details.hp summary .grup-no{background:#24304a}
+.tema-ikon-gunes{display:none}
+[data-theme="dark"] .tema-ikon-gunes{display:block}
+[data-theme="dark"] .tema-ikon-ay{display:none}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--zemin);color:var(--metin);font-family:Manrope,"Segoe UI",system-ui,sans-serif;font-size:14.5px;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums}
+.kod{font-family:"JetBrains Mono",Consolas,monospace;font-size:12.5px;font-weight:700;color:var(--mavi);background:var(--mavi-acik);padding:2px 6px;border-radius:5px;white-space:nowrap}
+
+/* İSKELET */
+.uygulama{display:flex;min-height:100vh}
+.yan{width:252px;flex:0 0 252px;background:var(--lacivert);color:#d8e1f0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.marka{display:flex;flex-direction:column;gap:14px;padding:22px 18px 18px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
+.marka-ust{display:flex;align-items:center;gap:13px}
+.marka img{width:52px;height:52px;flex:0 0 52px;border-radius:50%;background:#fff;padding:2px;box-shadow:0 0 0 4px rgba(255,255,255,.10)}
+.marka b{display:block;color:#fff;font-size:24px;font-weight:800;line-height:1;letter-spacing:3.5px}
+.marka-ad span{display:block;font-size:12.5px;font-weight:600;color:#c3cfe3;margin-top:6px;letter-spacing:.2px}
+.islevler{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 12px;border-radius:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);font-size:11px;font-weight:700;letter-spacing:.5px;color:#8fd9cf;white-space:nowrap}
+.islevler i{width:4px;height:4px;border-radius:50%;background:#5f7396;flex:0 0 4px}
+.grup-baslik{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#8597b5;padding:16px 20px 6px}
+.yan nav{display:flex;flex-direction:column;padding:0 10px}
+.yan nav button{display:flex;align-items:center;gap:11px;background:none;border:0;color:#d8e1f0;text-align:left;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:600;min-height:40px}
+.yan nav button:hover{background:rgba(255,255,255,.06)}
+.yan nav button.aktif{background:#fff;color:var(--lacivert)}
+.yan nav button svg{width:18px;height:18px;flex:0 0 18px}
+.yan nav .sayac{margin-left:auto;font-size:11.5px;background:var(--pin);color:#fff;border-radius:999px;padding:1px 7px}
+.yan-alt{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--turkuaz);color:#fff;display:grid;place-items:center;font-weight:800}
+.yan-alt small{display:block;color:#a9b8d0}
+
+.ana{flex:1;min-width:0;display:flex;flex-direction:column}
+.ustbar{position:sticky;top:0;z-index:20;background:rgba(245,246,250,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--cizgi);display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 28px}
+.ara{flex:1 1 280px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--cizgi);border-radius:10px;padding:0 12px;min-height:42px;color:var(--soluk)}
+.ara input{border:0;outline:0;flex:1;background:none;min-width:0}
+.tus{font-size:11px;border:1px solid var(--cizgi);border-radius:5px;padding:1px 6px;color:var(--soluk)}
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:10px;padding:10px 15px;min-height:42px;font-weight:700;cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.btn svg{width:17px;height:17px}
+.btn-ana{background:var(--mavi);color:#fff}
+.btn-ana:hover{background:#1857a3}
+.btn-cizgi{background:#fff;border-color:var(--cizgi);color:var(--metin)}
+.btn-cizgi:hover{border-color:#c9cfdc}
+.btn-ikon{width:42px;padding:0;justify-content:center;position:relative}
+.nokta{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--pin);border:2px solid #fff}
+.aciklama-btn{background:var(--amber-acik);border-color:#f0d29c;color:#7a4d00}
+.aciklama-btn.acik{background:var(--amber);color:#fff;border-color:var(--amber)}
+
+.icerik{padding:26px 28px 70px;max-width:1360px;width:100%}
+.ekran{display:none}.ekran.aktif{display:block}
+.sayfa-bas{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.sayfa-bas h1{margin:0;font-size:26px;letter-spacing:-.4px}
+.sayfa-bas p{margin:4px 0 0;color:var(--soluk)}
+.ust-araclar{display:flex;flex-wrap:wrap;gap:8px}
+
+.kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:14px;box-shadow:var(--golge)}
+.kart-ic{padding:18px 20px}
+.kart-bas{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 20px;border-bottom:1px solid var(--cizgi)}
+.kart-bas h2{margin:0;font-size:15.5px}
+.kart-bas a{font-size:13px;font-weight:700;color:var(--mavi);text-decoration:none}
+.izgara{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g-panel{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.metrik .etiket{font-size:12.5px;color:var(--soluk);font-weight:600;display:flex;justify-content:space-between}
+.metrik .deger{font-size:28px;font-weight:800;letter-spacing:-.6px;margin:8px 0 4px}
+.metrik .alt{font-size:12.5px;color:var(--soluk)}
+.trend{font-weight:700;font-size:12px;border-radius:6px;padding:1px 6px}
+.t-kotu{background:var(--mercan-acik);color:var(--mercan)}.t-iyi{background:var(--turkuaz-acik);color:var(--turkuaz)}
+.cubuk{height:6px;background:#eef1f6;border-radius:9px;overflow:hidden;margin-top:10px}.cubuk i{display:block;height:100%;border-radius:9px}
+
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--soluk);font-weight:700;text-align:left;padding:10px 14px;border-bottom:1px solid var(--cizgi);background:#fafbfd;white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid #eef0f5;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.sag{text-align:right}
+.tablo-kutu{overflow-x:auto}
+.etk{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.e-mavi{background:var(--mavi-acik);color:var(--mavi)}.e-yesil{background:var(--turkuaz-acik);color:var(--turkuaz)}
+.e-kirmizi{background:var(--mercan-acik);color:var(--mercan)}.e-amber{background:var(--amber-acik);color:var(--amber)}
+.e-gri{background:#eef0f5;color:var(--soluk)}
+.kirmizi{color:var(--mercan);font-weight:700}.yesil{color:var(--turkuaz);font-weight:700}.amber{color:var(--amber);font-weight:700}
+
+.uyari-satir{display:flex;gap:12px;align-items:flex-start;padding:12px 20px;border-bottom:1px solid #eef0f5}
+.uyari-satir:last-child{border-bottom:0}
+.uyari-ikon{width:32px;height:32px;flex:0 0 32px;border-radius:9px;display:grid;place-items:center}
+.uyari-ikon svg{width:17px;height:17px}
+.uyari-satir b{display:block;font-size:14px}
+.uyari-satir span{font-size:13px;color:var(--soluk)}
+.uyari-satir .btn{margin-left:auto;min-height:34px;padding:6px 11px;font-size:13px}
+
+.form-satir{display:flex;flex-wrap:wrap;gap:14px}
+.alan{display:flex;flex-direction:column;gap:6px;flex:1 1 180px;min-width:0}
+.alan label{font-size:12.5px;font-weight:700;color:var(--soluk)}
+.alan input,.alan select{border:1px solid #d7dce6;border-radius:9px;padding:10px 12px;background:#fff;min-height:42px;width:100%}
+.secim{display:flex;flex-wrap:wrap;gap:6px}
+.secim button{border:1px solid var(--cizgi);background:#fff;border-radius:9px;padding:8px 12px;font-weight:700;cursor:pointer;min-height:38px}
+.secim button.aktif{border-color:var(--mavi);background:var(--mavi-acik);color:var(--mavi)}
+.toplam{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.toplam .buyuk{font-size:22px;font-weight:800}
+
+.muh{border:1px dashed #b9c8e3;background:#f7faff;border-radius:14px;margin-top:16px}
+.muh .kart-bas{border-bottom-color:#dbe4f3}
+.muh .kart-bas h2{color:var(--lacivert-2);display:flex;gap:8px;align-items:center}
+.muh table{background:transparent}
+
+.not{background:var(--amber-acik);border:1px solid #f0d29c;color:#6d4500;border-radius:12px;padding:12px 16px;font-size:13.5px;margin:16px 0 0}
+.soru-kutu{background:var(--mercan-acik);border:1px solid #f1c5c0;border-radius:12px;padding:14px 18px;margin-top:16px}
+.soru-kutu h3{margin:0 0 8px;font-size:15px;color:var(--mercan)}
+.soru-kutu ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+/* Üretim ekranı - telefon görünümü */
+.telefon-sar{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.telefon{width:380px;max-width:100%;background:#0f1a2c;border-radius:34px;padding:12px;box-shadow:0 20px 50px rgba(19,43,79,.25)}
+.telefon-ekran{background:#fff;border-radius:24px;overflow:hidden}
+.tel-bas{background:var(--lacivert);color:#fff;padding:16px 18px}
+.tel-bas small{color:#a9b8d0}
+.tel-govde{padding:16px;display:flex;flex-direction:column;gap:12px}
+.dev{min-height:58px;font-size:17px;border-radius:14px;justify-content:center;width:100%}
+.tartim{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--cizgi);border-radius:12px;padding:10px 12px}
+.tartim b{font-size:18px}
+.tartim small{display:block;color:var(--soluk)}
+
+/* Kanban */
+.kanban{display:grid;grid-template-columns:repeat(6,minmax(210px,1fr));gap:12px;overflow-x:auto;padding-bottom:6px}
+.kolon{background:#eceff5;border-radius:12px;padding:10px;min-height:300px}
+.kolon h3{margin:2px 4px 10px;font-size:13px;display:flex;justify-content:space-between}
+.is-kart{background:#fff;border:1px solid var(--cizgi);border-radius:10px;padding:10px 11px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.is-kart b{display:block;font-size:13.5px}
+.is-kart span{font-size:12px;color:var(--soluk)}
+.is-alt{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.mini-av{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff}
+
+/* Asistan */
+.sohbet{display:flex;flex-direction:column;gap:10px;padding:18px;background:#eef2f8;max-height:520px;overflow:auto}
+.balon{max-width:78%;padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.45}
+.b-ben{align-self:flex-end;background:var(--mavi);color:#fff;border-bottom-right-radius:4px}
+.b-bot{align-self:flex-start;background:#fff;border:1px solid var(--cizgi);border-bottom-left-radius:4px}
+.balon small{display:block;opacity:.7;font-size:11px;margin-top:4px}
+.yetenek{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid #eef0f5}
+.yetenek:last-child{border-bottom:0}
+
+details.hp{border-bottom:1px solid var(--cizgi)}
+details.hp:last-of-type{border-bottom:0}
+details.hp summary{cursor:pointer;padding:14px 20px;font-weight:800;display:flex;gap:10px;align-items:center;list-style:none}
+details.hp summary::-webkit-details-marker{display:none}
+details.hp summary .grup-no{width:28px;height:28px;border-radius:8px;background:var(--lacivert);color:#fff;display:grid;place-items:center;font-size:13px}
+details.hp summary small{color:var(--soluk);font-weight:600}
+details.hp summary::after{content:"+";margin-left:auto;font-size:18px;color:var(--soluk)}
+details.hp[open] summary::after{content:"−"}
+
+/* AÇIKLAMA MODU */
+.pin{position:absolute;top:-9px;left:-9px;z-index:15;width:22px;height:22px;border-radius:50%;background:var(--pin);color:#fff;font-size:11.5px;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 3px #fff;cursor:pointer;font-family:Manrope,sans-serif;letter-spacing:0;text-transform:none}
+.tablo-kutu>.pin,.kanban>.pin,.kart>.pin,.yan .pin{top:6px;left:6px}
+body.aciklama [data-not]{outline:2px dashed rgba(226,87,76,.55);outline-offset:2px;border-radius:8px}
+body.aciklama .vurgu{outline:3px solid var(--pin)!important;box-shadow:0 0 0 6px rgba(226,87,76,.18)}
+.cekmece{position:fixed;top:0;right:0;height:100vh;width:370px;max-width:92vw;background:#fff;border-left:1px solid var(--cizgi);box-shadow:-10px 0 40px rgba(19,43,79,.12);z-index:50;transform:translateX(105%);transition:transform .2s;display:flex;flex-direction:column}
+body.aciklama .cekmece{transform:none}
+body.aciklama .ana{padding-right:370px}
+.cekmece-bas{padding:16px 18px;border-bottom:1px solid var(--cizgi);display:flex;justify-content:space-between;align-items:center}
+.cekmece-bas h3{margin:0;font-size:16px}
+.cekmece-liste{overflow:auto;padding:8px 10px 30px}
+.cekmece-oge{display:flex;gap:10px;padding:10px 8px;border-radius:10px;cursor:pointer}
+.cekmece-oge:hover,.cekmece-oge.secili{background:var(--amber-acik)}
+.cekmece-oge .pin{position:static;flex:0 0 22px;box-shadow:none}
+.cekmece-oge b{display:block;font-size:13.5px}
+.cekmece-oge span{font-size:13px;color:var(--soluk);line-height:1.45}
+
+.trend{white-space:nowrap}
+@media (max-width:1280px){
+  .aciklama-btn .yazi{display:none}
+  .aciklama-btn{padding:0;width:42px;justify-content:center}
+  .ara{flex-basis:200px}
+}
+@media (max-width:1100px){
+  .donem .yazi{display:none}
+  .donem{padding:0;width:42px;justify-content:center}
+}
+@media (max-width:1200px){
+  .g-panel{grid-template-columns:minmax(0,1fr)}
+  .izgara.g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  td,th{padding-left:10px;padding-right:10px}
+}
+.menu-btn,.perde,.mobil-marka{display:none}
+.mobil-marka{align-items:center;gap:8px;margin-right:auto}
+.mobil-marka img{width:32px;height:32px;border-radius:50%;background:#fff;padding:1px}
+.mobil-marka b{font-size:17px;font-weight:800;letter-spacing:2.5px}
+@media (max-width:1000px){
+  .yan{position:fixed;left:0;top:0;bottom:0;height:100vh;z-index:60;transform:translateX(-102%);transition:transform .22s;box-shadow:10px 0 40px rgba(0,0,0,.25)}
+  body.menu-acik .yan{transform:none}
+  .perde{position:fixed;inset:0;background:rgba(8,14,26,.45);z-index:55}
+  body.menu-acik .perde{display:block}
+  .menu-btn{display:inline-flex}
+  .mobil-marka{display:flex}
+  .g-panel{grid-template-columns:1fr}
+  .icerik{padding:20px 16px 60px}
+  .ustbar{padding:10px 16px}
+  body.aciklama .ana{padding-right:0}
+  .cekmece{width:100%;max-width:100%;top:auto;bottom:0;height:62vh;border-left:0;border-top:1px solid var(--cizgi);border-radius:18px 18px 0 0;transform:translateY(105%)}
+}
+@media (max-width:640px){
+  .ustbar{gap:8px}
+  .ustbar .donem{display:none}
+  .ara{order:10;flex-basis:100%}
+  .ustbar .btn-ana .yazi,.aciklama-btn .yazi,.donem .yazi{display:none}
+  .ustbar .btn-ana,.aciklama-btn,.donem{padding:0;width:42px;justify-content:center}
+  .sayfa-bas h1{font-size:22px}
+  .metrik .deger{font-size:24px}
+  .izgara.g4{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .g4 .kart-ic{padding:14px}
+  .kart-bas,.uyari-satir{padding-left:14px;padding-right:14px}
+  .uyari-satir{flex-wrap:wrap}
+  .uyari-satir>div:not(.uyari-ikon){flex:1 1 calc(100% - 44px);min-width:0}
+  .uyari-satir .btn{margin-left:0}
+  .uyari-satir .uyari-ikon~.btn{margin-left:44px}
+  .ust-araclar{width:100%}
+  .ust-araclar .btn{flex:1 1 auto;justify-content:center}
+  .toplam{align-items:flex-start}
+  .telefon{width:100%}
+  td,th{padding:9px 10px}
+  .kanban{grid-template-columns:repeat(6,minmax(78vw,1fr));scroll-snap-type:x mandatory}
+  .kolon{scroll-snap-align:start}
+  .balon{max-width:90%}
+  /* Telefonda tablolar kart olur: her satır bir kart, sütun adı solda, değer sağda */
+  .kart-tablo thead{display:none}
+  .kart-tablo,.kart-tablo tbody{display:block;width:100%}
+  .kart-tablo tr{display:block;padding:10px 14px;border-bottom:1px solid var(--cizgi)}
+  .kart-tablo tr:last-child{border-bottom:0}
+  .kart-tablo td{display:block;text-align:right;padding:3px 0;border:0;overflow:hidden;overflow-wrap:anywhere}
+  .kart-tablo td::before{content:attr(data-label);float:left;margin-right:12px;color:var(--soluk);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:22px}
+  .kart-tablo td:first-child{text-align:left;font-size:15px;padding-bottom:5px}
+  .kart-tablo td:first-child::before,.kart-tablo td[data-label=""]::before{display:none}
+  .kart-tablo td:empty{display:none}
+  .kart-tablo td .btn{min-height:36px;padding:6px 12px;margin-top:4px}
+  .kart-tablo tr[style*="background"]{border-radius:10px}
+  .tablo-kutu>.pin{top:6px;left:auto;right:6px}
+}
+@media (max-width:380px){
+  .mobil-marka b{display:none}
+}
+</style>
+</head>
+<body>
+<div class="uygulama">
+<div class="perde" id="perde"></div>
+
+<!-- ============ YAN MENÜ ============ -->
+<aside class="yan">
+  <div class="marka" data-not="Kooperatif kimliği|Programın adı (İmece), kooperatifin adı ve programın üç işlevi. Logoya tıklayınca her zaman Ana Panel'e dönülür. Logo ve ad Ayarlar'dan değiştirilebilir.">
+    <div class="marka-ust">
+      <img src="logo.png" alt="Suluova Üreten Eller Kadın Kooperatifi logosu">
+      <div class="marka-ad"><b>İMECE</b><span>Suluova Üreten Eller</span></div>
+    </div>
+    <div class="islevler"><span>Üretim</span><i></i><span>Muhasebe</span><i></i><span>İş Takibi</span></div>
+  </div>
+
+  <div class="grup-baslik">Genel</div>
+  <nav data-not="Ana menü|Programın bütün bölümleri dört grupta toplandı: Genel (günlük takip), Operasyon (mal giriş-çıkış, üretim), Finans (para ve cari), Muhasebe (rapor ve aktarım). Kırmızı sayılar o bölümde bekleyen iş sayısıdır.">
+    <button data-e="panel" class="aktif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Ana Panel</button>
+    <button data-e="isler"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>İşler ve Siparişler<span class="sayac">3</span></button>
+    <button data-e="asistan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/></svg>Asistan</button>
+    <button data-e="hatirlatici"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg>Hatırlatıcılar<span class="sayac">2</span></button>
+    <button data-e="notlar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Notlar</button>
+  </nav>
+  <div class="grup-baslik">Operasyon</div>
+  <nav>
+    <button data-e="alis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Alış</button>
+    <button data-e="uretim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 21V10l6 4V10l6 4V5h6v16z"/></svg>Üretim</button>
+    <button data-e="satis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21V9M7 14l5-5 5 5"/><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>Satış</button>
+    <button data-e="stok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>Stok</button>
+  </nav>
+  <div class="grup-baslik">Finans</div>
+  <nav>
+    <button data-e="kasa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20M6 15h4"/></svg>Kasa ve Banka</button>
+    <button data-e="cari"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5.5 5.5 0 0 1 3.5 6"/></svg>Cariler</button>
+  </nav>
+  <div class="grup-baslik">Muhasebe</div>
+  <nav>
+    <button data-e="rapor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Raporlar</button>
+    <button data-e="hesap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3"/></svg>Hesap Planı</button>
+    <button data-e="aktarim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h10l6 6v10H4z"/><path d="M14 4v6h6M9 14l3 3 3-3M12 17v-6"/></svg>Muhasebe Aktarımı</button>
+  </nav>
+
+  <div class="yan-alt" data-not="Giriş yapan kullanıcı|Kim olduğunuzu ve yetkinizi gösterir (Başkan, Ön muhasebe, İzleyici). İzleyici sadece bakar, kayıt giremez. Tıklayınca şifre değiştirme ve çıkış.">
+    <div class="avatar">CO</div>
+    <div><b style="color:#fff">Canan Bağcı Oral</b><small>Başkan · tam yetki</small></div>
+  </div>
+</aside>
+
+<!-- ============ ANA ALAN ============ -->
+<div class="ana">
+<header class="ustbar">
+  <button class="btn btn-cizgi btn-ikon menu-btn" id="menuBtn" aria-label="Menüyü aç"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <div class="mobil-marka"><img src="logo.png" alt=""><b>İMECE</b></div>
+  <div class="ara" data-not="Hızlı arama|Her şeyi tek kutudan arar: cari adı, fatura no, ürün, lot numarası, çek numarası. Klavyede Ctrl+K ile her ekrandan açılır.">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+    <input aria-label="Ara" placeholder="Cari, fatura, ürün, lot ara…"><span class="tus">Ctrl K</span>
+  </div>
+  <button class="btn btn-ana" data-not="Hızlı kayıt düğmesi|En sık yapılan kayıtlar tek tıkta: Alış, Satış, Tahsilat, Ödeme, Üretim partisi, Not. Hangi ekranda olursanız olun buradan başlatılır.">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="yazi">Yeni kayıt</span></button>
+  <button class="btn btn-cizgi btn-ikon" aria-label="Bildirimler" data-not="Bildirimler|Sistemin uyarıları: stok bitiyor, son kullanma tarihi yaklaşıyor, vadesi geçen alacak, size atanan iş. Aynı uyarılar Telegram'a da gider.">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg><span class="nokta"></span></button>
+  <button class="btn btn-cizgi donem" aria-label="Dönem: Kasım 2026" data-not="Dönem seçici|Ekrandaki rakamların hangi aya ait olduğunu belirler. Muhasebeye aktarılıp kapatılan ay kilitlenir, geriye dönük değiştirilemez."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span class="yazi">Kasım 2026 ▾</span></button>
+  <button class="btn btn-cizgi btn-ikon" id="temaBtn" aria-label="Karanlık / aydınlık mod" data-not="Görünüm modu|Aydınlık ve karanlık görünüm arasında geçiş yapar. İlk açılışta bilgisayarın veya telefonun kendi ayarına uyar; seçim hatırlanır.">
+    <svg class="tema-ikon-ay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="tema-ikon-gunes" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+  <button class="btn aciklama-btn" id="aciklamaBtn" aria-pressed="false">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg><span class="yazi">Açıklamaları göster</span></button>
+</header>
+
+<main class="icerik">
+
+<!-- ================= ANA PANEL ================= -->
+<section class="ekran aktif" id="panel">
+  <div class="sayfa-bas">
+    <div><h1>Günaydın, Canan Hanım</h1><p>7 Kasım 2026 Cumartesi · Kasım ayının özeti</p></div>
+    <div class="ust-araclar"><button class="btn btn-cizgi">Panoyu düzenle</button></div>
+  </div>
+
+  <div class="izgara g4" data-not="Özet kartları|Kooperatifin anlık durumu dört rakamda: elimizdeki para, tahsil edilemeyen alacak, yaklaşan ödemeler, bu ayki fire. Karta tıklayınca ilgili ekranın detayı açılır.">
+    <div class="kart kart-ic metrik"><div class="etiket">Kasa + Banka <span class="trend t-iyi">+8%</span></div><div class="deger num">184.250 ₺</div><div class="alt">Kasa 12.400 · Ziraat 171.850</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Vadesi geçen alacak <span class="trend t-kotu">5 cari</span></div><div class="deger num kirmizi">62.400 ₺</div><div class="alt">En eski: 34 gün</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">7 gün içinde ödenecek</div><div class="deger num">41.000 ₺</div><div class="alt">3 tedarikçi + 1 çek</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Bu ay fire <span class="trend t-kotu">▲ %4,1'den</span></div><div class="deger num amber">%6,8</div><div class="alt">Kayıp değeri 14.662 ₺</div><div class="cubuk"><i style="width:68%;background:var(--amber)"></i></div></div>
+  </div>
+
+  <div class="izgara g-panel" style="margin-top:16px">
+    <div class="kart" data-not="Dikkat edilecekler (kaçak radarı)|Programın en önemli kutusu. Sistem her gün kayıtları tarar ve sorun gördüğü yeri buraya yazar: reçeteden fazla harcama, sayım eksiği, biten stok, SKT, geciken tahsilat. Her satırdaki düğme sizi doğrudan o kayda götürür.">
+      <div class="kart-bas"><h2>Dikkat edilecekler</h2><a href="#">Tümü (6)</a></div>
+      <div class="uyari-satir"><div class="uyari-ikon" style="background:var(--amber-acik);color:var(--amber)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 9v4M12 17v.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div><div><b>Peynir reçeteden %14 fazla gitti</b><span>Su böreği · Parti #112 · sorumlu Ayşe</span></div><button class="btn btn-cizgi">Partiye git</button></div>
+      <div class="uyari-satir"><div class="uyari-ikon" style="background:var(--mercan-acik);color:var(--mercan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5z"/><path d="M3 8v8l9 5 9-5V8"/></svg></div><div><b>Sayımda 38 kg un eksik</b><span>Açıklanamayan fark · 692 ₺</span></div><button class="btn btn-cizgi">İncele</button></div>
+      <div class="uyari-satir"><div class="uyari-ikon" style="background:var(--amber-acik);color:var(--amber)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><b>Kıyma 2 gün içinde bitiyor</b><span>Kalan 14 kg · günlük ortalama 7 kg</span></div><button class="btn btn-cizgi">Sipariş ver</button></div>
+      <div class="uyari-satir"><div class="uyari-ikon" style="background:var(--mercan-acik);color:var(--mercan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></div><div><b>İçli köfte lot 0921: SKT'ye 10 gün</b><span>96 paket soğuk depoda</span></div><button class="btn btn-cizgi">Satışa öner</button></div>
+      <div class="uyari-satir"><div class="uyari-ikon" style="background:var(--mercan-acik);color:var(--mercan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><b>Yıldız Market: 18.500 ₺, 12 gün gecikti</b><span>Son tahsilat 20 Ekim</span></div><button class="btn btn-cizgi">Hatırlat</button></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="kart" data-not="Bugünkü üretim|Tesiste şu an hangi partiler var, ne kadar üretildi. Üretim ekranındaki telefondan girilen veriler buraya anında düşer.">
+        <div class="kart-bas"><h2>Bugünkü üretim</h2><a href="#">Üretim ›</a></div>
+        <div class="kart-ic" style="display:flex;flex-direction:column;gap:12px">
+          <div><div style="display:flex;justify-content:space-between"><b>Su böreği · #113</b><span class="etk e-yesil">Bitti</span></div><div class="cubuk"><i style="width:100%;background:var(--turkuaz)"></i></div><small style="color:var(--soluk)">320 / 320 adet · fire %3,6</small></div>
+          <div><div style="display:flex;justify-content:space-between"><b>İçli köfte · #114</b><span class="etk e-mavi">Devam ediyor</span></div><div class="cubuk"><i style="width:55%;background:var(--mavi)"></i></div><small style="color:var(--soluk)">110 / 200 paket · başlangıç 10:40</small></div>
+        </div>
+      </div>
+      <div class="kart" data-not="Son hareketler|Web'den veya Telegram'dan girilen her kayıt, kimin girdiğiyle birlikte buraya düşer. Kim ne zaman ne girdi sorusunun cevabı.">
+        <div class="kart-bas"><h2>Son hareketler</h2><a href="#">Tümü ›</a></div>
+        <table class="kompakt"><tbody>
+          <tr><td><span class="etk e-mavi">Alış</span></td><td>Yılmaz Gıda</td><td class="sag num">17.826,50</td></tr>
+          <tr><td><span class="etk e-yesil">Tahsilat</span></td><td>Kaya Pastanesi</td><td class="sag num">12.000,00</td></tr>
+          <tr><td><span class="etk e-amber">Satış</span></td><td>Yıldız Market</td><td class="sag num">24.846,00</td></tr>
+          <tr><td><span class="etk e-gri">Telegram</span></td><td colspan="2">Zehra: “Kıyma siparişi verildi”</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= İŞLER / SİPARİŞLER ================= -->
+<section class="ekran" id="isler">
+  <div class="sayfa-bas">
+    <div><h1>İşler ve Siparişler</h1><p>Siparişin alınmasından tahsilatına kadar her işin nerede olduğu</p></div>
+    <div class="ust-araclar"><button class="btn btn-cizgi">Liste görünümü</button><button class="btn btn-ana">+ Yeni sipariş</button></div>
+  </div>
+  <div class="kanban" data-not="İş panosu|Her sipariş bir kart. Kart soldan sağa ilerler: Alındı → Üretimde → Hazır → Sevk edildi → Faturalandı → Tahsil edildi. Kartı sürükleyerek bir sonraki aşamaya geçirirsiniz; Sevk ve Fatura aşamaları stok ve muhasebe kaydını otomatik oluşturur. Kırmızı tarih gecikmeyi gösterir.">
+    <div class="kolon"><h3>Alındı <span>2</span></h3>
+      <div class="is-kart"><b>Kaya Pastanesi</b><span>150 su böreği · teslim 10.11</span><div class="is-alt"><span class="etk e-gri">SP-0221</span><span class="mini-av" style="background:var(--turkuaz)">Z</span></div></div>
+      <div class="is-kart"><b>Okul kantini</b><span>80 içli köfte · teslim 12.11</span><div class="is-alt"><span class="etk e-gri">SP-0222</span><span class="mini-av" style="background:var(--mavi)">A</span></div></div></div>
+    <div class="kolon"><h3>Üretimde <span>1</span></h3>
+      <div class="is-kart"><b>Yıldız Market</b><span>200 içli köfte · parti #114</span><div class="is-alt"><span class="etk e-mavi">%55</span><span class="mini-av" style="background:var(--mavi)">A</span></div></div></div>
+    <div class="kolon"><h3>Hazır <span>1</span></h3>
+      <div class="is-kart"><b>Deniz Lokantası</b><span>60 su böreği · lot 1107-113</span><div class="is-alt"><span class="etk e-gri">SP-0218</span><span class="mini-av" style="background:var(--mercan)">C</span></div></div></div>
+    <div class="kolon"><h3>Sevk edildi <span>1</span></h3>
+      <div class="is-kart"><b>Yıldız Market</b><span>120 su böreği + 40 köfte</span><div class="is-alt"><span class="etk e-amber">Fatura bekliyor</span><span class="mini-av" style="background:var(--turkuaz)">Z</span></div></div></div>
+    <div class="kolon"><h3>Faturalandı <span>2</span></h3>
+      <div class="is-kart"><b>Yıldız Market</b><span>SAT-0371 · 18.500 ₺</span><div class="is-alt"><span class="etk e-kirmizi">12 gün gecikti</span><span class="mini-av" style="background:var(--mercan)">C</span></div></div>
+      <div class="is-kart"><b>Kaya Pastanesi</b><span>SAT-0388 · 6.200 ₺</span><div class="is-alt"><span class="etk e-gri">Vade 15.11</span><span class="mini-av" style="background:var(--mercan)">C</span></div></div></div>
+    <div class="kolon"><h3>Tahsil edildi <span>1</span></h3>
+      <div class="is-kart"><b>Kaya Pastanesi</b><span>12.000 ₺ · Ziraat</span><div class="is-alt"><span class="etk e-yesil">Kapandı</span><span class="mini-av" style="background:var(--mercan)">C</span></div></div></div>
+  </div>
+  <p class="not">Kartlardaki harf, işten sorumlu kişidir. Sorumluya Telegram'dan bildirim gider; iş gecikirse başkana uyarı düşer.</p>
+</section>
+
+<!-- ================= ASİSTAN ================= -->
+<section class="ekran" id="asistan">
+  <div class="sayfa-bas">
+    <div><h1>Asistan</h1><p>Telegram'dan yazarak, sesle veya fotoğrafla kayıt girme</p></div>
+    <div class="ust-araclar"><button class="btn btn-cizgi">Telegram bağlantısı: Bağlı ✓</button></div>
+  </div>
+  <div class="izgara g-panel">
+    <div class="kart" data-not="Asistan konuşmaları|Çalışanların Telegram'dan asistana yazdıkları ve asistanın cevapları burada da görünür. Asistan anlayamadığı veya emin olmadığı kaydı doğrudan girmez, 'taslak' olarak bırakır, web'den onaylanır.">
+      <div class="kart-bas"><h2>Son konuşmalar</h2><span class="etk e-gri">Telegram</span></div>
+      <div class="sohbet">
+        <div class="balon b-ben">özet<small>Canan · 09:02</small></div>
+        <div class="balon b-bot">📊 Kasım özeti<br>Kasa+Banka: 184.250 ₺<br>Vadesi geçen alacak: 62.400 ₺<br>Bu ay fire: %6,8 (geçen ay %4,1)<small>Asistan · 09:02</small></div>
+        <div class="balon b-ben">[Fatura fotoğrafı]<small>Zehra · 09:40</small></div>
+        <div class="balon b-bot">Yılmaz Gıda faturasını okudum: 500 kg un, 40 kg peynir, toplam 17.826,50 ₺. Alış taslağı oluşturdum, web'den onaylayın.<small>Asistan · 09:41</small></div>
+        <div class="balon b-ben">🎤 “Yarın sabah dokuzda kıyma siparişini hatırlat”<small>Zehra · 11:15</small></div>
+        <div class="balon b-bot">Tamam, 8 Kasım 09:00 için hatırlatıcı kurdum.<small>Asistan · 11:15</small></div>
+        <div class="balon b-ben">su böreği bitti 320 adet 12 tane bozuk<small>Ayşe · 11:32</small></div>
+        <div class="balon b-bot">Parti #113'e yazdım: 320 paketlendi, 12 bozuk. Fire %3,6.<small>Asistan · 11:32</small></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="kart" data-not="Asistanın yapabildikleri|Telegram'dan neler yapılabildiğinin listesi. Yeni yetenekler eklendikçe burada görünür.">
+        <div class="kart-bas"><h2>Asistan neler yapabilir?</h2></div>
+        <div class="kart-ic">
+          <div class="yetenek"><span class="etk e-mavi">Fotoğraf</span><span>Fatura/fiş fotoğrafından alış taslağı</span></div>
+          <div class="yetenek"><span class="etk e-mavi">Ses</span><span>Sesli mesajla not, hatırlatıcı, üretim bilgisi</span></div>
+          <div class="yetenek"><span class="etk e-mavi">Özet</span><span>“özet” yazınca kasa, alacak, borç, fire</span></div>
+          <div class="yetenek"><span class="etk e-mavi">Üretim</span><span>Parti bitti / bozuk sayısı girişi</span></div>
+          <div class="yetenek"><span class="etk e-mavi">Uyarı</span><span>Stok, SKT, vade uyarılarını kendiliğinden gönderir</span></div>
+        </div>
+      </div>
+      <div class="kart" data-not="Onay bekleyen taslaklar|Asistanın oluşturduğu ama henüz kesinleşmemiş kayıtlar. Yanlış okunan bir fatura muhasebeye gitmesin diye her taslak bir kişinin onayından geçer.">
+        <div class="kart-bas"><h2>Onay bekleyen taslaklar</h2><span class="etk e-amber">1</span></div>
+        <div class="uyari-satir"><div><b>Alış · Yılmaz Gıda</b><span>17.826,50 ₺ · fotoğraftan</span></div><button class="btn btn-ana">İncele ve onayla</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HATIRLATICILAR ================= -->
+<section class="ekran" id="hatirlatici">
+  <div class="sayfa-bas"><div><h1>Hatırlatıcılar</h1><p>Zamanı gelince Telegram'dan bildirim gelir</p></div><div class="ust-araclar"><button class="btn btn-ana">+ Hatırlatıcı</button></div></div>
+  <div class="kart" data-not="Hatırlatıcı listesi|Elle veya asistana söyleyerek kurulan hatırlatıcılar. Bir kısmını sistem kendisi kurar (çek vadesi, kredi kartı son ödeme, fatura vadesi); bunlar 'Otomatik' etiketiyle görünür.">
+    <table><thead><tr><th>Ne zaman</th><th>Konu</th><th>Kime</th><th>Kaynak</th><th></th></tr></thead><tbody>
+      <tr><td><b>Bugün 15:00</b></td><td>Yıldız Market'i ara (18.500 ₺ gecikme)</td><td>Canan</td><td><span class="etk e-gri">Elle</span></td><td class="sag"><button class="btn btn-cizgi">Tamamlandı</button></td></tr>
+      <tr><td><b>Yarın 09:00</b></td><td>Kıyma siparişi ver</td><td>Zehra</td><td><span class="etk e-mavi">Telegram sesli</span></td><td class="sag"><button class="btn btn-cizgi">Tamamlandı</button></td></tr>
+      <tr><td>14.11</td><td>Ziraat çek no 448812 ödenecek · 15.000 ₺</td><td>Canan</td><td><span class="etk e-amber">Otomatik</span></td><td class="sag"><button class="btn btn-cizgi">Tamamlandı</button></td></tr>
+      <tr><td>20.11</td><td>Şirket kredi kartı son ödeme · 6.120 ₺</td><td>Canan</td><td><span class="etk e-amber">Otomatik</span></td><td class="sag"><button class="btn btn-cizgi">Tamamlandı</button></td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ================= NOTLAR ================= -->
+<section class="ekran" id="notlar">
+  <div class="sayfa-bas"><div><h1>Notlar</h1><p>Ekip içi kısa notlar; bir kişiye yazılırsa ona Telegram'dan haber gider</p></div><div class="ust-araclar"><button class="btn btn-ana">+ Not</button></div></div>
+  <div class="izgara g3" data-not="Not kartları|Ekip içi yazışma. Not bir kişiye atanırsa o kişiye Telegram bildirimi gider. Bir kayda (sipariş, fatura, parti) bağlanabilir, o kaydın sayfasında da görünür.">
+    <div class="kart kart-ic"><span class="etk e-mavi">Zehra → Canan</span><p>Yılmaz Gıda peynir fiyatını 1 Aralık'tan itibaren %8 artıracakmış.</p><small style="color:var(--soluk)">Bugün 10:12 · Cari: Yılmaz Gıda</small></div>
+    <div class="kart kart-ic"><span class="etk e-amber">Ayşe → Herkes</span><p>2 numaralı şok dondurucu -15°C'de kalıyor, servis çağrılmalı.</p><small style="color:var(--soluk)">Dün 16:40</small></div>
+    <div class="kart kart-ic"><span class="etk e-gri">Canan</span><p>Okul kantini her ay düzenli 80 içli köfte istiyor, sabit sipariş yapalım.</p><small style="color:var(--soluk)">5 Kasım · Sipariş: SP-0222</small></div>
+  </div>
+</section>
+
+<!-- ================= ALIŞ ================= -->
+<section class="ekran" id="alis">
+  <div class="sayfa-bas"><div><h1>Yeni alış</h1><p>Tedarikçiden gelen mal ve faturası</p></div><div class="ust-araclar"><button class="btn btn-cizgi">Alış listesi</button></div></div>
+  <div class="kart kart-ic" style="display:flex;flex-direction:column;gap:18px">
+    <div class="form-satir" data-not="Fatura üst bilgisi|Tedarikçi yazarken mevcut cariler önerilir; yoksa tek tıkla yeni cari açılır ve muhasebe kodu (320.01.xxx) otomatik verilir. Vade girilirse ödeme günü hatırlatıcısı kendiliğinden kurulur.">
+      <div class="alan" style="flex:2 1 260px"><label>Tedarikçi</label><input value="Yılmaz Gıda"></div>
+      <div class="alan"><label>Fatura no</label><input value="YLM2026-0418"></div>
+      <div class="alan"><label>Fatura tarihi</label><input value="07.11.2026"></div>
+      <div class="alan"><label>Vade</label><input value="30 gün · 07.12.2026"></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center" data-not="Fotoğraftan okuma|Faturanın fotoğrafı çekilir, yapay zeka kalemleri, miktarları, fiyatları ve KDV'yi okuyup aşağıdaki tabloya doldurur. Kullanıcı kontrol eder, düzeltir, kaydeder.">
+      <button class="btn btn-cizgi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>Faturayı fotoğraftan okut</button>
+      <span style="color:var(--soluk);font-size:13px">veya e-fatura XML dosyası yükle</span>
+    </div>
+    <div class="tablo-kutu" data-not="Fatura kalemleri|Her satır bir malzeme. Malzeme adı yazılırken stok kartları önerilir (ceviz yazınca 'Ceviz içi' çıkar); listede yoksa yeni kart açılır. Tutar ve KDV otomatik hesaplanır.">
+      <table><thead><tr><th>Malzeme</th><th>Stok kodu</th><th class="sag">Miktar</th><th>Birim</th><th class="sag">Birim fiyat</th><th class="sag">KDV</th><th class="sag">Tutar</th></tr></thead><tbody>
+        <tr><td><b>Un (Tip 550)</b></td><td><span class="kod">150.01.001</span></td><td class="sag num">500</td><td>kg</td><td class="sag num">18,50</td><td class="sag">%1</td><td class="sag num">9.250,00</td></tr>
+        <tr><td><b>Beyaz peynir</b></td><td><span class="kod">150.01.002</span></td><td class="sag num">40</td><td>kg</td><td class="sag num">210,00</td><td class="sag">%1</td><td class="sag num">8.400,00</td></tr>
+        <tr><td colspan="7" style="color:var(--mavi);font-weight:700">+ Kalem ekle</td></tr>
+      </tbody></table>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-end">
+      <div class="alan" style="flex:0 1 auto" data-not="Ödeme şekli|Kullanıcı sadece nasıl ödendiğini seçer. Seçime göre sistem doğru hesabı kullanır: Veresiye → 320 tedarikçi borcu, Kasa → 100, Banka → 102, Kredi kartı → 300 (alt hesap), Çek → 103.">
+        <label>Ödeme şekli</label>
+        <div class="secim"><button class="aktif">Veresiye</button><button>Kasa</button><button>Banka</button><button>Kredi kartı</button><button>Çek</button></div>
+      </div>
+      <div class="toplam"><span class="num" style="color:var(--soluk)">Ara toplam 17.650,00 · KDV 176,50</span><span class="buyuk num">17.826,50 ₺</span></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-cizgi">Taslak kaydet</button><button class="btn btn-ana">Kaydet</button></div>
+  </div>
+  <div class="muh" data-not="Muhasebe karşılığı|Kaydın arka planda hangi hesap kodlarıyla muhasebeye yazıldığı. Kullanıcı görmek zorunda değil; muhasebeci kontrol etsin diye var. Borç toplamı alacak toplamına eşit değilse sistem kaydı kabul etmez.">
+    <div class="kart-bas"><h2>⇄ Muhasebe karşılığı <span class="etk e-gri">otomatik</span></h2><span class="etk e-yesil">Borç = Alacak ✓</span></div>
+    <div class="tablo-kutu"><table><thead><tr><th>Hesap kodu</th><th>Hesap adı</th><th class="sag">Borç</th><th class="sag">Alacak</th></tr></thead><tbody>
+      <tr><td><span class="kod">150.01.001</span></td><td>İlk Madde ve Malzeme · Un</td><td class="sag num">9.250,00</td><td></td></tr>
+      <tr><td><span class="kod">150.01.002</span></td><td>İlk Madde ve Malzeme · Beyaz peynir</td><td class="sag num">8.400,00</td><td></td></tr>
+      <tr><td><span class="kod">191.01</span></td><td>İndirilecek KDV · %1</td><td class="sag num">176,50</td><td></td></tr>
+      <tr><td><span class="kod">320.01.001</span></td><td>Satıcılar · Yılmaz Gıda</td><td></td><td class="sag num">17.826,50</td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<!-- ================= ÜRETİM ================= -->
+<section class="ekran" id="uretim">
+  <div class="sayfa-bas"><div><h1>Üretim</h1><p>Parti kaydı tesiste telefondan girilir; masaüstünde özet ve geçmiş</p></div><div class="ust-araclar"><button class="btn btn-cizgi">Reçeteler</button><button class="btn btn-ana">+ Yeni parti</button></div></div>
+  <div class="telefon-sar">
+    <div class="telefon" data-not="Tesis ekranı (telefon)|Üretimde çalışan kişinin gördüğü ekran. Büyük düğmeler, az yazı. 'Başladı' ve 'Bitti' saati tutar; tartılan malzeme kilo olarak girilir; reçeteden fazla giden satır turuncu yanar. Telefonu olmayan Telegram'dan sesli de söyleyebilir.">
+      <div class="telefon-ekran">
+        <div class="tel-bas"><small>Parti #113</small><div style="font-size:19px;font-weight:800">Su böreği · 1 kg</div><small>Sorumlu: Ayşe · Başladı 08:10</small></div>
+        <div class="tel-govde">
+          <button class="btn btn-ana dev">■ Bitti olarak işaretle</button>
+          <div style="font-weight:800;margin-top:4px">Tartılan malzeme</div>
+          <div class="tartim"><div><b>Un</b><small>Reçete 40,0 kg</small></div><b class="num amber">42,0 kg</b></div>
+          <div class="tartim"><div><b>Beyaz peynir</b><small>Reçete 12,0 kg</small></div><b class="num">12,5 kg</b></div>
+          <div class="tartim"><div><b>Kutu 1 kg</b><small>Reçete 320 adet</small></div><b class="num amber">332</b></div>
+          <button class="btn btn-cizgi dev">+ Malzeme ekle</button>
+          <div style="font-weight:800;margin-top:4px">Çıktı</div>
+          <div class="tartim"><div><b>Paketlenen</b><small>Lot 1107-113 · SKT 07.05.2027</small></div><b class="num">320</b></div>
+          <div class="tartim"><div><b>Bozuk / atılan</b><small>Neden: yırtık hamur</small></div><b class="num kirmizi">12</b></div>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1 1 420px;min-width:0;display:flex;flex-direction:column;gap:16px">
+      <div class="izgara g4" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))" data-not="Parti sonucu|Parti bitince sistem kendisi hesaplar: kaç saat sürdü, saatte kaç kilo üretildi, bir paketin maliyeti ne oldu, fire yüzde kaç. Bu rakamlar fire ve verim raporlarına gider.">
+        <div class="kart kart-ic metrik"><div class="etiket">Süre</div><div class="deger num" style="font-size:22px">3 sa 20 dk</div></div>
+        <div class="kart kart-ic metrik"><div class="etiket">Verim</div><div class="deger num" style="font-size:22px">96 kg/sa</div></div>
+        <div class="kart kart-ic metrik"><div class="etiket">Birim maliyet</div><div class="deger num" style="font-size:22px">84,30 ₺</div></div>
+        <div class="kart kart-ic metrik"><div class="etiket">Fire</div><div class="deger num amber" style="font-size:22px">%3,6</div></div>
+      </div>
+      <div class="kart" data-not="Son partiler|Her partinin özeti. Reçeteden sapan ya da firesi yüksek parti renkli görünür; tıklayınca detayına girilir.">
+        <div class="kart-bas"><h2>Son partiler</h2><a href="#">Tümü ›</a></div>
+        <div class="tablo-kutu"><table><thead><tr><th>Parti</th><th>Ürün</th><th>Sorumlu</th><th class="sag">Çıktı</th><th class="sag">Fire</th><th>Durum</th></tr></thead><tbody>
+          <tr><td>#114</td><td>İçli köfte</td><td>Ayşe</td><td class="sag num">110/200</td><td class="sag">—</td><td><span class="etk e-mavi">Devam</span></td></tr>
+          <tr><td>#113</td><td>Su böreği</td><td>Ayşe</td><td class="sag num">320</td><td class="sag num">%3,6</td><td><span class="etk e-yesil">Bitti</span></td></tr>
+          <tr><td>#112</td><td>Su böreği</td><td>Hatice</td><td class="sag num">300</td><td class="sag num amber">%9,1</td><td><span class="etk e-amber">Reçete sapması</span></td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="muh" style="margin-top:0" data-not="Üretimin muhasebe karşılığı|Kullanılan malzeme stoktan düşer ve maliyete yazılır (710); ay sonunda bu maliyet ürüne aktarılır (152). Fire maliyete dahildir. Normalin üstündeki fire raporda görünür ama sistem onu otomatik 689'a ayırmaz; ayırma kararını muhasebeci verir.">
+        <div class="kart-bas"><h2>⇄ Muhasebe karşılığı <span class="etk e-gri">7/A varsayımı</span></h2></div>
+        <div class="tablo-kutu"><table><thead><tr><th>Ne zaman</th><th>Hesap</th><th class="sag">Borç</th><th class="sag">Alacak</th></tr></thead><tbody>
+          <tr><td>Parti bitince</td><td><span class="kod">710.01</span> Direkt ilk madde gideri</td><td class="sag num">4.418,60</td><td></td></tr>
+          <tr><td></td><td><span class="kod">150.01.xxx</span> Un, peynir, kutu</td><td></td><td class="sag num">4.418,60</td></tr>
+          <tr><td>Ay sonu</td><td><span class="kod">152.01.001</span> Mamul · Su böreği</td><td class="sag num">26.976,00</td><td></td></tr>
+          <tr><td></td><td><span class="kod">711 / 721 / 731</span> Yansıtma</td><td></td><td class="sag num">26.976,00</td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SATIŞ ================= -->
+<section class="ekran" id="satis">
+  <div class="sayfa-bas"><div><h1>Yeni satış</h1><p>Sevk ve satış faturası</p></div><div class="ust-araclar"><button class="btn btn-cizgi">Siparişten oluştur</button></div></div>
+  <div class="kart kart-ic" style="display:flex;flex-direction:column;gap:18px">
+    <div class="form-satir"><div class="alan" style="flex:2 1 260px"><label>Müşteri</label><input value="Yıldız Market"></div><div class="alan"><label>Tarih</label><input value="07.11.2026"></div><div class="alan"><label>Vade</label><input value="15 gün"></div></div>
+    <div class="tablo-kutu" data-not="Satış kalemleri ve lot|Ürün seçilince soğuk depodaki lotlar listelenir; son kullanma tarihi en yakın olan önce önerilir (ilk giren ilk çıkar). Böylece hangi müşteriye hangi lotun gittiği de kayıt altında olur.">
+      <table><thead><tr><th>Ürün</th><th>Lot / SKT</th><th class="sag">Adet</th><th class="sag">Fiyat</th><th class="sag">KDV</th><th class="sag">Tutar</th></tr></thead><tbody>
+        <tr><td><b>Su böreği 1 kg</b></td><td>1107-113 · 07.05.27</td><td class="sag num">120</td><td class="sag num">150,00</td><td class="sag">%1</td><td class="sag num">18.000,00</td></tr>
+        <tr><td><b>İçli köfte 20'li</b></td><td><span class="etk e-amber">0921 · SKT yakın</span></td><td class="sag num">40</td><td class="sag num">165,00</td><td class="sag">%1</td><td class="sag num">6.600,00</td></tr>
+      </tbody></table>
+    </div>
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px;align-items:flex-end">
+      <div class="alan" style="flex:0 1 auto"><label>Tahsilat</label><div class="secim"><button class="aktif">Veresiye</button><button>Nakit</button><button>Havale</button><button>Kredi kartı (POS)</button><button>Çek</button></div></div>
+      <div class="toplam"><span class="num" style="color:var(--soluk)">Ara toplam 24.600,00 · KDV 246,00</span><span class="buyuk num">24.846,00 ₺</span></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end"><button class="btn btn-ana">Kaydet</button></div>
+  </div>
+  <div class="muh">
+    <div class="kart-bas"><h2>⇄ Muhasebe karşılığı <span class="etk e-gri">otomatik</span></h2><span class="etk e-yesil">Borç = Alacak ✓</span></div>
+    <div class="tablo-kutu"><table><thead><tr><th>Hesap kodu</th><th>Hesap adı</th><th class="sag">Borç</th><th class="sag">Alacak</th></tr></thead><tbody>
+      <tr><td><span class="kod">120.01.001</span></td><td>Alıcılar · Yıldız Market</td><td class="sag num">24.846,00</td><td></td></tr>
+      <tr><td><span class="kod">600.01</span></td><td>Yurtiçi Satışlar · Donuk hamur işleri</td><td></td><td class="sag num">24.600,00</td></tr>
+      <tr><td><span class="kod">391.01</span></td><td>Hesaplanan KDV · %1</td><td></td><td class="sag num">246,00</td></tr>
+      <tr><td><span class="kod">620.01</span></td><td>Satılan Mamuller Maliyeti</td><td class="sag num">13.796,00</td><td></td></tr>
+      <tr><td><span class="kod">152.01</span></td><td>Mamuller (stoktan çıkış)</td><td></td><td class="sag num">13.796,00</td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<!-- ================= STOK ================= -->
+<section class="ekran" id="stok">
+  <div class="sayfa-bas"><div><h1>Stok</h1><p>Hammadde, ambalaj ve ürünler · kuru depo ve soğuk depo</p></div>
+    <div class="ust-araclar" data-not="Stok işlemleri|Sayım gir: depodaki gerçek miktar girilir, sistemle farkı 'açıklanamayan fark' olarak kaydedilir (kaçak burada yakalanır). Kartları birleştir: aynı malzeme iki kez açıldıysa tek karta toplanır. Yeni kart: yeni malzeme/ürün; kodu otomatik verilir.">
+      <button class="btn btn-cizgi">Sayım gir</button><button class="btn btn-cizgi">Kartları birleştir</button><button class="btn btn-ana">+ Yeni kart</button></div></div>
+  <div class="secim" style="margin-bottom:14px" data-not="Filtreler|Listeyi türüne veya deposuna göre daraltır.">
+    <button class="aktif">Tümü</button><button>Hammadde</button><button>Ambalaj</button><button>Ürün</button><button>Soğuk depo</button><button>Uyarısı olanlar</button></div>
+  <div class="kart tablo-kutu" data-not="Stok kartları|Her kartın anlık miktarı, ortalama maliyeti ve toplam değeri. Muhasebe kodu kart açılırken otomatik verilir: hammadde 150.01.xxx, ambalaj 150.02.xxx, ürün 152.01.xxx.">
+    <table><thead><tr><th>Kart</th><th>Kod</th><th>Tür</th><th>Depo</th><th class="sag">Miktar</th><th class="sag">Ort. maliyet</th><th class="sag">Değer</th><th>Durum</th></tr></thead><tbody>
+      <tr><td><b>Un (Tip 550)</b></td><td><span class="kod">150.01.001</span></td><td>Hammadde</td><td>Kuru</td><td class="sag num">462 kg</td><td class="sag num">18,20</td><td class="sag num">8.408</td><td><span class="etk e-kirmizi">Sayımda 38 kg eksik</span></td></tr>
+      <tr><td><b>Kıyma</b></td><td><span class="kod">150.01.003</span></td><td>Hammadde</td><td>Soğuk</td><td class="sag num">14 kg</td><td class="sag num">520,00</td><td class="sag num">7.280</td><td><span class="etk e-amber">Minimumun altında</span></td></tr>
+      <tr><td><b>Ceviz içi</b></td><td><span class="kod">150.01.004</span></td><td>Hammadde</td><td>Kuru</td><td class="sag num">25 kg</td><td class="sag num">340,00</td><td class="sag num">8.500</td><td><span class="etk e-yesil">Normal</span></td></tr>
+      <tr><td><b>Kutu 1 kg</b></td><td><span class="kod">150.02.001</span></td><td>Ambalaj</td><td>Kuru</td><td class="sag num">1.840 ad</td><td class="sag num">3,10</td><td class="sag num">5.704</td><td><span class="etk e-yesil">Normal</span></td></tr>
+      <tr><td><b>Su böreği 1 kg</b></td><td><span class="kod">152.01.001</span></td><td>Ürün</td><td>Soğuk −18°C</td><td class="sag num">410 ad</td><td class="sag num">84,30</td><td class="sag num">34.563</td><td><span class="etk e-gri">3 lot</span></td></tr>
+      <tr><td><b>İçli köfte 20'li</b></td><td><span class="kod">152.01.002</span></td><td>Ürün</td><td>Soğuk −18°C</td><td class="sag num">96 pk</td><td class="sag num">92,00</td><td class="sag num">8.832</td><td><span class="etk e-amber">Lot 0921 SKT 10 gün</span></td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ================= KASA / BANKA ================= -->
+<section class="ekran" id="kasa">
+  <div class="sayfa-bas"><div><h1>Kasa ve Banka</h1><p>Para nerede, ne zaman giriyor, ne zaman çıkıyor</p></div>
+    <div class="ust-araclar"><button class="btn btn-cizgi">Virman</button><button class="btn btn-cizgi">Çek al / ver</button><button class="btn btn-cizgi">Ödeme</button><button class="btn btn-ana">+ Tahsilat</button></div></div>
+  <div class="izgara g3" data-not="Hesap kartları|Her para hesabı ayrı kart: nakit kasa, her banka hesabı, POS'ta bekleyen para, alınan/verilen çekler, şirket kredi kartı. Yanındaki kod o hesabın muhasebedeki karşılığı.">
+    <div class="kart kart-ic metrik"><div class="etiket">Nakit kasa <span class="kod">100.01</span></div><div class="deger num">12.400 ₺</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Ziraat vadesiz <span class="kod">102.01</span></div><div class="deger num">171.850 ₺</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">POS'ta bekleyen <span class="kod">108.01</span></div><div class="deger num">3.450 ₺</div><div class="alt">Ertesi gün bankaya geçer</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Portföydeki çekler <span class="kod">101.01</span></div><div class="deger num">20.000 ₺</div><div class="alt">2 çek</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Verilen çekler <span class="kod">103.01</span></div><div class="deger num kirmizi">15.000 ₺</div><div class="alt">Vadesi 14.11</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Şirket kredi kartı <span class="kod">300.02</span></div><div class="deger num kirmizi">6.120 ₺</div><div class="alt">Son ödeme 20.11</div></div>
+  </div>
+  <div class="kart tablo-kutu" style="margin-top:16px" data-not="Para hareketleri|Her giriş-çıkış, kimden/kime olduğu ve hangi faturayı kapattığıyla. Son sütun muhasebe karşılığı: B = borç, A = alacak. Kullanıcı sadece işlem türünü seçer, kodları sistem yazar.">
+    <table><thead><tr><th>Tarih</th><th>İşlem</th><th>Kimden / kime</th><th class="sag">Tutar</th><th>Muhasebe karşılığı</th></tr></thead><tbody>
+      <tr><td>07.11</td><td><span class="etk e-yesil">Tahsilat</span> havale</td><td>Kaya Pastanesi</td><td class="sag num yesil">+12.000</td><td><span class="kod">102.01</span> B · <span class="kod">120.01.002</span> A</td></tr>
+      <tr><td>07.11</td><td><span class="etk e-yesil">Tahsilat</span> kartla</td><td>Perakende satış</td><td class="sag num yesil">+3.450</td><td><span class="kod">108.01</span> B · <span class="kod">600.01</span> A</td></tr>
+      <tr><td>08.11</td><td><span class="etk e-gri">POS bankaya geçti</span></td><td>Ziraat POS</td><td class="sag num">3.450</td><td><span class="kod">102.01</span> B 3.381 · <span class="kod">780</span> B 69 · <span class="kod">108.01</span> A</td></tr>
+      <tr><td>06.11</td><td><span class="etk e-kirmizi">Gider</span> kasadan</td><td>Elektrik faturası</td><td class="sag num kirmizi">−3.240</td><td><span class="kod">730.01</span> B · <span class="kod">191</span> B · <span class="kod">100.01</span> A</td></tr>
+      <tr><td>05.11</td><td><span class="etk e-mavi">Çek alındı</span></td><td>Yıldız Market</td><td class="sag num">10.000</td><td><span class="kod">101.01</span> B · <span class="kod">120.01.001</span> A</td></tr>
+      <tr><td>05.11</td><td><span class="etk e-amber">Çek verildi</span></td><td>Yılmaz Gıda</td><td class="sag num">15.000</td><td><span class="kod">320.01.001</span> B · <span class="kod">103.01</span> A</td></tr>
+      <tr><td>04.11</td><td><span class="etk e-amber">Kredi kartı</span></td><td>Paket A.Ş. (ambalaj)</td><td class="sag num">6.120</td><td><span class="kod">320.01.002</span> B · <span class="kod">300.02</span> A</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ================= CARİLER ================= -->
+<section class="ekran" id="cari">
+  <div class="sayfa-bas"><div><h1>Cariler</h1><p>Müşteriler ve tedarikçiler</p></div><div class="ust-araclar"><button class="btn btn-cizgi">Yaşlandırma raporu</button><button class="btn btn-ana">+ Yeni cari</button></div></div>
+  <div class="izgara g-panel">
+    <div class="kart tablo-kutu" data-not="Cari listesi|Her müşteri ve tedarikçinin bakiyesi ve vade durumu. Kod otomatik verilir: müşteri 120.01.xxx, tedarikçi 320.01.xxx. Hem alıp hem sattığımız biri varsa iki kodu da olur.">
+      <table><thead><tr><th>Cari</th><th>Kod</th><th>Tür</th><th class="sag">Bakiye</th><th>Vade</th></tr></thead><tbody>
+        <tr style="background:var(--mavi-acik)"><td><b>Yıldız Market</b></td><td><span class="kod">120.01.001</span></td><td>Müşteri</td><td class="sag num">33.346 A</td><td><span class="etk e-kirmizi">12 gün gecikme</span></td></tr>
+        <tr><td><b>Kaya Pastanesi</b></td><td><span class="kod">120.01.002</span></td><td>Müşteri</td><td class="sag num">6.200 A</td><td><span class="etk e-gri">Vadesinde</span></td></tr>
+        <tr><td><b>Yılmaz Gıda</b></td><td><span class="kod">320.01.001</span></td><td>Tedarikçi</td><td class="sag num">27.826 B</td><td><span class="etk e-amber">Bu hafta</span></td></tr>
+        <tr><td><b>Paket A.Ş.</b></td><td><span class="kod">320.01.002</span></td><td>Tedarikçi</td><td class="sag num">0</td><td><span class="etk e-yesil">Kapalı</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="kart" data-not="Cari ekstresi|Seçilen carinin bütün hareketleri ve yürüyen bakiye. Excel/PDF olarak indirilip müşteriye mutabakat için gönderilebilir.">
+      <div class="kart-bas"><h2>Yıldız Market · ekstre</h2><button class="btn btn-cizgi" style="min-height:34px;padding:6px 11px">Excel</button></div>
+      <table><thead><tr><th>Tarih</th><th>Belge</th><th class="sag">Borç</th><th class="sag">Bakiye</th></tr></thead><tbody>
+        <tr><td>20.10</td><td>SAT-0371</td><td class="sag num">18.500</td><td class="sag num">18.500</td></tr>
+        <tr><td>05.11</td><td>Çek alındı</td><td class="sag num">−10.000</td><td class="sag num">8.500</td></tr>
+        <tr><td>07.11</td><td>SAT-0392</td><td class="sag num">24.846</td><td class="sag num"><b>33.346</b></td></tr>
+      </tbody></table>
+      <div class="kart-ic" style="border-top:1px solid var(--cizgi);font-size:13px;color:var(--soluk)">Vergi no: [VERGİ NO] · Vade: 15 gün · IBAN: [IBAN]</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RAPORLAR ================= -->
+<section class="ekran" id="rapor">
+  <div class="sayfa-bas"><div><h1>Raporlar</h1><p>Her rapor Excel ve PDF olarak indirilebilir</p></div></div>
+  <div class="kart" data-not="Fire ve kaçak raporu|Programın kuruluş amacı. Kayıp üç ayrı sütunda: (1) reçeteden fazla harcanan malzeme, (2) üretimde bozulup atılan ürün, (3) depoda sayımla sistem arasındaki açıklanamayan fark. Üçüncüsü kaçak veya kayıt hatasıdır.">
+    <div class="kart-bas"><h2>Fire ve kaçak · Ekim 2026</h2><button class="btn btn-cizgi" style="min-height:34px;padding:6px 11px">Excel</button></div>
+    <div class="tablo-kutu"><table><thead><tr><th>Ürün / malzeme</th><th class="sag">Reçeteden fazla</th><th class="sag">Üretimde bozulan</th><th class="sag">Açıklanamayan fark</th><th class="sag">Toplam kayıp</th></tr></thead><tbody>
+      <tr><td><b>Su böreği</b></td><td class="sag num">6.420 ₺</td><td class="sag num">3.120 ₺</td><td class="sag">—</td><td class="sag num kirmizi">9.540 ₺</td></tr>
+      <tr><td><b>İçli köfte</b></td><td class="sag num">2.980 ₺</td><td class="sag num">1.450 ₺</td><td class="sag">—</td><td class="sag num">4.430 ₺</td></tr>
+      <tr><td><b>Un (depo)</b></td><td class="sag">—</td><td class="sag">—</td><td class="sag num kirmizi">692 ₺ · 38 kg</td><td class="sag num">692 ₺</td></tr>
+      <tr><td><b>Toplam</b></td><td class="sag num"><b>9.400 ₺</b></td><td class="sag num"><b>4.570 ₺</b></td><td class="sag num"><b>692 ₺</b></td><td class="sag num kirmizi">14.662 ₺</td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="izgara g3" style="margin-top:16px" data-not="Diğer raporlar|Her kutu ayrı bir rapor. Üstteki dönem seçiciyle ay veya yıl seçilir.">
+    <div class="kart kart-ic"><b>Üretim verimi</b><p style="color:var(--soluk);margin:6px 0 0">Parti süresi, kg/saat, sorumlu bazında</p></div>
+    <div class="kart kart-ic"><b>Maliyet ve kârlılık</b><p style="color:var(--soluk);margin:6px 0 0">Ürün başına maliyet ve satış fiyatı</p></div>
+    <div class="kart kart-ic"><b>Mizan</b><p style="color:var(--soluk);margin:6px 0 0">Her hesap kodunun borç, alacak, bakiyesi</p></div>
+    <div class="kart kart-ic"><b>Cari yaşlandırma</b><p style="color:var(--soluk);margin:6px 0 0">Alacaklar 0–30 / 31–60 / 60+ gün</p></div>
+    <div class="kart kart-ic"><b>Stok ve lot</b><p style="color:var(--soluk);margin:6px 0 0">Miktar, değer, SKT takibi</p></div>
+    <div class="kart kart-ic"><b>KDV özeti</b><p style="color:var(--soluk);margin:6px 0 0">191 indirilecek, 391 hesaplanan</p></div>
+  </div>
+</section>
+
+<!-- ================= HESAP PLANI ================= -->
+<section class="ekran" id="hesap">
+  <div class="sayfa-bas"><div><h1>Hesap Planı</h1><p>Programın kullandığı muhasebe kodları (Tek Düzen Hesap Planı)</p></div><div class="ust-araclar"><button class="btn btn-cizgi">Excel indir</button><button class="btn btn-ana">+ Alt hesap</button></div></div>
+  <div class="kart kart-ic" data-not="Kod mantığı|İlk rakam hesabın grubunu söyler. Ana kodun arkasına nokta ile alt hesap açılır: 102 Bankalar → 102.01 Ziraat → 102.02 Halkbank. Müşteri, tedarikçi ve stok kartı açıldıkça alt hesapları program kendisi açar.">
+    <div class="izgara g4" style="gap:10px">
+      <div><span class="kod">1</span> Dönen varlıklar<br><small style="color:var(--soluk)">Para, alacak, stok</small></div>
+      <div><span class="kod">2</span> Duran varlıklar<br><small style="color:var(--soluk)">Makine, araç</small></div>
+      <div><span class="kod">3</span> Kısa vadeli borçlar<br><small style="color:var(--soluk)">Tedarikçi, kart, vergi</small></div>
+      <div><span class="kod">5</span> Öz kaynaklar<br><small style="color:var(--soluk)">Ortak sermayesi</small></div>
+      <div><span class="kod">6</span> Gelir tablosu<br><small style="color:var(--soluk)">Satış, maliyet</small></div>
+      <div><span class="kod">7</span> Maliyet hesapları<br><small style="color:var(--soluk)">Üretim ve giderler</small></div>
+    </div>
+  </div>
+  <div class="kart" style="margin-top:16px" data-not="Hesap listesi|Programda kullanılan her kod; resmî adı, sade açıklaması ve bizdeki alt hesap örnekleri. Muhasebecinin kontrol edip onaylayacağı liste.">
+    <details class="hp" open><summary><span class="grup-no">10</span>Hazır değerler <small>nakit, banka, çek, POS</small></summary>
+      <div class="tablo-kutu"><table><thead><tr><th>Kod</th><th>Resmî adı</th><th>Ne için</th><th>Alt hesaplar</th></tr></thead><tbody>
+        <tr><td><span class="kod">100</span></td><td>Kasa</td><td>Elde tutulan nakit</td><td><span class="kod">100.01</span> Merkez kasa</td></tr>
+        <tr><td><span class="kod">101</span></td><td>Alınan Çekler</td><td>Müşteriden alınıp henüz tahsil edilmemiş çekler</td><td><span class="kod">101.01</span> Portföy · <span class="kod">101.02</span> Tahsile verilen</td></tr>
+        <tr><td><span class="kod">102</span></td><td>Bankalar</td><td>Banka hesapları, her hesap ayrı</td><td><span class="kod">102.01</span> Ziraat TL · <span class="kod">102.02</span> Halkbank TL</td></tr>
+        <tr><td><span class="kod">103</span></td><td>Verilen Çekler ve Ödeme Emirleri (−)</td><td>Bizim yazdığımız, ödenmemiş çekler</td><td><span class="kod">103.01</span> Ziraat çek hesabı</td></tr>
+        <tr><td><span class="kod">108</span></td><td>Diğer Hazır Değerler</td><td>Kartlı satışta POS'ta bekleyen para</td><td><span class="kod">108.01</span> Ziraat POS</td></tr>
+      </tbody></table></div></details>
+    <details class="hp"><summary><span class="grup-no">12</span>Ticari alacaklar <small>müşteriler</small></summary>
+      <div class="tablo-kutu"><table><tbody>
+        <tr><td><span class="kod">120</span></td><td>Alıcılar</td><td>Veresiye satılan müşteriler</td><td><span class="kod">120.01.001</span> Yıldız Market</td></tr>
+        <tr><td><span class="kod">121</span></td><td>Alacak Senetleri</td><td>Müşteriden alınan senetler</td><td>—</td></tr>
+      </tbody></table></div></details>
+    <details class="hp" open><summary><span class="grup-no">15</span>Stoklar <small>hammadde, ambalaj, ürün</small></summary>
+      <div class="tablo-kutu"><table><tbody>
+        <tr><td><span class="kod">150</span></td><td>İlk Madde ve Malzeme</td><td>Hammadde ve ambalaj</td><td><span class="kod">150.01</span> Hammadde · <span class="kod">150.02</span> Ambalaj</td></tr>
+        <tr><td><span class="kod">151</span></td><td>Yarı Mamuller</td><td>Üretimi bitmemiş ürün</td><td>Ay sonu</td></tr>
+        <tr><td><span class="kod">152</span></td><td>Mamuller</td><td>Ürettiğimiz, satışa hazır ürün</td><td><span class="kod">152.01.001</span> Su böreği</td></tr>
+        <tr><td><span class="kod">153</span></td><td>Ticari Mallar</td><td>Üretmeden alıp sattığımız mal</td><td>Varsa</td></tr>
+      </tbody></table></div></details>
+    <details class="hp"><summary><span class="grup-no">19</span>KDV ve avanslar</summary>
+      <div class="tablo-kutu"><table><tbody>
+        <tr><td><span class="kod">190</span></td><td>Devreden KDV</td><td>Sonraki aya devreden KDV</td><td>—</td></tr>
+        <tr><td><span class="kod">191</span></td><td>İndirilecek KDV</td><td>Alışta ödenen KDV</td><td><span class="kod">191.01</span> %1 · <span class="kod">191.10</span> %10 · <span class="kod">191.20</span> %20</td></tr>
+        <tr><td><span class="kod">195</span></td><td>İş Avansları</td><td>Bir iş için çalışana verilen para</td><td>—</td></tr>
+        <tr><td><span class="kod">196</span></td><td>Personel Avansları</td><td>Maaştan düşülecek avans</td><td>—</td></tr>
+      </tbody></table></div></details>
+    <details class="hp"><summary><span class="grup-no">25</span>Maddi duran varlıklar</summary>
+      <div class="tablo-kutu"><table><tbody>
+        <tr><td><span class="kod">253</span></td><td>Tesis, Makine ve Cihazlar</td><td>Hamur makinesi, şok dondurucu, soğuk oda</td><td>—</td></tr>
+        <tr><td><span class="kod">254</span></td><td>Taşıtlar</td><td>Frigorifik araç</td><td>—</td></tr>
+        <tr><td><span class="kod">255</span></td><td>Demirbaşlar</td><td>Tartı, bilgisayar, mobilya</td><td>—</td></tr>
+        <tr><td><span class="kod">257</span></td><td>Birikmiş Amortismanlar (−)</td><td>Yıpranma payı</td><td>—</td></tr>
+      </tbody></table></div></details>
+    <details class="hp" open><summary><span class="grup-no">30</span>Kısa vadeli borçlar <small>tedarikçi, kredi kartı, banka kredisi, vergi</small></summary>
+      <div class="tablo-kutu"><table><tbody>
+        <tr><td><span class="kod">300</span></td><td>Banka Kredileri</td><td>Kredi, kredili mevduat hesabı</td><td><span class="kod">300.01</span> Ziraat işletme kredisi</td></tr>
+        <tr><td><span class="kod">300</span></td><td>Banka Kredileri</td><td>Şirket kredi kartı borcu (alt hesap)</td><td><span class="kod">300.02</span> Ziraat şirket kartı</td></tr>
+        <tr><td><span class="kod">320</span></td><td>Satıcılar</td><td>Veresiye alınan tedarikçiler</td><td><span class="kod">320.01.001</span> Yılmaz Gıda</td></tr>
+        <tr><td><span class="kod">321</span></td><td>Borç Senetleri</td><td>Verdiğimiz senetler</td><td>—</td></tr>
+        <tr><td><span class="kod">331</span></td><td>Ortaklara Borçlar</td><td>Kooperatif ortaklarına borç</td><td>Ortak bazında</td></tr>
+        <tr><td><span class="kod">335</span></td><td>Personele Borçlar</td><td>Ödenmemiş maaş</td><td>—</td></tr>
+        <tr><td><span class="kod">340</span></td><td>Alınan Sipariş Avansları</td><td>Peşin alınan, malı verilmemiş</td><td>—</td></tr>
+        <tr><td><span class="kod">360</span></td><td>Ödenecek Vergi ve Fonlar</td><td>Stopaj, ödenecek KDV</td><td>—</td></tr>
+        <tr><td><span class="kod">361</span></td><td>Ödenecek Sosyal Güvenlik Kesintileri</td><td>SGK primleri</td><td>—</td></tr>
+        <tr><td><span class="kod">391</span></td><td>Hesaplanan KDV</td><td>Satışta alınan KDV</td><td><span class="kod">391.01</span> %1</td></tr>
+      </tbody></table></div></details>
+    <details class="hp"><summary><span class="grup-no">50</span>Sermaye</summary>
+      <div class="tablo-kutu"><table><tbody><tr><td><span class="kod">500</span></td><td>Sermaye</td><td>Ortakların sermaye payları</td><td>—</td></tr></tbody></table></div></details>
+    <details class="hp" open><summary><span class="grup-no">60</span>Gelir tablosu <small>satış, maliyet, diğer</small></summary>
+      <div class="tablo-kutu"><table><tbody>
+        <tr><td><span class="kod">600</span></td><td>Yurtiçi Satışlar</td><td>Ürün satışları</td><td><span class="kod">600.01</span> Donuk hamur işleri</td></tr>
+        <tr><td><span class="kod">602</span></td><td>Diğer Gelirler</td><td>Ana iş dışı gelir</td><td>—</td></tr>
+        <tr><td><span class="kod">610</span></td><td>Satıştan İadeler (−)</td><td>Geri gelen ürün</td><td>—</td></tr>
+        <tr><td><span class="kod">611</span></td><td>Satış İskontoları (−)</td><td>Sonradan yapılan indirim</td><td>—</td></tr>
+        <tr><td><span class="kod">620</span></td><td>Satılan Mamuller Maliyeti (−)</td><td>Satılan ürünün maliyeti</td><td><span class="kod">620.01</span></td></tr>
+      </tbody></table></div></details>
+    <details class="hp" open><summary><span class="grup-no">7</span>Maliyet hesapları <small>7/A</small></summary>
+      <div class="tablo-kutu"><table><tbody>
+        <tr><td><span class="kod">710</span></td><td>Direkt İlk Madde ve Malzeme Giderleri</td><td>Üretimde kullanılan malzeme</td><td><span class="kod">711</span> yansıtma</td></tr>
+        <tr><td><span class="kod">720</span></td><td>Direkt İşçilik Giderleri</td><td>Üretim çalışanlarının ücreti</td><td><span class="kod">721</span> yansıtma</td></tr>
+        <tr><td><span class="kod">730</span></td><td>Genel Üretim Giderleri</td><td>Elektrik, soğuk oda, doğalgaz, bakım</td><td><span class="kod">731</span> yansıtma</td></tr>
+        <tr><td><span class="kod">760</span></td><td>Pazarlama Satış ve Dağıtım Giderleri</td><td>Nakliye, araç yakıtı, reklam</td><td>—</td></tr>
+        <tr><td><span class="kod">770</span></td><td>Genel Yönetim Giderleri</td><td>Ofis, kırtasiye, telefon, müşavir</td><td>—</td></tr>
+        <tr><td><span class="kod">780</span></td><td>Finansman Giderleri</td><td>Kredi faizi, banka masrafı, POS komisyonu</td><td>—</td></tr>
+      </tbody></table></div></details>
+  </div>
+  <div class="soru-kutu" data-not="Muhasebeci için sorular|Programın doğru kodlarla çalışması için muhasebecinin cevaplaması gereken konular. Cevaplara göre kodlar ayarlanır.">
+    <h3>Muhasebeci cevapları (9 Kasım 2026)</h3>
+    <ol>
+      <li>Maliyet sistemi: <b>7/A</b> uygun.</li>
+      <li>Kartlı satış <b>108</b>'de izleniyor; POS komisyonu <b>780</b>'e yazılıyor.</li>
+      <li>Şirket kredi kartı <b>300</b>'de, alt hesap olarak.</li>
+      <li>Cari kodu ile muhasebe kodu <b>birebir aynı</b> (ayrı cari kodu yok). Müşteri 120, tedarikçi 320.</li>
+      <li>Fire için oran belirtilmesin, duruma göre karar veriliyor (sistem otomatik 689 ayırmaz).</li>
+      <li><b>Açık:</b> Mikro'ya aktarım için örnek Excel şablonu henüz cevaplanmadı.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= MUHASEBE AKTARIMI ================= -->
+<section class="ekran" id="aktarim">
+  <div class="sayfa-bas"><div><h1>Muhasebe Aktarımı</h1><p>Seçilen dönemin bütün kayıtları, hesap kodlu fişler halinde</p></div>
+    <div class="ust-araclar"><button class="btn btn-cizgi">Dönemi kapat ve kilitle</button><button class="btn btn-ana" id="indir">Excel indir (örnek)</button></div></div>
+  <div class="izgara g4" data-not="Aktarım kontrolü|Dosya inmeden önce sistem kontrol eder: her fişte borç = alacak mı, kodu eksik satır var mı. Sorun varsa aktarım engellenir ve sorunlu kayıt gösterilir.">
+    <div class="kart kart-ic metrik"><div class="etiket">Fiş sayısı</div><div class="deger num">4</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Satır sayısı</div><div class="deger num">11</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Borç = Alacak</div><div class="deger yesil">Dengede ✓</div></div>
+    <div class="kart kart-ic metrik"><div class="etiket">Kodu eksik satır</div><div class="deger num yesil">0</div></div>
+  </div>
+  <div class="kart tablo-kutu" style="margin-top:16px" data-not="Aktarım dosyasının içeriği|Muhasebe programına gidecek satırlar. Bu genel bir düzendir; Mikro'nun içe aktarma şablonu gelince sütun adları ve sırası birebir ona göre ayarlanır, veri değişmez. 'Excel indir' düğmesi bu tabloyu gerçekten indirir.">
+    <table id="fistablo"><thead><tr><th>Fiş no</th><th>Tarih</th><th>Fiş türü</th><th>Hesap kodu</th><th>Hesap adı</th><th>Açıklama</th><th class="sag">Borç</th><th class="sag">Alacak</th><th>Belge no</th></tr></thead><tbody>
+      <tr><td>M-0001</td><td>07.11.2026</td><td>Alış faturası</td><td><span class="kod">150.01.001</span></td><td>Un</td><td>Yılmaz Gıda alış</td><td class="sag num">9250,00</td><td class="sag"></td><td>YLM2026-0418</td></tr>
+      <tr><td>M-0001</td><td>07.11.2026</td><td>Alış faturası</td><td><span class="kod">150.01.002</span></td><td>Beyaz peynir</td><td>Yılmaz Gıda alış</td><td class="sag num">8400,00</td><td class="sag"></td><td>YLM2026-0418</td></tr>
+      <tr><td>M-0001</td><td>07.11.2026</td><td>Alış faturası</td><td><span class="kod">191.01</span></td><td>İndirilecek KDV %1</td><td>Yılmaz Gıda alış</td><td class="sag num">176,50</td><td class="sag"></td><td>YLM2026-0418</td></tr>
+      <tr><td>M-0001</td><td>07.11.2026</td><td>Alış faturası</td><td><span class="kod">320.01.001</span></td><td>Yılmaz Gıda</td><td>Yılmaz Gıda alış</td><td class="sag"></td><td class="sag num">17826,50</td><td>YLM2026-0418</td></tr>
+      <tr><td>M-0002</td><td>07.11.2026</td><td>Satış faturası</td><td><span class="kod">120.01.001</span></td><td>Yıldız Market</td><td>Satış</td><td class="sag num">24846,00</td><td class="sag"></td><td>SAT-0392</td></tr>
+      <tr><td>M-0002</td><td>07.11.2026</td><td>Satış faturası</td><td><span class="kod">600.01</span></td><td>Yurtiçi satışlar</td><td>Satış</td><td class="sag"></td><td class="sag num">24600,00</td><td>SAT-0392</td></tr>
+      <tr><td>M-0002</td><td>07.11.2026</td><td>Satış faturası</td><td><span class="kod">391.01</span></td><td>Hesaplanan KDV %1</td><td>Satış</td><td class="sag"></td><td class="sag num">246,00</td><td>SAT-0392</td></tr>
+      <tr><td>M-0003</td><td>07.11.2026</td><td>Tahsil fişi</td><td><span class="kod">102.01</span></td><td>Ziraat vadesiz</td><td>Kaya Pastanesi havale</td><td class="sag num">12000,00</td><td class="sag"></td><td>DKN-5521</td></tr>
+      <tr><td>M-0003</td><td>07.11.2026</td><td>Tahsil fişi</td><td><span class="kod">120.01.002</span></td><td>Kaya Pastanesi</td><td>Kaya Pastanesi havale</td><td class="sag"></td><td class="sag num">12000,00</td><td>DKN-5521</td></tr>
+      <tr><td>M-0004</td><td>05.11.2026</td><td>Çek çıkış</td><td><span class="kod">320.01.001</span></td><td>Yılmaz Gıda</td><td>Çek no 448812</td><td class="sag num">15000,00</td><td class="sag"></td><td>448812</td></tr>
+      <tr><td>M-0004</td><td>05.11.2026</td><td>Çek çıkış</td><td><span class="kod">103.01</span></td><td>Ziraat çek hesabı</td><td>Çek no 448812</td><td class="sag"></td><td class="sag num">15000,00</td><td>448812</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+</main>
+</div>
+</div>
+
+<!-- AÇIKLAMA ÇEKMECESİ -->
+<aside class="cekmece" aria-label="Açıklamalar">
+  <div class="cekmece-bas"><div><h3>Bu ekranda ne var?</h3><small style="color:var(--soluk)">Numaraya tıklayın, ilgili yer vurgulanır</small></div><button class="btn btn-cizgi btn-ikon" id="kapat" aria-label="Kapat">✕</button></div>
+  <div class="cekmece-liste" id="liste"></div>
+</aside>
+
+<script>
+(function () {
+  // Her tablo hücresine sütun adını yaz (telefonda kart görünümü için)
+  var hpBasliklar = null;
+  document.querySelectorAll('table').forEach(function (t) {
+    if (t.classList.contains('kompakt')) return;
+    var basliklar = [].map.call(t.querySelectorAll('thead th'), function (th) { return th.textContent.trim(); });
+    if (t.closest('details.hp')) {
+      if (basliklar.length) hpBasliklar = basliklar; else basliklar = hpBasliklar || [];
+    }
+    t.classList.add('kart-tablo');
+    t.querySelectorAll('tbody tr').forEach(function (tr) {
+      var i = 0;
+      [].forEach.call(tr.children, function (td) {
+        td.setAttribute('data-label', basliklar[i] || '');
+        i += td.colSpan || 1;
+      });
+    });
+  });
+
+  var aktifEkran = 'panel';
+  function ekranGoster(id) {
+    aktifEkran = id;
+    document.querySelectorAll('.yan nav button').forEach(function (b) { b.classList.toggle('aktif', b.dataset.e === id); });
+    document.querySelectorAll('.ekran').forEach(function (s) { s.classList.toggle('aktif', s.id === id); });
+    window.scrollTo(0, 0);
+    if (document.body.classList.contains('aciklama')) aciklamalariKur();
+  }
+  document.querySelectorAll('.yan nav button').forEach(function (b) {
+    b.addEventListener('click', function () { ekranGoster(b.dataset.e); document.body.classList.remove('menu-acik'); });
+  });
+  document.getElementById('menuBtn').addEventListener('click', function () { document.body.classList.toggle('menu-acik'); });
+  document.getElementById('perde').addEventListener('click', function () { document.body.classList.remove('menu-acik'); });
+  document.querySelector('.marka').addEventListener('click', function () { ekranGoster('panel'); });
+  document.getElementById('temaBtn').addEventListener('click', function () {
+    var yeni = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', yeni);
+    try { localStorage.setItem('imece-tema', yeni); } catch (e) {}
+  });
+  document.querySelectorAll('.secim').forEach(function (g) {
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      g.querySelectorAll('button').forEach(function (x) { x.classList.toggle('aktif', x === b); });
+    });
+  });
+
+  function temizle() {
+    document.querySelectorAll('.pin').forEach(function (p) { if (!p.closest('.cekmece')) p.remove(); });
+    document.querySelectorAll('.vurgu').forEach(function (v) { v.classList.remove('vurgu'); });
+  }
+  function aciklamalariKur() {
+    temizle();
+    var hedefler = [].slice.call(document.querySelectorAll('[data-not]')).filter(function (el) {
+      var ekran = el.closest('.ekran');
+      return !ekran || ekran.id === aktifEkran;
+    });
+    var liste = document.getElementById('liste'); liste.innerHTML = '';
+    hedefler.forEach(function (el, i) {
+      var parca = el.getAttribute('data-not').split('|');
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+      var pin = document.createElement('span'); pin.className = 'pin'; pin.textContent = i + 1;
+      el.appendChild(pin);
+      var oge = document.createElement('div'); oge.className = 'cekmece-oge';
+      var p2 = document.createElement('span'); p2.className = 'pin'; p2.textContent = i + 1;
+      var metin = document.createElement('div');
+      var b = document.createElement('b'); b.textContent = parca[0];
+      var s = document.createElement('span'); s.textContent = parca[1] || '';
+      metin.appendChild(b); metin.appendChild(s); oge.appendChild(p2); oge.appendChild(metin);
+      liste.appendChild(oge);
+      function sec(kaydir) {
+        document.querySelectorAll('.vurgu').forEach(function (v) { v.classList.remove('vurgu'); });
+        document.querySelectorAll('.cekmece-oge.secili').forEach(function (v) { v.classList.remove('secili'); });
+        el.classList.add('vurgu'); oge.classList.add('secili');
+        if (kaydir === 'el') el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        else oge.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+      oge.addEventListener('click', function () { sec('el'); });
+      pin.addEventListener('click', function (e) { e.stopPropagation(); sec('oge'); });
+    });
+  }
+  var btn = document.getElementById('aciklamaBtn');
+  function ac(durum) {
+    document.body.classList.toggle('aciklama', durum);
+    btn.classList.toggle('acik', durum); btn.setAttribute('aria-pressed', durum);
+    btn.lastChild.textContent = durum ? 'Açıklamaları gizle' : 'Açıklamaları göster';
+    if (durum) aciklamalariKur(); else temizle();
+  }
+  btn.addEventListener('click', function () { ac(!document.body.classList.contains('aciklama')); });
+  document.getElementById('kapat').addEventListener('click', function () { ac(false); });
+
+  document.getElementById('indir').addEventListener('click', function () {
+    var satirlar = [];
+    document.querySelectorAll('#fistablo tr').forEach(function (tr) {
+      var h = [];
+      tr.querySelectorAll('th,td').forEach(function (c) { h.push('"' + c.textContent.trim().replace(/"/g, '""') + '"'); });
+      satirlar.push(h.join(';'));
+    });
+    var blob = new Blob(['﻿' + satirlar.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'muhasebe-aktarim-ornek-2026-11.csv'; a.click();
+  });
+})();
+</script>
+</body>
+</html>

@@ -3,6 +3,8 @@ import { ayarDurumuGetir } from "@/app/actions/ayarlar";
 import { kullanicilariGetir } from "@/app/actions/kullanicilar";
 import { AyarlarFormu } from "@/components/AyarlarFormu";
 import { KullanicilarYonetimi } from "@/components/KullanicilarYonetimi";
+import { yoneticiMi } from "@/lib/rol";
+import type { KullaniciRolu } from "@/types/database";
 
 export default async function AyarlarPage() {
   const supabase = await createClient();
@@ -18,7 +20,7 @@ export default async function AyarlarPage() {
 
   const durum = await ayarDurumuGetir();
   const kullanicilar = await kullanicilariGetir();
-  const buradaBaskanMi = profil?.rol === "baskan";
+  const yonetici = yoneticiMi((profil?.rol as KullaniciRolu) ?? null);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -37,7 +39,7 @@ export default async function AyarlarPage() {
             kurumAdi={durum.kurumAdi}
             logoUrl={durum.logoUrl}
             asistanPromptu={durum.asistanPromptu}
-            baskanMi={buradaBaskanMi}
+            baskanMi={yonetici}
           />
         </div>
       </div>
@@ -46,7 +48,8 @@ export default async function AyarlarPage() {
         <KullanicilarYonetimi
           kullanicilar={kullanicilar}
           kendiId={user?.id ?? ""}
-          baskanMi={buradaBaskanMi}
+          yonetici={yonetici}
+          benimRol={(profil?.rol as KullaniciRolu) ?? null}
         />
       </div>
     </div>
