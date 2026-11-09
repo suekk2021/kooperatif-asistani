@@ -1,5 +1,12 @@
 # Kooperatif Asistanı → Stok + Üretim + Cari + Muhasebe Kodlu Takip Sistemi — Aksiyon Planı
 
+> **🟢 CANLIDA (9 Kasım 2026, 22:37): https://imece.suluovaureteneller.com** (ayrıca kooperatif-asistani.vercel.app)
+> - Yükleme: kooperatifin Vercel takımı "SULUOVA ÜRETEN ELLER" (kullanıcı suekk2021-1528), proje `kooperatif-asistani`, GitHub `suekk2021/kooperatif-asistani` **main** dalına push = otomatik production deploy. Bu bilgisayardaki Vercel CLI ise kullanıcının KİŞİSEL hesabına (akposta-6883) bağlı — oradan deploy ETME. Kooperatif hesapları kullanıcının **ego-lite** tarayıcısında açık (Vercel, Güzel.net — Canan Hanım'ın müşteri paneli); hangi hesapta işlem yapılacağı her seferinde kullanıcıya sorulur.
+> - Alan adı: suluovaureteneller.com Güzel.net'te (DNS: *.guzelhosting.com). Eklenen kayıt: `imece` CNAME `f5ae8c859f53d702.vercel-dns-017.com` (mevcut `@` A 185.106.208.2 ve `www` CNAME'e dokunulmadı).
+> - Yükleme öncesi yapılanlar: güvenlik taraması (✅; iki açık kapatıldı: ayarlar tablosundaki API anahtarları tarayıcıya kapatıldı — `20261110230000`; Telegram webhook sır doğrulaması — `20261110240000`, sır `ayarlar.telegram_webhook_secret`'ta, setWebhook aynı URL ile güncellendi), DENEME kayıtları temizlendi ve numara sayaçları sıfırlandı (`supabase/tek-seferlik/2026-11-09_deneme-temizligi.sql`, yedek `yedek/2026-11-09_deneme-turu-oncesi-temizlik.json`).
+> - **Kalan yükleme sonrası işler:** (1) Telegram'da gerçek bir mesajla ("özet") botun hâlâ cevap verdiğini doğrula; (2) Vercel env var `HIZMET_DURDURULDU` artık etkisiz — silinebilir (kullanıcı onayıyla); (3) Vercel'deki taslak projesi `imece` (imece-omega.vercel.app) ve kişisel hesaptaki eski `kooperatif-asistani` kopyası — silinmesi kullanıcıya sorulacak; (4) Fatih Bey hesabı; (5) açılış bakiyeleri (muhasebeci cevabı); (6) teslimde kullanıcının uygulama hesabını sil.
+> - Git düzeni: geliştirme `imece` dalında, yayın için `main`'e fast-forward + push.
+
 > **Durum (7 Kasım 2026):** Plan onaylandı, Faz 0 (bilgi toplama) aşamasındayız — henüz kod yazılmadı. Kullanıcının notları ve ortak şirketin muhasebe programı/aktarım şablonu bekleniyor. Bu plan `suluova-kooperatif` klasöründe yanlışlıkla açılan oturumda hazırlandı; "Yanlış klasördeyiz" maddesi artık geçersiz.
 >
 > **Güncelleme (7 Kasım 2026, kooperatif-asistani oturumu):**
