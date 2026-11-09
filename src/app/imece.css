@@ -324,4 +324,9 @@ details.form-ac[open]>summary{display:none}
 
 /* Kapalı düğme açıkla aynı görünüyordu; kullanıcı basıp hiçbir şey olmayınca programı bozuk sandı. */
 .btn:disabled,.btn[disabled]{opacity:.55;cursor:not-allowed}
+.diger-bolumler{margin-top:4px}
+.diger-bolumler>summary{cursor:pointer;list-style:none}
+.diger-bolumler>summary::-webkit-details-marker{display:none}
+.diger-bolumler>summary::after{content:" +"}
+.diger-bolumler[open]>summary::after{content:" −"}
 }

@@ -19,7 +19,7 @@ export default async function PanelPage() {
   const bugun = bugunIstanbul();
 
   const say = (sorgu: PromiseLike<{ count: number | null }>) => sorgu.then((r) => r.count ?? 0);
-  const [profil, musteri, tedarikci, stokKarti, fis, hatirlaticilar, paraHesabi] = await Promise.all([
+  const [profil, musteri, tedarikci, stokKarti, fis, hatirlaticilar, paraHesabi, acilisFisi] = await Promise.all([
     supabase.from("profiller").select("ad_soyad").eq("id", user?.id ?? "").maybeSingle(),
     say(supabase.from("cariler").select("id", { count: "exact", head: true }).eq("tur", "musteri").eq("aktif", true)),
     say(supabase.from("cariler").select("id", { count: "exact", head: true }).eq("tur", "tedarikci").eq("aktif", true)),
@@ -33,6 +33,7 @@ export default async function PanelPage() {
       .limit(5),
     // Merkez Kasa hazır geliyor; kullanıcının açtığı hesaplar (banka, POS, kart) sayılır.
     say(supabase.from("kasa_banka_hesaplari").select("id", { count: "exact", head: true }).eq("aktif", true).neq("kod", "100.01")),
+    say(supabase.from("yevmiye_fisleri").select("id", { count: "exact", head: true }).eq("kaynak_tur", "acilis")),
   ]);
 
   const ad = (profil.data?.ad_soyad ?? "").split(" ")[0];
@@ -50,7 +51,7 @@ export default async function PanelPage() {
     { ad: "Müşteri kartları", acik: "Ürün sattığınız yerler", sayi: musteri, yol: "/cariler?tur=musteri", hazir: true },
     { ad: "Stok kartları", acik: "Hammadde, ambalaj ve ürünler", sayi: stokKarti, yol: "/stok", hazir: true },
     { ad: "Banka, POS ve kredi kartı hesapları", acik: "Merkez kasa hazır; bankaları ekleyin", sayi: paraHesabi, yol: "/kasa", hazir: true },
-    { ad: "Açılış bakiyeleri ve ilk stok sayımı", acik: "Bugüne kadarki borç/alacak ve depodaki mal", sayi: 0, yol: "/kasa", hazir: false },
+    { ad: "Açılış bakiyeleri ve ilk stok sayımı", acik: "Kasa/banka, eski borç-alacak, depo sayımı", sayi: acilisFisi, yol: "/acilis", hazir: true },
   ];
 
   return (

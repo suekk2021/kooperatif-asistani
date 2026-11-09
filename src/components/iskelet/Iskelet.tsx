@@ -5,11 +5,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cikisYap } from "@/app/actions/auth";
-import { rolAdi } from "@/lib/roller";
+import { rolAdi, rolBilgisi } from "@/lib/roller";
 import type { KullaniciRolu } from "@/types/database";
 import { ikonlar, type IkonAdi } from "./Ikonlar";
 
-type MenuOgesi = { yol: string; ad: string; ikon: IkonAdi; yakinda?: boolean };
+// kimler: menüde kimlerin göreceği (boşsa herkes). Bu sadece sadelik içindir, güvenlik değil:
+// yetkiyi veritabanı kuralları uygular; adresi bilen herkes sayfayı açabilir, yazamıyorsa yazamaz.
+type MenuOgesi = { yol: string; ad: string; ikon: IkonAdi; yakinda?: boolean; kimler?: KullaniciRolu[] };
+
+const KAYIT_GIRENLER: KullaniciRolu[] = ["operasyon", "destek", "on_muhasebe"];
+const IZLEYENLER: KullaniciRolu[] = ["muhasebeci", "izleyici"];
 
 const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
   {
@@ -25,28 +30,32 @@ const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
   {
     grup: "Operasyon",
     ogeler: [
-      { yol: "/alis", ad: "Alış", ikon: "alis" },
-      { yol: "/uretim", ad: "Üretim", ikon: "uretim" },
-      { yol: "/satis", ad: "Satış", ikon: "satis" },
-      { yol: "/stok", ad: "Stok", ikon: "stok" },
+      { yol: "/alis", ad: "Alış", ikon: "alis", kimler: [...KAYIT_GIRENLER, "depo"] },
+      { yol: "/uretim", ad: "Üretim", ikon: "uretim", kimler: [...KAYIT_GIRENLER, "depo"] },
+      { yol: "/satis", ad: "Satış", ikon: "satis", kimler: KAYIT_GIRENLER },
+      { yol: "/stok", ad: "Stok", ikon: "stok", kimler: [...KAYIT_GIRENLER, "depo", ...IZLEYENLER] },
     ],
   },
   {
     grup: "Finans",
     ogeler: [
-      { yol: "/kasa", ad: "Kasa ve Banka", ikon: "kasa" },
-      { yol: "/cariler", ad: "Cariler", ikon: "cari" },
+      { yol: "/kasa", ad: "Kasa ve Banka", ikon: "kasa", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
+      { yol: "/cariler", ad: "Cariler", ikon: "cari", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
     ],
   },
   {
     grup: "Muhasebe",
     ogeler: [
       { yol: "/raporlar", ad: "Raporlar", ikon: "rapor", yakinda: true },
-      { yol: "/hesap-plani", ad: "Hesap Planı", ikon: "hesap" },
+      { yol: "/hesap-plani", ad: "Hesap Planı", ikon: "hesap", kimler: [...KAYIT_GIRENLER, "muhasebeci"] },
       { yol: "/aktarim", ad: "Muhasebe Aktarımı", ikon: "aktarim", yakinda: true },
     ],
   },
 ];
+
+function gorurMu(o: MenuOgesi, rol: KullaniciRolu | null) {
+  return !o.yakinda && (!o.kimler || (rol !== null && o.kimler.includes(rol)));
+}
 
 
 function basHarfler(ad: string) {
@@ -71,6 +80,17 @@ export function Iskelet({
 }) {
   const yol = usePathname();
   const [menuAcik, setMenuAcik] = useState(false);
+  const benimRol = (rol as KullaniciRolu | null) ?? null;
+  const yonetici = Boolean(rolBilgisi(benimRol)?.yonetici);
+  // Yönetici (ör. temsil görevindeki başkan) kendi listesinde olmayan bölümlere "Diğer bölümler"den ulaşır.
+  const digerleri = yonetici ? MENU.flatMap((g) => g.ogeler).filter((o) => !o.yakinda && !gorurMu(o, benimRol)) : [];
+
+  const baglanti = (o: MenuOgesi) => (
+    <Link key={o.yol} href={o.yol} className={yol.startsWith(o.yol) ? "aktif" : undefined} onClick={() => setMenuAcik(false)}>
+      {ikonlar[o.ikon]}
+      {o.ad}
+    </Link>
+  );
 
   useEffect(() => {
     document.body.classList.toggle("menu-acik", menuAcik);
@@ -109,25 +129,23 @@ export function Iskelet({
           </div>
         </Link>
 
-        {MENU.map((g) => (
-          <div key={g.grup}>
-            <div className="grup-baslik">{g.grup}</div>
-            <nav>
-              {g.ogeler.map((o) => (
-                <Link
-                  key={o.yol}
-                  href={o.yol}
-                  className={yol.startsWith(o.yol) ? "aktif" : undefined}
-                  onClick={() => setMenuAcik(false)}
-                >
-                  {ikonlar[o.ikon]}
-                  {o.ad}
-                  {o.yakinda && <span className="yakinda">yakında</span>}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        ))}
+        {MENU.map((g) => {
+          const gorunen = g.ogeler.filter((o) => gorurMu(o, benimRol));
+          if (!gorunen.length) return null;
+          return (
+            <div key={g.grup}>
+              <div className="grup-baslik">{g.grup}</div>
+              <nav>{gorunen.map(baglanti)}</nav>
+            </div>
+          );
+        })}
+
+        {digerleri.length > 0 && (
+          <details className="diger-bolumler">
+            <summary className="grup-baslik">Diğer bölümler</summary>
+            <nav>{digerleri.map(baglanti)}</nav>
+          </details>
+        )}
 
         <div className="yan-alt">
           <div className="avatar">{basHarfler(kullaniciAdi) || "?"}</div>
@@ -135,7 +153,7 @@ export function Iskelet({
             <b style={{ color: "#fff" }}>{kullaniciAdi}</b>
             <small>{rolAdi(rol as KullaniciRolu | null)}</small>
             <div className="baglantilar">
-              <Link href="/ayarlar">Ayarlar</Link>
+              {yonetici && <Link href="/ayarlar">Ayarlar</Link>}
               <Link href="/hesap">Hesabım</Link>
               <form action={cikisYap}>
                 <button type="submit">Çıkış</button>
