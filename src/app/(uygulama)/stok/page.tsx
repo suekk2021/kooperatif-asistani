@@ -33,7 +33,12 @@ export default async function StokPage({
       <div className="sayfa-bas">
         <div>
           <h1>Stok</h1>
-          <p>Hammadde, ambalaj ve ürün kartları. Miktar ve değer, alış/üretim/satış kayıtlarından otomatik hesaplanacak.</p>
+          <p>Hammadde, ambalaj ve ürün kartları. Miktar ve değer alış, üretim, satış ve sayımdan otomatik hesaplanır.</p>
+        </div>
+        <div className="ust-araclar">
+          <Link href="/stok/sayim" className="btn btn-cizgi">
+            Sayım yap
+          </Link>
         </div>
       </div>
 
