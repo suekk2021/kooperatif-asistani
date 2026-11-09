@@ -146,9 +146,15 @@ export async function POST(request: NextRequest) {
   const supabase = createAdminClient();
   const { data: ayarlar } = await supabase
     .from("ayarlar")
-    .select("telegram_bot_token, telegram_chat_id, ocr_saglayici, gemini_api_key, openai_api_key, asistan_promptu")
+    .select("telegram_bot_token, telegram_chat_id, ocr_saglayici, gemini_api_key, openai_api_key, asistan_promptu, telegram_webhook_secret")
     .eq("id", true)
     .single();
+
+  // İstek gerçekten Telegram'dan mı? setWebhook'ta verilen sır her istekte bu başlıkla gelir.
+  // Sır tanımlıysa ve tutmuyorsa sahte istektir; hiçbir şey işlenmez.
+  if (ayarlar?.telegram_webhook_secret && request.headers.get("x-telegram-bot-api-secret-token") !== ayarlar.telegram_webhook_secret) {
+    return NextResponse.json({ ok: false }, { status: 401 });
+  }
 
   const izinliChatIdler = chatIdListesiCikar(ayarlar?.telegram_chat_id);
 
