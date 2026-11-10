@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AcilisAyarFormu, AcilisTablosu, type AcilisSatiri } from "@/components/acilis/AcilisFormlari";
 import { IptalFormu } from "@/components/IptalFormu";
 import { PARA_HESABI_TURU_ADI, STOK_TURU_ADI, tarihTR, tl } from "@/lib/imece";
-import { mevcutRol, yoneticiMi } from "@/lib/rol";
+import { mevcutRol } from "@/lib/rol";
 import { iptalEdebilir, islemIzni, oturum } from "@/lib/yetki";
 import { createClient } from "@/lib/supabase/server";
 import type { Cari, Hesap, KasaBankaHesabi, StokKarti, YevmiyeSatiri } from "@/types/database";
@@ -80,8 +80,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
   const karsiSecenekleri = hesaplar.filter((h) => !ustler.has(h.kod) && h.kod.split(".").length <= 2);
 
   const ayarli = Boolean(ayar?.tarih && ayar?.karsi_hesap);
-  const yonetici = yoneticiMi(rol);
-  // Açılış bakiyesini yönetici ve ön muhasebe girer (migration 20261111180000); tarih + karşı hesap ayarı yalnız yönetici.
+  // Açılış bakiyesini ve tarih + karşı hesap ayarını yönetici ve ön muhasebe girer (migration 20261111180000 ve 20261111200000).
   const yazabilir = islemIzni(rol, "acilis");
   const karsiAd = hesaplar.find((h) => h.kod === ayar?.karsi_hesap)?.ad;
 
@@ -108,11 +107,11 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
         ) : (
           <p style={{ margin: "0 0 10px" }}>
             <b>Açılış kaydedilmeden önce muhasebeciden iki bilgi alınmalı:</b> açılış tarihi ve açılış kaydının karşı hesabı.
-            {yonetici ? " Gelince aşağıya girin." : " Ayarı Başkan veya Operasyon yöneticisi girer; muhasebeciden aldığınız bilgiyi ona iletin."} Tablolar şimdiden doldurulabilir ama
+            {yazabilir ? " Gelince aşağıya girin." : " Açılış ayarını yönetici ya da ön muhasebe girer."} Tablolar şimdiden doldurulabilir ama
             kaydedilemez.
           </p>
         )}
-        {yonetici && <AcilisAyarFormu tarih={ayar?.tarih ?? null} karsiHesap={ayar?.karsi_hesap ?? null} hesaplar={karsiSecenekleri} />}
+        {yazabilir && <AcilisAyarFormu tarih={ayar?.tarih ?? null} karsiHesap={ayar?.karsi_hesap ?? null} hesaplar={karsiSecenekleri} />}
       </div>
 
       <div className="sekmeler">

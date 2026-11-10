@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { hataMesaji, metin } from "@/lib/imece";
-import { mevcutRol, yoneticiMi } from "@/lib/rol";
+import { mevcutRol } from "@/lib/rol";
+import { islemIzni } from "@/lib/yetki";
 import type { FormSonucu } from "./cariler";
 
 function yenile() {
@@ -16,7 +17,7 @@ function yenile() {
 }
 
 export async function acilisAyariKaydet(formData: FormData): Promise<FormSonucu> {
-  if (!yoneticiMi(await mevcutRol())) return { hata: "Açılış ayarını Başkan veya Operasyon yöneticisi girer." };
+  if (!islemIzni(await mevcutRol(), "acilis")) return { hata: "Açılış ayarını yönetici ya da ön muhasebe girer." };
   const tarih = metin(formData, "tarih");
   const karsiHesap = metin(formData, "karsi_hesap");
   if (!tarih || !karsiHesap) return { hata: "Açılış tarihi ve karşı hesap birlikte girilmeli." };

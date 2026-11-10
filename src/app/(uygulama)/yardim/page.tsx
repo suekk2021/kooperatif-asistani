@@ -336,25 +336,6 @@ const BOLUMLER: Bolum[] = [
 
 const YONETICI_BOLUMLERI: Bolum[] = [
   {
-    baslik: "Açılış tarihi ve karşı hesabı girmek",
-    alt: "Açılış ekranının üstündeki sarı kutu",
-    icerik: (
-      <ol>
-        <li>
-          Mali müşavirden iki bilgi alın: açılış tarihi ve açılış farkının yazılacağı hesap (570, 580, 500 ya da müşavirin söylediği başka bir hesap).
-        </li>
-        <li>
-          Ana Panel&apos;deki kurulum adımlarından <b>Açılış bakiyeleri</b> satırına girin, üstteki kutuya <b>Açılış tarihi</b> ve <b>Karşı hesap</b>&apos;ı yazıp{" "}
-          <B>Ayarı kaydet</B> deyin.
-        </li>
-        <li>
-          Bundan sonra ön muhasebe (Nagihan Hanım) açılış bakiyelerini girebilir. Ayarı yalnızca yönetici değiştirebilir; değiştirmeniz gerekirse önce mali müşavire
-          sorun.
-        </li>
-      </ol>
-    ),
-  },
-  {
     baslik: "Yeni kişi ekleme ve roller",
     alt: "Ayarlar → Kişiler ve yetkiler",
     icerik: (

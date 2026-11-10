@@ -13,6 +13,7 @@ function Adim({ no, baslik, alt, children }: { no: number; baslik: string; alt: 
           <span className="mk-adim-no">{no}</span> {baslik}
         </h2>
         <span className="soluk" style={{ fontSize: 13 }}>{alt}</span>
+        <a href="#sira" className="mk-sira">↑ Sıraya dön</a>
       </div>
       <div className="kart-ic yardim-govde">{children}</div>
     </section>
@@ -53,8 +54,8 @@ export default function IlkKurulumPage() {
         </div>
         <ul className="kart-ic yardim-liste" style={{ margin: 0 }}>
           <li>
-            <b>Mali müşavirden iki bilgi:</b> açılış tarihi ve açılış kaydının karşı hesabı. Bu ikisini programa <b>yönetici</b> (Başkan ya da Operasyon
-            yöneticisi) girer; siz bilgiyi ona iletirsiniz. Gelene kadar beklemeyin, 1–5. adımlar buna bağlı değil.
+            <b>Mali müşavirden iki bilgi:</b> açılış tarihi ve açılış kaydının karşı hesabı. Bu ikisini Açılış ekranının üstündeki kutuya siz yazarsınız.
+            Gelene kadar beklemeyin: 1–5. adımlar buna bağlı değil, test döneminde 6. adımı geçici bir tarih ve hesapla deneyebilirsiniz.
           </li>
           <li>
             <b>Açılış günü rakamları:</b> kasadaki ve bankadaki para, müşterilerin bize borçları, bizim tedarikçilere borçlarımız, depo sayımı (miktar ve
@@ -66,7 +67,7 @@ export default function IlkKurulumPage() {
         </ul>
       </div>
 
-      <div className="kart" style={{ marginBottom: 16 }}>
+      <div className="kart" id="sira" style={{ marginBottom: 16, scrollMarginTop: 70 }}>
         <div className="kart-bas">
           <h2>Sıra</h2>
         </div>
@@ -206,8 +207,8 @@ export default function IlkKurulumPage() {
         <Aciklama
           maddeler={[
             <>
-              Üstte açılış tarihi ve karşı hesap yazıyorsa hazırsınız. Bunun yerine sarı bir uyarı görüyorsanız yönetici henüz girmemiştir; bilgiyi ona iletin. O
-              zamana kadar tabloyu doldurabilirsiniz ama kaydedemezsiniz.
+              Üstte açılış tarihi ve karşı hesap yazıyorsa hazırsınız. Bunun yerine sarı bir kutu görüyorsanız <b>Açılış tarihi</b> ve <b>Karşı hesap</b> alanlarını doldurup{" "}
+              <B>Ayarı kaydet</B> deyin (mali müşavirin söylediği; test döneminde herhangi biri olabilir). Bu ayar girilmeden tablo doldurulur ama kaydedilemez.
             </>,
             <>
               Üç sekme var: <b>Kasa ve Banka</b>, <b>Cariler</b>, <b>Depo sayımı</b>. Her birini ayrı kaydedin.
