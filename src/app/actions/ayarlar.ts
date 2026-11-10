@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { izKaydet } from "@/lib/iz";
 import { anahtarGecerliMi } from "@/lib/ai";
 import { yoneticiMi } from "@/lib/rol";
 import type { KullaniciRolu, OcrSaglayici } from "@/types/database";
@@ -140,11 +141,33 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
     guncelleme.logo_url = publicUrl.publicUrl;
   }
 
+  const { data: onceki } = await createAdminClient()
+    .from("ayarlar")
+    .select("ocr_saglayici, telegram_chat_id, asistan_promptu, kurum_adi, muhasebeci_email")
+    .eq("id", true)
+    .single();
+
   const { error } = await supabase.from("ayarlar").update(guncelleme).eq("id", true);
 
   if (error) {
     return { hata: error.message };
   }
+
+  // İşlem Geçmişi için özet: anahtar, e-posta ve numara değerleri yazılmaz, yalnızca "değiştirildi".
+  const ozet: string[] = [];
+  if (destek) {
+    if (onceki?.ocr_saglayici !== ocrSaglayici) ozet.push(`fiş okuma sağlayıcısı: ${onceki?.ocr_saglayici ?? "—"} → ${ocrSaglayici}`);
+    if (geminiSil) ozet.push("Gemini anahtarı silindi");
+    else if (geminiKey) ozet.push("Gemini anahtarı değiştirildi");
+    if (openaiSil) ozet.push("OpenAI anahtarı silindi");
+    else if (openaiKey) ozet.push("OpenAI anahtarı değiştirildi");
+    if ((onceki?.telegram_chat_id ?? "") !== telegramChatIdler) ozet.push("Telegram bildirim listesi değiştirildi");
+    if ((onceki?.asistan_promptu ?? "") !== asistanPromptu) ozet.push("asistan kişiliği değiştirildi");
+  }
+  if (kurumAdi && kurumAdi !== onceki?.kurum_adi) ozet.push(`kooperatif adı: ${onceki?.kurum_adi ?? "—"} → ${kurumAdi}`);
+  if (muhasebeciEmail && muhasebeciEmail !== onceki?.muhasebeci_email) ozet.push("mali müşavir e-postası değiştirildi");
+  if (dosya && dosya.size > 0) ozet.push("logo değiştirildi");
+  if (ozet.length) await izKaydet({ tablo: "ayarlar", kayit: null, kullanici: user.id, yeni: { fiil: "değiştirdi", hedef: "Ayarlar", ozet } });
 
   revalidatePath("/ayarlar");
   revalidatePath("/", "layout");

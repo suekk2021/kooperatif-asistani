@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { YazdirDugmesi } from "@/components/YazdirDugmesi";
 import { mevcutRol, yoneticiMi } from "@/lib/rol";
+import { TEKNIK_DESTEK } from "@/lib/imza";
 import { ROLLER } from "@/lib/roller";
 
 type Bolum = { baslik: string; alt: string; icerik: React.ReactNode };
@@ -196,7 +197,7 @@ const BOLUMLER: Bolum[] = [
           </li>
         </ol>
         <p className="not">
-          Kendi girdiğiniz kaydı <b>aynı gün</b> iptal edebilirsiniz. Daha eski kayıtlar ve başkasının kayıtları için yöneticiye
+          Kendi girdiğiniz kaydı <b>aynı gün</b> iptal edebilirsiniz. Daha eski kayıtlar ve başkasının kayıtları için kooperatif yönetimine (Başkan ya da Operasyon yöneticisi)
           söyleyin. İadesi olan bir fatura iptal edilemez; önce iade iptal edilir.
         </p>
       </>
@@ -214,7 +215,7 @@ const BOLUMLER: Bolum[] = [
           Yazarak ya da sesli mesajla hatırlatıcı kurun: <i>&quot;15 Aralık&apos;ta SGK ödemesini hatırlat&quot;</i>. Hatırlatma
           size gelir.
         </li>
-        <li>Bot sizi tanımıyorsa size bir numara söyler; o numarayı yöneticiye iletin.</li>
+        <li>Bot sizi tanımıyorsa size bir numara söyler; o numarayı teknik desteğe iletin.</li>
       </ul>
     ),
   },
@@ -382,7 +383,7 @@ const YONETICI_BOLUMLERI: Bolum[] = [
           <li>Şifreyi kişiye siz iletin; girişten sonra <b>Hesabım</b> sayfasından kendi şifresini koymasını söyleyin.</li>
         </ol>
         <p className="not">
-          Şifrenin kendisi hiçbir yere kaydedilmez. Kural: Başkanın şifresini Başkan ya da teknik destek, teknik desteğin şifresini yalnızca teknik destek sıfırlar.
+          Her sıfırlama <b>İşlem Geçmişi</b>&apos;ne &quot;Şifre sıfırlama&quot; olarak yazılır; şifrenin kendisi hiçbir yere kaydedilmez. Kural: Başkanın şifresini Başkan ya da teknik destek, teknik desteğin şifresini yalnızca teknik destek sıfırlar.
           Kendi şifrenizi Hesabım&apos;dan değiştirin.
         </p>
       </>
@@ -394,7 +395,7 @@ const YONETICI_BOLUMLERI: Bolum[] = [
     icerik: (
       <p>
         Programda kimin, ne zaman, hangi kaydı eklediğini, değiştirdiğini ya da iptal ettiğini gösterir. <b>Kişi</b>, <b>Kayıt türü</b> ve tarih aralığıyla
-        süzebilirsiniz; değişen alanlarda eski ve yeni değer yan yana görünür. Liste değiştirilemez. Başkan, Operasyon yöneticisi ve muhasebeci görür.
+        süzebilirsiniz; değişen alanlarda eski ve yeni değer yan yana görünür. Kullanıcı ekleme/silme, rol-görev-Telegram değişikliği, şifre sıfırlama ve Ayarlar değişiklikleri de burada görünür; teknik destek hesabıyla yapılanlar kişisel ad yerine &quot;Teknik destek&quot; olarak yazılır (şifre ve anahtarların kendisi yazılmaz). Liste değiştirilemez. Başkan, Operasyon yöneticisi, teknik destek ve muhasebeci görür.
       </p>
     ),
   },
@@ -481,8 +482,8 @@ export default async function YardimPage() {
       {yonetici && (
         <div className="kart" style={{ marginTop: 16 }}>
           <div className="kart-bas">
-            <h2>Yöneticiler için</h2>
-            <span className="soluk" style={{ fontSize: 13 }}>Bu bölümü yalnızca yöneticiler görür</span>
+            <h2>Yönetim ve teknik destek için</h2>
+            <span className="soluk" style={{ fontSize: 13 }}>Bu bölümü yalnızca Başkan, Operasyon yöneticisi ve teknik destek görür</span>
           </div>
           {YONETICI_BOLUMLERI.map((b, i) => (
             <details className="hp" key={b.baslik}>
@@ -504,6 +505,18 @@ export default async function YardimPage() {
         Raporlar (Muhasebe → Raporlar) her an bakılabilir ve Excel olarak indirilebilir. Takıldığınız yeri not alın; kılavuza
         ekleyelim.
       </p>
+
+      <div className="not">
+        <b>Teknik destek:</b> programda hata görürseniz, bir ekran anlaşılmıyorsa, şifrenizi unuttuysanız ya da kayıt girerken takıldıysanız teknik desteğe ulaşın
+        {TEKNIK_DESTEK.telefon ? (
+          <>
+            : <b>{TEKNIK_DESTEK.telefon}</b>
+          </>
+        ) : (
+          "."
+        )}{" "}
+        Genel kooperatif işleyişi (karar, iptal, koordinasyon) için kooperatif yönetimine (Başkan ya da Operasyon yöneticisi) başvurun.
+      </div>
     </div>
   );
 }

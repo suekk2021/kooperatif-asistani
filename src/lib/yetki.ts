@@ -34,4 +34,4 @@ export function iptalEdebilir(o: Oturum | null, kayit: { olusturan: string | nul
 }
 
 /** İptal düğmesi yerine gösterilecek kısa açıklama (kayıt giren ama iptal edemeyen kişiye). */
-export const IPTAL_YETKI_NOTU = "Bu kaydı iptal etmek için yöneticiye başvurun (ön muhasebe yalnızca kendi girdiğini aynı gün iptal edebilir).";
+export const IPTAL_YETKI_NOTU = "Bu kaydı iptal etmek için kooperatif yönetimine (Başkan ya da Operasyon yöneticisi) başvurun (ön muhasebe yalnızca kendi girdiğini aynı gün iptal edebilir).";

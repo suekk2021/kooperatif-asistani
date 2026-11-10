@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { izKaydet } from "@/lib/iz";
 import { KORUNAN_ROLLER, ROLLER, rolBilgisi } from "@/lib/roller";
 import type { KullaniciRolu, Profil } from "@/types/database";
 
@@ -65,6 +66,15 @@ export async function kullaniciEkle(formData: FormData): Promise<KullaniciSonuc>
   if (data.user) {
     await admin.from("profiller").update({ rol, gorev }).eq("id", data.user.id);
   }
+  const ben = await mevcutKullanici();
+  if (ben) {
+    await izKaydet({
+      tablo: "kullanicilar",
+      kayit: data.user?.id ?? null,
+      kullanici: ben.id,
+      yeni: { fiil: "ekledi", hedef: adSoyad, ozet: [`rol: ${rolBilgisi(rol)?.ad ?? rol}`, ...(gorev ? [`görev: ${gorev}`] : [])] },
+    });
+  }
 
   revalidatePath("/ayarlar");
   return { basarili: `${adSoyad} için hesap oluşturuldu. E-posta ve geçici şifreyi kendisine iletin.` };
@@ -81,8 +91,8 @@ export async function kullaniciGuncelle(
   if (degisiklik.rol && ben?.id === id) return { hata: "Kendi rolünüzü değiştiremezsiniz." };
 
   const supabase = await createClient();
+  const { data: hedef } = await supabase.from("profiller").select("ad_soyad, rol, gorev, telegram_chat_id").eq("id", id).single();
   if (degisiklik.rol) {
-    const { data: hedef } = await supabase.from("profiller").select("rol").eq("id", id).single();
     if (!korunanaDokunabilir(ben?.rol, hedef?.rol)) return { hata: `${rolBilgisi(hedef?.rol)?.ad} rolündeki kişinin rolünü bu hesap değiştiremez.` };
   }
 
@@ -93,6 +103,14 @@ export async function kullaniciGuncelle(
 
   const { error } = await supabase.from("profiller").update(guncel).eq("id", id);
   if (error) return { hata: error.message };
+
+  const ozet: string[] = [];
+  if (guncel.rol && guncel.rol !== hedef?.rol) ozet.push(`rol: ${rolBilgisi(hedef?.rol)?.ad ?? "—"} → ${rolBilgisi(guncel.rol as KullaniciRolu)?.ad}`);
+  if ("gorev" in guncel && (guncel.gorev ?? null) !== (hedef?.gorev ?? null)) ozet.push(`görev: ${hedef?.gorev ?? "—"} → ${guncel.gorev ?? "—"}`);
+  if ("telegram_chat_id" in guncel && (guncel.telegram_chat_id ?? null) !== (hedef?.telegram_chat_id ?? null)) {
+    ozet.push(guncel.telegram_chat_id ? "Telegram numarası yazıldı ya da değiştirildi" : "Telegram numarası silindi");
+  }
+  if (ben && ozet.length) await izKaydet({ tablo: "kullanicilar", kayit: id, kullanici: ben.id, yeni: { fiil: "değiştirdi", hedef: hedef?.ad_soyad ?? "", ozet } });
 
   revalidatePath("/ayarlar");
   return { basarili: "Kaydedildi." };
@@ -105,7 +123,7 @@ export async function kullaniciSil(id: string): Promise<KullaniciSonuc> {
   if (ben?.id === id) return { hata: "Kendi hesabınızı buradan silemezsiniz." };
 
   const supabase = await createClient();
-  const { data: hedef } = await supabase.from("profiller").select("rol").eq("id", id).single();
+  const { data: hedef } = await supabase.from("profiller").select("ad_soyad, rol").eq("id", id).single();
   // Teknik destek hesabını yöneticiler her zaman silebilir (erişimi kesme hakkı kooperatifte).
   if (hedef?.rol === "baskan" && ben?.rol !== "baskan" && ben?.rol !== "destek") return { hata: "Başkanı sadece Başkan silebilir." };
 
@@ -113,6 +131,8 @@ export async function kullaniciSil(id: string): Promise<KullaniciSonuc> {
   // auth.users silinince profil (on delete cascade) de silinir.
   const { error } = await admin.auth.admin.deleteUser(id);
   if (error) return { hata: error.message };
+
+  if (ben) await izKaydet({ tablo: "kullanicilar", kayit: id, kullanici: ben.id, yeni: { fiil: "sildi", hedef: hedef?.ad_soyad ?? "", ozet: [] } });
 
   revalidatePath("/ayarlar");
   return { basarili: "Kullanıcı silindi." };
@@ -122,7 +142,7 @@ export async function kullaniciSil(id: string): Promise<KullaniciSonuc> {
  * Yönetici başka bir kişinin şifresini yeni bir geçici şifreyle sıfırlar (şifremi unuttum çözümü).
  * Korunan roller (başkan, teknik destek) için kullaniciGuncelle ile aynı kural geçerli: başkanı başkan ya da
  * teknik destek, teknik desteği yalnız teknik destek sıfırlar. Şifrenin kendisi hiçbir yere kaydedilmez.
- * İşlem Geçmişi'ne yazılmaz (kullanıcı kararı, 11 Kas 2026: geçmiş yalnız finans, üretim ve kooperatif işleyişi kayıtlarını içerir).
+ * Her sıfırlama İşlem Geçmişi'ne yazılır (kullanıcı kararı, 11 Kas 2026); teknik destek hesabı "Teknik destek" olarak görünür.
  */
 export async function kullaniciSifreSifirla(id: string, yeniSifre: string): Promise<KullaniciSonuc> {
   const yetkiHatasi = await yetkiKontrol();
@@ -142,6 +162,8 @@ export async function kullaniciSifreSifirla(id: string, yeniSifre: string): Prom
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.updateUserById(id, { password: yeniSifre });
   if (error) return { hata: error.message };
+
+  await izKaydet({ tablo: "kullanici_sifre", kayit: id, kullanici: ben.id, yeni: { fiil: "sıfırladı", hedef: hedef.ad_soyad, ozet: [] } });
 
   return { basarili: `${hedef.ad_soyad} için şifre sıfırlandı. Yeni şifreyi kendisine iletin; girişten sonra Hesabım'dan değiştirmesini söyleyin.` };
 }

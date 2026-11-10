@@ -41,6 +41,7 @@ export default async function IslemGecmisiPage({
   const son = tarihMi(q.son) ?? bugun;
 
   const supabase = await createClient();
+  const { data: kisiler } = await supabase.from("profiller").select("id, ad_soyad, rol").order("ad_soyad");
   let sorgu = supabase
     .from("degisiklik_kaydi")
     .select("id, tablo, kayit, islem, eski, yeni, kullanici, zaman")
@@ -51,13 +52,14 @@ export default async function IslemGecmisiPage({
   // Kart açılınca program kendiliğinden hesap planına alt hesap ekler (ve geçiş kayıtları da sistemden gelir):
   // bunlar kimsenin yaptığı bir işlem değil, kart kaydının sonucudur; listelenmez. Hesap planındaki değişiklikler görünür.
   sorgu = sorgu.or("tablo.neq.hesap_plani,islem.neq.INSERT");
-  if (q.kisi) sorgu = sorgu.eq("kullanici", q.kisi);
+  if (q.kisi === "destek") {
+    // "Teknik destek" seçeneği teknik destek hesabının işlemlerini süzer (kişisel adı listede yok).
+    const destekIdleri = (kisiler ?? []).filter((k) => k.rol === "destek").map((k) => k.id);
+    sorgu = destekIdleri.length ? sorgu.in("kullanici", destekIdleri) : sorgu.eq("kullanici", "00000000-0000-0000-0000-000000000000");
+  } else if (q.kisi) sorgu = sorgu.eq("kullanici", q.kisi);
   if (q.tur && KAYIT_TURLERI[q.tur]) sorgu = sorgu.eq("tablo", q.tur);
 
-  const [{ data: kayitlar, error }, { data: kisiler }] = await Promise.all([
-    sorgu,
-    supabase.from("profiller").select("id, ad_soyad, rol").order("ad_soyad"),
-  ]);
+  const { data: kayitlar, error } = await sorgu;
   const kisi = new Map((kisiler ?? []).map((k) => [k.id, k]));
 
   return (
@@ -74,6 +76,7 @@ export default async function IslemGecmisiPage({
           <label htmlFor="kisi">Kişi</label>
           <select id="kisi" name="kisi" defaultValue={q.kisi ?? ""}>
             <option value="">Herkes</option>
+            <option value="destek">Teknik destek</option>
             {(kisiler ?? []).filter((k) => k.rol !== "destek").map((k) => (
               <option key={k.id} value={k.id}>
                 {k.ad_soyad}
@@ -129,7 +132,7 @@ export default async function IslemGecmisiPage({
             if (ozet.fiil === "değiştirdi" && ozet.ayrinti.length === 0) return null;
             return (
               <div className="uyari-satir" key={k.id}>
-                <span className={`etk ${ozet.fiil === "iptal etti" || ozet.fiil === "sildi" ? "e-kirmizi" : ozet.fiil === "ekledi" ? "e-yesil" : "e-mavi"}`} style={{ marginTop: 2 }}>
+                <span className={`etk ${ozet.fiil === "iptal etti" || ozet.fiil === "sildi" ? "e-kirmizi" : ozet.fiil === "ekledi" ? "e-yesil" : ozet.fiil === "sıfırladı" ? "e-amber" : "e-mavi"}`} style={{ marginTop: 2 }}>
                   {ozet.fiil}
                 </span>
                 <div style={{ minWidth: 0 }}>

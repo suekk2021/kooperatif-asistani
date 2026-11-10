@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
         await telegramMesajGonder(
           ayarlar.telegram_bot_token,
           gelenChatId,
-          `Bu bot ${KURUM_ADI} çalışanları içindir.\n\nTelegram numaranız: <code>${gelenChatId}</code>\n\nBu numarayı yöneticinize iletin; İMECE'de profilinize eklendiğinde bot size cevap vermeye başlar.`
+          `Bu bot ${KURUM_ADI} çalışanları içindir.\n\nTelegram numaranız: <code>${gelenChatId}</code>\n\nBu numarayı teknik desteğe iletin; İMECE'de profilinize eklendiğinde bot size cevap vermeye başlar.`
         );
       } catch {
         // Cevap gitmese de sorun değil.

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Aciklama, Ekran, Maket, No } from "@/components/yardim/Maket";
 import { YazdirDugmesi } from "@/components/YazdirDugmesi";
+import { TEKNIK_DESTEK } from "@/lib/imza";
 import { ikonlar } from "@/components/iskelet/Ikonlar";
 
 const B = ({ children }: { children: React.ReactNode }) => <b className="yardim-dugme">{children}</b>;
@@ -225,7 +226,7 @@ export default function IlkKurulumPage() {
         />
         <p className="not" style={{ marginTop: 0 }}>
           <b>Yanlış girdiyseniz:</b> sayfanın altındaki &quot;Açılış kayıtları&quot; listesinde, kendi girdiğiniz kaydın yanında <B>İptal et</B> düğmesi çıkar (aynı gün). Sonra
-          doğrusunu yeniden girin. Eski günlerin ve başkasının kayıtlarını yönetici iptal eder.
+          doğrusunu yeniden girin. Eski günlerin ve başkasının kayıtlarını kooperatif yönetimi (Başkan ya da Operasyon yöneticisi) iptal eder.
         </p>
         <Kontrol>Ana Panel&apos;de nakit ve alacak rakamları girdiğiniz bakiyelerle uyuşur.</Kontrol>
       </Adim>
@@ -242,11 +243,11 @@ export default function IlkKurulumPage() {
           <B>Muhasebe</B> → <B>Raporlar</B>&apos;da <b>Mizan</b> raporunu açın ve mali müşavirin açılış rakamlarıyla karşılaştırın. <b>Alacak yaşlandırma</b> hangi
           müşterinin ne kadar geciktiğini, <b>Satış-kârlılık</b> ve <b>Fire</b> raporları kazancı ve kaybı gösterir. Raporlar Excel olarak indirilebilir.
         </p>
-        <Kontrol>Rakamlar mali müşavirin elindekiyle tutuyor. Tutmuyorsa hangi hesapta fark olduğunu not edip yöneticiye iletin.</Kontrol>
+        <Kontrol>Rakamlar mali müşavirin elindekiyle tutuyor. Tutmuyorsa hangi hesapta fark olduğunu not edip kooperatif yönetimine iletin.</Kontrol>
       </Adim>
 
       <p className="soluk" style={{ fontSize: 13, marginTop: 16 }}>
-        Takıldığınız, anlaşılmayan ya da yanlış bulduğunuz her şeyi not edin ve yöneticiye iletin; rehber buna göre güncellenir.
+        Takıldığınız, anlaşılmayan ya da yanlış bulduğunuz her şeyi not edin ve teknik desteğe iletin{TEKNIK_DESTEK.telefon ? ` (${TEKNIK_DESTEK.telefon})` : ""}; rehber buna göre güncellenir.
       </p>
     </div>
   );

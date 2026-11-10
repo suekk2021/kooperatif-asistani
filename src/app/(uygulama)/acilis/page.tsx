@@ -107,7 +107,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
         ) : (
           <p style={{ margin: "0 0 10px" }}>
             <b>Açılış kaydedilmeden önce muhasebeciden iki bilgi alınmalı:</b> açılış tarihi ve açılış kaydının karşı hesabı.
-            {yazabilir ? " Gelince aşağıya girin." : " Açılış ayarını yönetici ya da ön muhasebe girer."} Tablolar şimdiden doldurulabilir ama
+            {yazabilir ? " Gelince aşağıya girin." : " Açılış ayarını Başkan, Operasyon yöneticisi ya da ön muhasebe girer."} Tablolar şimdiden doldurulabilir ama
             kaydedilemez.
           </p>
         )}
@@ -126,7 +126,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
         {yazabilir ? (
           <AcilisTablosu key={sekme} tur={sekme} satirlar={tablo} kilitli={!ayarli} />
         ) : (
-          <p className="bos">Açılış bakiyelerini yönetici ya da ön muhasebe girer.</p>
+          <p className="bos">Açılış bakiyelerini Başkan, Operasyon yöneticisi ya da ön muhasebe girer.</p>
         )}
       </div>
 

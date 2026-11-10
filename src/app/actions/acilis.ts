@@ -17,7 +17,7 @@ function yenile() {
 }
 
 export async function acilisAyariKaydet(formData: FormData): Promise<FormSonucu> {
-  if (!islemIzni(await mevcutRol(), "acilis")) return { hata: "Açılış ayarını yönetici ya da ön muhasebe girer." };
+  if (!islemIzni(await mevcutRol(), "acilis")) return { hata: "Açılış ayarını Başkan, Operasyon yöneticisi ya da ön muhasebe girer." };
   const tarih = metin(formData, "tarih");
   const karsiHesap = metin(formData, "karsi_hesap");
   if (!tarih || !karsiHesap) return { hata: "Açılış tarihi ve karşı hesap birlikte girilmeli." };

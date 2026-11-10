@@ -19,6 +19,9 @@ export const KAYIT_TURLERI: Record<string, { ad: string; yol?: (id: string) => s
   kdv_oranlari: { ad: "KDV oranı" },
   depolar: { ad: "Depo" },
   kapali_donemler: { ad: "Dönem kilidi" },
+  kullanicilar: { ad: "Kişi ve yetki" },
+  kullanici_sifre: { ad: "Şifre sıfırlama" },
+  ayarlar: { ad: "Ayarlar" },
 };
 
 const ALAN_ADLARI: Record<string, string> = {
@@ -33,6 +36,7 @@ const GIZLI_ALANLAR = new Set(["updated_at", "created_at", "fis_id", "iptal_fis_
 /** Kayıt için okunabilir kısa ad: "SAT-12", "Fatura 4521 ", "Parti 7", cari ünvanı… */
 export function kayitEtiketi(tablo: string, j: Json): string {
   if (!j) return "";
+  if (j.teknik) return String(j.hedef ?? "");
   const v = (k: string) => (j[k] === null || j[k] === undefined ? null : String(j[k]));
   if (tablo === "satis_faturalari") return `SAT-${v("satis_no")}${v("belge_no") ? ` (${v("belge_no")})` : ""}`;
   if (tablo === "alis_faturalari") return `Fatura ${v("belge_no")}`;
@@ -49,6 +53,7 @@ export type Ozet = { fiil: string; ayrinti: string[] };
 
 /** "ekledi" / "değiştirdi: unvan A → B" / "iptal etti (neden)" / "sildi" */
 export function islemOzeti(islem: string, eski: Json, yeni: Json): Ozet {
+  if (yeni?.teknik) return { fiil: String(yeni.fiil ?? "değiştirdi"), ayrinti: Array.isArray(yeni.ozet) ? yeni.ozet.map(String) : [] };
   if (islem === "INSERT") return { fiil: "ekledi", ayrinti: [] };
   if (islem === "DELETE") return { fiil: "sildi", ayrinti: [] };
   if (yeni?.durum === "iptal" && eski?.durum !== "iptal") {

@@ -31,7 +31,7 @@ export const ROLLER: {
     deger: "destek",
     ad: "Teknik destek",
     aciklama:
-      "Programın geliştiricisi. Hataları görüp düzeltmek için her şeye erişir; kişi listelerinde, @ çağırmada ve bildirimlerde yer almaz. Yaptığı her değişiklik kayda geçer; yöneticiler bu hesabı silebilir.",
+      "Programın geliştiricisi ve teknik desteği. Hataları görüp düzeltmek için her şeye erişir; kişi listelerinde, @ çağırmada ve bildirimlerde yer almaz. İşlem Geçmişi'nde kişisel adıyla değil \"Teknik destek\" olarak görünür; yöneticiler bu hesabı silebilir.",
     yazar: true,
     yonetici: true,
   },
