@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ayarDurumuGetir } from "@/app/actions/ayarlar";
 import { kullanicilariGetir } from "@/app/actions/kullanicilar";
@@ -18,9 +19,12 @@ export default async function AyarlarPage() {
     .eq("id", user?.id ?? "")
     .single();
 
+  // Ayarlar yalnızca yöneticilerin: menüde zaten görünmez, adresi bilen başkası da buradan geri gönderilir.
+  const yonetici = yoneticiMi((profil?.rol as KullaniciRolu) ?? null);
+  if (!yonetici) redirect("/panel");
+  const destek = profil?.rol === "destek";
   const durum = await ayarDurumuGetir();
   const kullanicilar = await kullanicilariGetir();
-  const yonetici = yoneticiMi((profil?.rol as KullaniciRolu) ?? null);
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -32,14 +36,15 @@ export default async function AyarlarPage() {
         <div className="rounded-xl border border-line bg-card p-6">
           <AyarlarFormu
             mevcutSaglayici={durum.ocrSaglayici}
-            geminiAnahtarVar={durum.geminiAnahtarVar}
-            openaiAnahtarVar={durum.openaiAnahtarVar}
-            telegramChatIdler={durum.telegramChatIdler}
+            geminiAnahtarVar={destek && durum.geminiAnahtarVar}
+            openaiAnahtarVar={destek && durum.openaiAnahtarVar}
+            telegramChatIdler={destek ? durum.telegramChatIdler : ""}
             muhasebeciEmail={durum.muhasebeciEmail}
             kurumAdi={durum.kurumAdi}
             logoUrl={durum.logoUrl}
-            asistanPromptu={durum.asistanPromptu}
+            asistanPromptu={destek ? durum.asistanPromptu : ""}
             baskanMi={yonetici}
+            destekMi={destek}
           />
         </div>
       </div>

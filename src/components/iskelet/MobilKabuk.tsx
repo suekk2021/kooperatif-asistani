@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cikisYap } from "@/app/actions/auth";
+import { IMZA } from "@/lib/imza";
 import { rolAdi } from "@/lib/roller";
 import type { KullaniciRolu } from "@/types/database";
 import { ikonlar } from "./Ikonlar";
@@ -136,6 +137,12 @@ export function MobilKabuk({
               <button type="submit">Çıkış</button>
             </form>
           </div>
+          <p className="mc-imza">
+            Geliştirici:{" "}
+            <a href={IMZA.url} target="_blank" rel="noopener noreferrer">
+              {IMZA.ad}
+            </a>
+          </p>
         </div>
       )}
     </>

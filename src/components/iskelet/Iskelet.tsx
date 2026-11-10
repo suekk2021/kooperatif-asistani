@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cikisYap } from "@/app/actions/auth";
 import { tarihTR } from "@/lib/imece";
 import { rolAdi, rolBilgisi } from "@/lib/roller";
+import { IMZA } from "@/lib/imza";
 import { TEST_DONEMI_BITIS } from "@/lib/test-donemi";
 import type { KullaniciRolu } from "@/types/database";
 import { ikonlar } from "./Ikonlar";
@@ -108,6 +109,12 @@ export function Iskelet({
               </form>
             </div>
           </div>
+        </div>
+        <div className="yan-imza">
+          Geliştirici:{" "}
+          <a href={IMZA.url} target="_blank" rel="noopener noreferrer">
+            {IMZA.ad}
+          </a>
         </div>
       </aside>
 

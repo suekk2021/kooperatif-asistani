@@ -48,6 +48,9 @@ export default async function IslemGecmisiPage({
     .lte("zaman", gunSonu(son))
     .order("zaman", { ascending: false })
     .limit(SAYFA);
+  // Kart açılınca program kendiliğinden hesap planına alt hesap ekler (ve geçiş kayıtları da sistemden gelir):
+  // bunlar kimsenin yaptığı bir işlem değil, kart kaydının sonucudur; listelenmez. Hesap planındaki değişiklikler görünür.
+  sorgu = sorgu.or("tablo.neq.hesap_plani,islem.neq.INSERT");
   if (q.kisi) sorgu = sorgu.eq("kullanici", q.kisi);
   if (q.tur && KAYIT_TURLERI[q.tur]) sorgu = sorgu.eq("tablo", q.tur);
 

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { girisYap } from "@/app/actions/auth";
+import { IMZA } from "@/lib/imza";
 import { kurumKimligiGetir } from "@/lib/kurum";
 
 export default async function GirisPage({
@@ -11,7 +12,7 @@ export default async function GirisPage({
   const kurum = await kurumKimligiGetir();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-pine-deep px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-pine-deep px-4">
       <form
         action={girisYap}
         className="w-full max-w-sm space-y-5 rounded-2xl border border-line bg-card p-8 shadow-xl shadow-black/10"
@@ -67,6 +68,12 @@ export default async function GirisPage({
           Giriş Yap
         </button>
       </form>
+      <p className="mt-5 text-center text-xs text-white/70">
+        Geliştirici:{" "}
+        <a href={IMZA.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-white/90 hover:text-white">
+          {IMZA.ad}
+        </a>
+      </p>
     </div>
   );
 }

@@ -16,6 +16,7 @@ export function AyarlarFormu({
   logoUrl,
   asistanPromptu,
   baskanMi,
+  destekMi,
 }: {
   mevcutSaglayici: OcrSaglayici;
   geminiAnahtarVar: boolean;
@@ -26,6 +27,7 @@ export function AyarlarFormu({
   logoUrl: string | null;
   asistanPromptu: string;
   baskanMi: boolean;
+  destekMi: boolean;
 }) {
   const [saglayici, setSaglayici] = useState<OcrSaglayici>(mevcutSaglayici);
   const [sonuc, action, bekliyor] = useActionState(
@@ -83,6 +85,8 @@ export function AyarlarFormu({
         </div>
       </div>
 
+      {destekMi && (
+      <>
       <div className="border-t border-line pt-4">
         <p className="mb-2 text-sm font-medium text-ink-soft">Fiş okuma için hangi model kullanılsın?</p>
         <div className="flex gap-4 text-sm">
@@ -172,6 +176,8 @@ export function AyarlarFormu({
           className="w-full rounded-md border border-line px-3 py-2 text-sm"
         />
       </div>
+      </>
+      )}
 
       <div className="border-t border-line pt-4">
         <p className="mb-2 text-sm font-medium text-ink-soft">Mali Müşavir</p>

@@ -75,6 +75,9 @@ button,input,select{font:inherit;color:inherit}
 .yan-alt{margin-top:auto;padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;align-items:center}
 .avatar{width:34px;height:34px;border-radius:50%;background:var(--turkuaz);color:#fff;display:grid;place-items:center;font-weight:800}
 .yan-alt small{display:block;color:#a9b8d0}
+.yan-imza{padding:2px 18px 16px;font-size:11.5px;line-height:1.45;color:#8597b5}
+.yan-imza a{color:#a9b8d0;text-decoration:none}
+.yan-imza a:hover{color:#fff;text-decoration:underline}
 
 .ana{flex:1;min-width:0;display:flex;flex-direction:column}
 .ustbar{position:sticky;top:0;z-index:20;background:rgba(245,246,250,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--cizgi);display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 28px}
@@ -285,6 +288,8 @@ body.aciklama .ana{padding-right:370px}
   .mc-baglantilar>a{flex:1}
   .mc-baglantilar form{flex:1;display:flex}
   .mc-baglantilar button{flex:1;color:var(--mercan)}
+  .mc-imza{margin:14px 0 0;text-align:center;font-size:12px;color:var(--soluk)}
+  .mc-imza a{color:var(--mavi);font-weight:700;text-decoration:none}
   body.panel-acik{overflow:hidden}
   body.aciklama .ana{padding-right:0}
   .cekmece{width:100%;max-width:100%;top:auto;bottom:0;height:62vh;border-left:0;border-top:1px solid var(--cizgi);border-radius:18px 18px 0 0;transform:translateY(105%)}

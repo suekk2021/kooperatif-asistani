@@ -72,6 +72,9 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
     return { hata: "Bu ayarları sadece Başkan veya Operasyon yöneticisi değiştirebilir." };
   }
 
+  // Fiş okuma, API anahtarları, Telegram bildirimi ve asistan ayarlarını yalnızca teknik destek değiştirir
+  // (kullanıcı kararı, 11 Kas 2026); Başkan ve Operasyon yöneticisi kurum kimliği ile mali müşavir e-postasını değiştirir.
+  const destek = profil?.rol === "destek";
   const ocrSaglayici = String(formData.get("ocr_saglayici") ?? "gemini") as OcrSaglayici;
   const geminiKey = String(formData.get("gemini_api_key") ?? "").trim();
   const openaiKey = String(formData.get("openai_api_key") ?? "").trim();
@@ -85,36 +88,37 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
   // Yanlislikla baska bir sifre/deger yapistirilmasini onlemek icin, kaydetmeden once
   // anahtari gercek bir API istegiyle test ediyoruz - "kayitli" gorunup calismamasi riskini
   // (yesil isaret yanilticiydi) ortadan kaldirir.
-  if (geminiKey) {
+  if (destek && geminiKey) {
     const sonuc = await anahtarGecerliMi("gemini", geminiKey);
     if (!sonuc.gecerli) {
       return { hata: `Gemini anahtarı geçersiz görünüyor, kaydedilmedi: ${sonuc.mesaj}` };
     }
   }
-  if (openaiKey) {
+  if (destek && openaiKey) {
     const sonuc = await anahtarGecerliMi("openai", openaiKey);
     if (!sonuc.gecerli) {
       return { hata: `OpenAI anahtarı geçersiz görünüyor, kaydedilmedi: ${sonuc.mesaj}` };
     }
   }
 
-  const guncelleme: Record<string, unknown> = {
-    ocr_saglayici: ocrSaglayici,
+  const guncelleme: Record<string, unknown> = {};
+  if (destek) {
+    guncelleme.ocr_saglayici = ocrSaglayici;
     // Bu alanlar tam gorunur/duzenlenebilir oldugu icin (sifre gibi maskelenmiyor),
     // bos birakilirsa gercekten temizlenmesi istenmis demektir.
-    telegram_chat_id: telegramChatIdler || null,
-    asistan_promptu: asistanPromptu || null,
-  };
+    guncelleme.telegram_chat_id = telegramChatIdler || null;
+    guncelleme.asistan_promptu = asistanPromptu || null;
+  }
   // Diger alanlar (anahtarlar) icin: bos birakilan alan mevcut degeri SILMEZ,
   // sadece ilgili "sil" kutusu isaretliyse temizlenir.
-  if (geminiSil) {
+  if (destek && geminiSil) {
     guncelleme.gemini_api_key = null;
-  } else if (geminiKey) {
+  } else if (destek && geminiKey) {
     guncelleme.gemini_api_key = geminiKey;
   }
-  if (openaiSil) {
+  if (destek && openaiSil) {
     guncelleme.openai_api_key = null;
-  } else if (openaiKey) {
+  } else if (destek && openaiKey) {
     guncelleme.openai_api_key = openaiKey;
   }
   if (muhasebeciEmail) guncelleme.muhasebeci_email = muhasebeciEmail;
