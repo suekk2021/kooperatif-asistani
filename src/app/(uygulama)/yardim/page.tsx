@@ -382,8 +382,8 @@ const YONETICI_BOLUMLERI: Bolum[] = [
           <li>Şifreyi kişiye siz iletin; girişten sonra <b>Hesabım</b> sayfasından kendi şifresini koymasını söyleyin.</li>
         </ol>
         <p className="not">
-          Her sıfırlama <b>İşlem Geçmişi</b>&apos;ne &quot;Şifre sıfırlama&quot; olarak, kimin yaptığıyla yazılır; şifrenin kendisi hiçbir yere kaydedilmez. Kural: Başkanın şifresini Başkan ya da
-          teknik destek, teknik desteğin şifresini yalnızca teknik destek sıfırlar. Kendi şifrenizi Hesabım&apos;dan değiştirin.
+          Şifrenin kendisi hiçbir yere kaydedilmez. Kural: Başkanın şifresini Başkan ya da teknik destek, teknik desteğin şifresini yalnızca teknik destek sıfırlar.
+          Kendi şifrenizi Hesabım&apos;dan değiştirin.
         </p>
       </>
     ),

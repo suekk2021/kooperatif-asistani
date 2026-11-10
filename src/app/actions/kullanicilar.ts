@@ -121,8 +121,8 @@ export async function kullaniciSil(id: string): Promise<KullaniciSonuc> {
 /**
  * Yönetici başka bir kişinin şifresini yeni bir geçici şifreyle sıfırlar (şifremi unuttum çözümü).
  * Korunan roller (başkan, teknik destek) için kullaniciGuncelle ile aynı kural geçerli: başkanı başkan ya da
- * teknik destek, teknik desteği yalnız teknik destek sıfırlar. Her sıfırlama İşlem Geçmişi'ne kim tarafından
- * yapıldığıyla yazılır; şifrenin kendisi hiçbir yere kaydedilmez.
+ * teknik destek, teknik desteği yalnız teknik destek sıfırlar. Şifrenin kendisi hiçbir yere kaydedilmez.
+ * İşlem Geçmişi'ne yazılmaz (kullanıcı kararı, 11 Kas 2026: geçmiş yalnız finans, üretim ve kooperatif işleyişi kayıtlarını içerir).
  */
 export async function kullaniciSifreSifirla(id: string, yeniSifre: string): Promise<KullaniciSonuc> {
   const yetkiHatasi = await yetkiKontrol();
@@ -143,19 +143,5 @@ export async function kullaniciSifreSifirla(id: string, yeniSifre: string): Prom
   const { error } = await admin.auth.admin.updateUserById(id, { password: yeniSifre });
   if (error) return { hata: error.message };
 
-  // İz: kayıt, işlemi yapan kişi adına yazılır (service role auth.uid() bilmediği için kullanici açıkça verilir).
-  const { error: kayitHatasi } = await admin.from("degisiklik_kaydi").insert({
-    tablo: "kullanici_sifre",
-    kayit: id,
-    islem: "UPDATE",
-    eski: null,
-    yeni: { sifre_sifirlandi: true, hedef: hedef.ad_soyad },
-    kullanici: ben.id,
-  });
-
-  revalidatePath("/islem-gecmisi");
-  if (kayitHatasi) {
-    return { basarili: `${hedef.ad_soyad} için şifre sıfırlandı, ama işlem geçmişine yazılamadı (${kayitHatasi.message}). Yeni şifreyi kendisine iletin.` };
-  }
   return { basarili: `${hedef.ad_soyad} için şifre sıfırlandı. Yeni şifreyi kendisine iletin; girişten sonra Hesabım'dan değiştirmesini söyleyin.` };
 }
