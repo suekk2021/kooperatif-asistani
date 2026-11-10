@@ -59,9 +59,11 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
           <Link href="/satis" className="btn btn-cizgi">
             Satış listesi
           </Link>
-          <Link href="/satis/yeni" className="btn btn-ana">
-            + Yeni satış
-          </Link>
+          {duzenlemeYetkisiVarMi(rol) && (
+            <Link href="/satis/yeni" className="btn btn-ana">
+              + Yeni satış
+            </Link>
+          )}
         </div>
       </div>
 

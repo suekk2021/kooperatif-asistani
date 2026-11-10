@@ -60,9 +60,11 @@ export default async function AlisDetayPage({ params }: { params: Promise<{ id: 
           <Link href="/alis" className="btn btn-cizgi">
             Alış listesi
           </Link>
-          <Link href="/alis/yeni" className="btn btn-ana">
-            + Yeni alış
-          </Link>
+          {duzenlemeYetkisiVarMi(rol) && (
+            <Link href="/alis/yeni" className="btn btn-ana">
+              + Yeni alış
+            </Link>
+          )}
         </div>
       </div>
 

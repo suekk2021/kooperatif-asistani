@@ -31,9 +31,9 @@ const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
   {
     grup: "Operasyon",
     ogeler: [
-      { yol: "/alis", ad: "Alış", ikon: "alis", kimler: [...KAYIT_GIRENLER, "depo"] },
+      { yol: "/alis", ad: "Alış", ikon: "alis", kimler: [...KAYIT_GIRENLER, "depo", ...IZLEYENLER] },
       { yol: "/uretim", ad: "Üretim", ikon: "uretim", kimler: [...KAYIT_GIRENLER, "depo"] },
-      { yol: "/satis", ad: "Satış", ikon: "satis", kimler: KAYIT_GIRENLER },
+      { yol: "/satis", ad: "Satış", ikon: "satis", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
       { yol: "/stok", ad: "Stok", ikon: "stok", kimler: [...KAYIT_GIRENLER, "depo", ...IZLEYENLER] },
     ],
   },
