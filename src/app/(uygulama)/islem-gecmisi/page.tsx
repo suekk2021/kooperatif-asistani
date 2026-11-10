@@ -126,7 +126,7 @@ export default async function IslemGecmisiPage({
             if (ozet.fiil === "değiştirdi" && ozet.ayrinti.length === 0) return null;
             return (
               <div className="uyari-satir" key={k.id}>
-                <span className={`etk ${ozet.fiil === "iptal etti" || ozet.fiil === "sildi" ? "e-kirmizi" : ozet.fiil === "ekledi" ? "e-yesil" : "e-mavi"}`} style={{ marginTop: 2 }}>
+                <span className={`etk ${ozet.fiil === "iptal etti" || ozet.fiil === "sildi" ? "e-kirmizi" : ozet.fiil === "ekledi" ? "e-yesil" : ozet.fiil === "sıfırladı" ? "e-amber" : "e-mavi"}`} style={{ marginTop: 2 }}>
                   {ozet.fiil}
                 </span>
                 <div style={{ minWidth: 0 }}>

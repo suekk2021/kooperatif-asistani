@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
-import { kullaniciEkle, kullaniciGuncelle, kullaniciSil, type KullaniciSonuc } from "@/app/actions/kullanicilar";
+import { kullaniciEkle, kullaniciGuncelle, kullaniciSifreSifirla, kullaniciSil, type KullaniciSonuc } from "@/app/actions/kullanicilar";
 import { FormMesaji } from "@/components/FormMesaji";
 import { KORUNAN_ROLLER, ROLLER, rolAdi } from "@/lib/roller";
 import type { KullaniciRolu, Profil } from "@/types/database";
@@ -28,6 +28,8 @@ function KullaniciSatiri({
   const [chatId, setChatId] = useState(kullanici.telegram_chat_id ?? "");
   const [silOnay, setSilOnay] = useState(false);
   const [silindi, setSilindi] = useState(false);
+  const [sifreAcik, setSifreAcik] = useState(false);
+  const [yeniSifre, setYeniSifre] = useState("");
   const rolDegisebilir = verebilir(benimRol, kullanici.rol);
   // Teknik destek hesabını her yönetici silebilir: erişimi kesme hakkı kooperatifte.
   const silinebilir = kullanici.rol === "destek" || kullanici.rol !== "baskan" || benimRol === "baskan" || benimRol === "destek";
@@ -65,6 +67,11 @@ function KullaniciSatiri({
                   ))}
                 </select>
               </div>
+            )}
+            {rolDegisebilir && (
+              <button type="button" className="btn btn-cizgi" onClick={() => setSifreAcik((a) => !a)}>
+                Şifreyi sıfırla
+              </button>
             )}
             {!silinebilir ? null : silOnay ? (
               <>
@@ -114,6 +121,33 @@ function KullaniciSatiri({
           <div className="alan" style={{ flex: "0 0 auto", justifyContent: "flex-end" }}>
             <button type="button" className="btn btn-cizgi" disabled={bekliyor} onClick={() => kaydet({ gorev, telegram_chat_id: chatId })}>
               Kaydet
+            </button>
+          </div>
+        </div>
+      )}
+      {yonetici && !kendisiMi && rolDegisebilir && sifreAcik && (
+        <div className="form-satir" style={{ marginTop: 10, alignItems: "flex-end" }}>
+          <div className="alan" style={{ flex: "2 1 240px" }}>
+            <label>Yeni geçici şifre (en az 6 karakter)</label>
+            <input value={yeniSifre} onChange={(e) => setYeniSifre(e.target.value)} autoComplete="off" placeholder="Kişiye ileteceğiniz şifre" />
+          </div>
+          <div className="alan" style={{ flex: "0 0 auto", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              className="btn btn-ana"
+              disabled={bekliyor || yeniSifre.length < 6}
+              onClick={() =>
+                baslat(async () => {
+                  const s = await kullaniciSifreSifirla(kullanici.id, yeniSifre);
+                  setSonuc(s);
+                  if (s.basarili) {
+                    setYeniSifre("");
+                    setSifreAcik(false);
+                  }
+                })
+              }
+            >
+              Şifreyi sıfırla
             </button>
           </div>
         </div>

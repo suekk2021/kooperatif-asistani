@@ -117,3 +117,45 @@ export async function kullaniciSil(id: string): Promise<KullaniciSonuc> {
   revalidatePath("/ayarlar");
   return { basarili: "Kullanıcı silindi." };
 }
+
+/**
+ * Yönetici başka bir kişinin şifresini yeni bir geçici şifreyle sıfırlar (şifremi unuttum çözümü).
+ * Korunan roller (başkan, teknik destek) için kullaniciGuncelle ile aynı kural geçerli: başkanı başkan ya da
+ * teknik destek, teknik desteği yalnız teknik destek sıfırlar. Her sıfırlama İşlem Geçmişi'ne kim tarafından
+ * yapıldığıyla yazılır; şifrenin kendisi hiçbir yere kaydedilmez.
+ */
+export async function kullaniciSifreSifirla(id: string, yeniSifre: string): Promise<KullaniciSonuc> {
+  const yetkiHatasi = await yetkiKontrol();
+  if (yetkiHatasi) return { hata: yetkiHatasi };
+  const ben = await mevcutKullanici();
+  if (!ben) return { hata: "Oturum bulunamadı." };
+  if (ben.id === id) return { hata: "Kendi şifrenizi Hesabım sayfasından değiştirin." };
+  if (yeniSifre.length < 6) return { hata: "Yeni şifre en az 6 karakter olmalı." };
+
+  const supabase = await createClient();
+  const { data: hedef } = await supabase.from("profiller").select("ad_soyad, rol").eq("id", id).single();
+  if (!hedef) return { hata: "Kişi bulunamadı." };
+  if (!korunanaDokunabilir(ben.rol, hedef.rol)) {
+    return { hata: `${rolBilgisi(hedef.rol)?.ad} rolündeki kişinin şifresini bu hesap sıfırlayamaz.` };
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(id, { password: yeniSifre });
+  if (error) return { hata: error.message };
+
+  // İz: kayıt, işlemi yapan kişi adına yazılır (service role auth.uid() bilmediği için kullanici açıkça verilir).
+  const { error: kayitHatasi } = await admin.from("degisiklik_kaydi").insert({
+    tablo: "kullanici_sifre",
+    kayit: id,
+    islem: "UPDATE",
+    eski: null,
+    yeni: { sifre_sifirlandi: true, hedef: hedef.ad_soyad },
+    kullanici: ben.id,
+  });
+
+  revalidatePath("/islem-gecmisi");
+  if (kayitHatasi) {
+    return { basarili: `${hedef.ad_soyad} için şifre sıfırlandı, ama işlem geçmişine yazılamadı (${kayitHatasi.message}). Yeni şifreyi kendisine iletin.` };
+  }
+  return { basarili: `${hedef.ad_soyad} için şifre sıfırlandı. Yeni şifreyi kendisine iletin; girişten sonra Hesabım'dan değiştirmesini söyleyin.` };
+}
