@@ -17,6 +17,7 @@ type Kalem = {
   miktar: string;
   birim_fiyat: string;
   kdv: number;
+  isk: string;
 };
 
 /** "1.250,50" / "18,5" / "18.5" -> sayı */
@@ -37,7 +38,14 @@ const bosKalem = (tip: Kalem["tip"] = "stok"): Kalem => ({
   miktar: "",
   birim_fiyat: "",
   kdv: 1,
+  isk: "",
 });
+/** Boş = 0; geçersiz ya da 0–99,99 dışı = NaN. */
+function iskontoCoz(s: string): number {
+  if (!s.trim()) return 0;
+  const n = sayiCoz(s);
+  return n >= 0 && n < 100 ? n : NaN;
+}
 
 export function AlisFormu({
   tedarikciler,
@@ -63,6 +71,7 @@ export function AlisFormu({
   const [vade, setVade] = useState("");
   const [aciklama, setAciklama] = useState("");
   const [odeme, setOdeme] = useState<string>("");
+  const [genelIsk, setGenelIsk] = useState("");
   const [kalemler, setKalemler] = useState<Kalem[]>([bosKalem()]);
   const [sonuc, setSonuc] = useState<FormSonucu & { id?: string }>({});
   const [bekliyor, baslat] = useTransition();
@@ -89,15 +98,22 @@ export function AlisFormu({
     );
   }
 
+  const genelOran = iskontoCoz(genelIsk);
+  // Veritabanındaki alis_kaydet ile aynı hesap: iskonto maliyetten düşer.
   const hesaplanan = kalemler.map((k) => {
     const kart = k.tip === "stok" ? kartAdla.get(k.stokAdi.toLocaleLowerCase("tr-TR").trim()) : undefined;
     const miktar = sayiCoz(k.miktar);
     const fiyat = sayiCoz(k.birim_fiyat);
-    const tutar = Number.isFinite(miktar) && Number.isFinite(fiyat) ? yuvarla(miktar * fiyat) : 0;
+    const isk = iskontoCoz(k.isk);
+    const gecerli = Number.isFinite(miktar) && Number.isFinite(fiyat);
+    const brut = gecerli ? yuvarla(miktar * fiyat) : 0;
+    const tutar = gecerli && Number.isFinite(isk) && Number.isFinite(genelOran) ? yuvarla(miktar * fiyat * (1 - isk / 100) * (1 - genelOran / 100)) : brut;
+    const iskonto = yuvarla(brut - tutar);
     const kdvTutari = yuvarla((tutar * k.kdv) / 100);
     const hesap = k.tip === "stok" ? kart?.kod : k.hesap_kodu || undefined;
-    return { k, kart, miktar, fiyat, tutar, kdvTutari, hesap };
+    return { k, kart, miktar, fiyat, isk, brut, tutar, iskonto, kdvTutari, hesap };
   });
+  const iskontoToplam = yuvarla(hesaplanan.reduce((t, h) => t + h.iskonto, 0));
   const ara = yuvarla(hesaplanan.reduce((t, h) => t + h.tutar, 0));
   const kdvToplam = yuvarla(hesaplanan.reduce((t, h) => t + h.kdvTutari, 0));
   const genel = yuvarla(ara + kdvToplam);
@@ -119,6 +135,9 @@ export function AlisFormu({
     if (!cariId) return setSonuc({ hata: "Tedarikçi seçin." });
     if (!belgeNo.trim()) return setSonuc({ hata: "Fatura numarasını girin." });
     if (genel <= 0) return setSonuc({ hata: "En az bir kalemde miktar ve birim fiyat girin." });
+    if (!Number.isFinite(genelOran)) return setSonuc({ hata: "Genel iskonto 0 ile 99 arasında bir yüzde olmalı." });
+    const yanlisIsk = hesaplanan.findIndex((h) => !Number.isFinite(h.isk));
+    if (yanlisIsk !== -1) return setSonuc({ hata: `${yanlisIsk + 1}. kalemdeki iskonto 0 ile 99 arasında bir yüzde olmalı.` });
     const eksikStok = hesaplanan.findIndex((h) => h.k.tip === "stok" && !h.kart);
     if (eksikStok !== -1) {
       setSonuc({ hata: `${eksikStok + 1}. satırdaki malzeme stok kartlarında yok. Listeden seçin ya da önce Stok ekranından kart açın.` });
@@ -130,6 +149,7 @@ export function AlisFormu({
       miktar: h.miktar,
       birim_fiyat: h.fiyat,
       kdv_orani: h.k.kdv,
+      iskonto_orani: h.isk,
     }));
     baslat(async () => {
       const s = await alisKaydet({
@@ -139,6 +159,7 @@ export function AlisFormu({
         vade_tarihi: vade || undefined,
         aciklama: aciklama || undefined,
         odeme_hesap_id: odeme || null,
+        genel_iskonto_orani: genelOran,
         kalemler: kalemGirdileri,
       });
       setSonuc(s);
@@ -258,10 +279,25 @@ export function AlisFormu({
                     ))}
                   </select>
                 </div>
+                <div className="alan" style={{ flex: "0 1 90px" }}>
+                  <label>İskonto %</label>
+                  <input
+                    inputMode="decimal"
+                    value={h.k.isk}
+                    onChange={(e) => guncelle(h.k.anahtar, { isk: e.target.value })}
+                    placeholder="0"
+                    style={!Number.isFinite(h.isk) ? { borderColor: "var(--amber)" } : undefined}
+                  />
+                </div>
                 <div className="alan" style={{ flex: "1 1 110px", alignItems: "flex-end", justifyContent: "flex-end" }}>
                   <label>Tutar</label>
-                  <b className="num" style={{ minHeight: 42, display: "flex", alignItems: "center" }}>
+                  <b className="num" style={{ minHeight: 42, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-end" }}>
                     {tl(h.tutar)}
+                    {h.iskonto > 0 && (
+                      <span className="soluk" style={{ fontSize: 12, fontWeight: 600 }}>
+                        {tl(h.brut)} − {tl(h.iskonto)}
+                      </span>
+                    )}
                   </b>
                 </div>
               </div>
@@ -305,7 +341,20 @@ export function AlisFormu({
               ))}
             </div>
           </div>
+          <div className="alan" style={{ flex: "0 1 140px" }}>
+            <label htmlFor="genel-isk">Genel iskonto %</label>
+            <input
+              id="genel-isk"
+              inputMode="decimal"
+              value={genelIsk}
+              onChange={(e) => setGenelIsk(e.target.value)}
+              placeholder="0"
+              title="Faturanın tamamına uygulanır (satır iskontosundan sonra); maliyetten düşer"
+              style={!Number.isFinite(genelOran) ? { borderColor: "var(--amber)" } : undefined}
+            />
+          </div>
           <div className="toplam">
+            {iskontoToplam > 0 && <span className="num soluk">İskonto −{tl(iskontoToplam)} (maliyetten düşüldü)</span>}
             <span className="num soluk">
               Ara toplam {tl(ara)} · KDV {tl(kdvToplam)}
             </span>

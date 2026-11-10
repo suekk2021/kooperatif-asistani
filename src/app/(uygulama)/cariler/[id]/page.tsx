@@ -19,6 +19,7 @@ const KAYNAK_ADI: Record<string, string> = {
   iptal: "İptal",
   acilis: "Açılış",
   manuel: "Elle kayıt",
+  iade: "İade",
 };
 
 export default async function CariEkstrePage({ params }: { params: Promise<{ id: string }> }) {
@@ -28,6 +29,8 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
   if (!cariVeri) notFound();
   const cari = cariVeri as Cari;
 
+  const { data: iadeVeri } = await supabase.from("iadeler").select("id").eq("cari_id", id);
+  const iadeIdleri = new Set((iadeVeri ?? []).map((i) => i.id as string));
   const [{ data: satirVeri }, { data: alisVeri }, { data: satisVeri }, rol] = await Promise.all([
     supabase
       .from("yevmiye_satirlari")
@@ -61,6 +64,7 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
     if (!kaynakId) return null;
     if (alisIdleri.has(kaynakId)) return `/alis/${kaynakId}`;
     if (satisIdleri.has(kaynakId)) return `/satis/${kaynakId}`;
+    if (iadeIdleri.has(kaynakId)) return `/iade/${kaynakId}`;
     if (tur === "tahsilat" || tur === "odeme") return "/kasa";
     return null;
   }

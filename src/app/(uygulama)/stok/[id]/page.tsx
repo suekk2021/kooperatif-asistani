@@ -27,6 +27,7 @@ const KAYNAK: Record<string, { ad: string; yol?: string; renk: string }> = {
   uretim_cikti: { ad: "Üretildi", yol: "/uretim/", renk: "e-yesil" },
   sayim: { ad: "Sayım farkı", yol: "/stok/sayim/", renk: "e-kirmizi" },
   acilis: { ad: "Açılış", renk: "e-gri" },
+  iade: { ad: "İade", yol: "/iade/", renk: "e-mavi" },
   iptal: { ad: "İptal", renk: "e-kirmizi" },
 };
 

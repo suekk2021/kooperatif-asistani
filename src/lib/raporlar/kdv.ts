@@ -40,8 +40,23 @@ export async function kdvRaporu(s: Istemci, d: Donem): Promise<Rapor> {
     ),
   ]);
 
-  const sOran = oranBazinda(satis);
-  const aOran = oranBazinda(alis);
+  // İadeler KDV'yi düzeltir: satış iadesi hesaplanandan, alış iadesi indirilecekten düşer.
+  type IadeKalem = Kalem & { iadeler: { tur: string } | { tur: string }[] | null };
+  const iadeler = await hepsiniGetir<IadeKalem>((bas, son) =>
+    s
+      .from("iade_kalemleri")
+      .select("kdv_orani, tutar, kdv_tutari, iadeler!inner(tur, tarih, durum)")
+      .eq("iadeler.durum", "kayitli")
+      .gte("iadeler.tarih", d.bas)
+      .lte("iadeler.tarih", d.son)
+      .order("id")
+      .range(bas, son) as unknown as Sonuc<IadeKalem>
+  );
+  const turu = (k: IadeKalem) => (Array.isArray(k.iadeler) ? k.iadeler[0]?.tur : k.iadeler?.tur);
+  const eksi = (k: Kalem): Kalem => ({ kdv_orani: k.kdv_orani, tutar: -Number(k.tutar), kdv_tutari: -Number(k.kdv_tutari) });
+
+  const sOran = oranBazinda([...satis, ...iadeler.filter((k) => turu(k) === "satis").map(eksi)]);
+  const aOran = oranBazinda([...alis, ...iadeler.filter((k) => turu(k) === "alis").map(eksi)]);
   const hesaplanan = sOran.reduce((t, [, x]) => t + x.kdv, 0);
   const indirilecek = aOran.reduce((t, [, x]) => t + x.kdv, 0);
   const fark = yuvarla(hesaplanan - indirilecek);
@@ -56,7 +71,7 @@ export async function kdvRaporu(s: Istemci, d: Donem): Promise<Rapor> {
     baslik: "KDV özeti",
     donemYazisi: ayAdi(d.ay),
     notlar: [
-      "Programdaki kayıtlı alış ve satış faturalarından hesaplanır; iptal edilenler dahil değildir.",
+      "Programdaki kayıtlı alış ve satış faturalarından hesaplanır; iptal edilenler dahil değildir. Bu ay girilen iadeler düşülmüştür.",
       "Bu bir kontrol özetidir, beyanname değildir. Önceki aydan devreden KDV, tevkifat ve iadeler burada yoktur; beyanname Mikro'da hazırlanır.",
     ],
     bolumler: [

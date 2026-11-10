@@ -12,9 +12,11 @@ export type AlisKalemGirdisi = {
   miktar: number;
   birim_fiyat: number;
   kdv_orani: number;
+  iskonto_orani?: number;
 };
 
 export type AlisGirdisi = {
+  genel_iskonto_orani?: number;
   cari_id: string;
   belge_no: string;
   tarih: string;

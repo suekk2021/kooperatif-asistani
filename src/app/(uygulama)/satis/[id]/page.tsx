@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IptalFormu } from "@/components/IptalFormu";
 import { KayitIzi } from "@/components/KayitIzi";
+import { FaturaIadeleri } from "@/components/iade/FaturaIadeleri";
 import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { sayi, tarihTR, tl } from "@/lib/imece";
@@ -98,6 +99,7 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
                     </td>
                     <td data-label="Birim fiyat" className="sag num">
                       {tl(k.birim_fiyat)}
+                      {Number(k.iskonto_orani) > 0 && <div className="soluk" style={{ fontSize: 12 }}>%{Number(k.iskonto_orani)} iskonto</div>}
                     </td>
                     <td data-label="KDV" className="sag num">
                       %{Number(k.kdv_orani)} · {tl(k.kdv_tutari)}
@@ -128,6 +130,12 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
             {f.aciklama && <p className="soluk" style={{ margin: "8px 0 0" }}>Not: {f.aciklama}</p>}
           </div>
           <div className="toplam">
+            {Number(f.iskonto_toplam) > 0 && (
+              <span className="num soluk">
+                Brüt {tl(Number(f.ara_toplam) + Number(f.iskonto_toplam))} · İskonto −{tl(f.iskonto_toplam)}
+                {Number(f.genel_iskonto_orani) > 0 && ` (genel %${Number(f.genel_iskonto_orani)} dahil)`}
+              </span>
+            )}
             <span className="num soluk">
               Ara toplam {tl(f.ara_toplam)} · KDV {tl(f.kdv_toplam)}
             </span>
@@ -157,6 +165,8 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
           hesapAdlari={hesapAdlari}
         />
       )}
+
+      <FaturaIadeleri tur="satis" faturaId={f.id} faturaIptal={iptal} />
 
       <KayitIzi tablo="satis_faturalari" id={f.id} olusturan={f.olusturan} zaman={f.created_at} />
 

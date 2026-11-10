@@ -160,7 +160,7 @@ export default async function PanelPage() {
             </div>
           </Link>
           <Link href="/raporlar?r=satis" className="kart kart-ic metrik" style={linkStili}>
-            <div className="etiket">Bu ay satış (KDV hariç)</div>
+            <div className="etiket">Bu ay net satış (KDV hariç)</div>
             <div className="deger num">{tl(buAySatis.ciro)}</div>
             <div className="alt">
               Brüt kâr {tl(buAySatis.kar)}

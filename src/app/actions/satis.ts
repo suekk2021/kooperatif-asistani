@@ -11,9 +11,11 @@ export type SatisKalemGirdisi = {
   miktar: number;
   birim_fiyat: number;
   kdv_orani: number;
+  iskonto_orani?: number;
 };
 
 export type SatisGirdisi = {
+  genel_iskonto_orani?: number;
   cari_id: string;
   belge_no?: string;
   tarih: string;

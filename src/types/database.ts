@@ -174,6 +174,8 @@ export type AlisFaturasi = {
   iptal_fis_id: string | null;
   olusturan: string | null;
   created_at: string;
+  genel_iskonto_orani: number;
+  iskonto_toplam: number;
 };
 
 export type AlisKalemi = {
@@ -188,6 +190,8 @@ export type AlisKalemi = {
   kdv_orani: number;
   tutar: number;
   kdv_tutari: number;
+  iskonto_orani: number;
+  iskonto_tutari: number;
 };
 
 export type ParaHareketiTuru = "tahsilat" | "odeme" | "virman";
@@ -244,6 +248,8 @@ export type SatisFaturasi = {
   iptal_fis_id: string | null;
   olusturan: string | null;
   created_at: string;
+  genel_iskonto_orani: number;
+  iskonto_toplam: number;
 };
 
 export type SatisKalemi = {
@@ -260,6 +266,8 @@ export type SatisKalemi = {
   birim_maliyet: number;
   maliyet_tutari: number;
   maliyet_tahmini: boolean;
+  iskonto_orani: number;
+  iskonto_tutari: number;
 };
 
 // ===== Adım 4 (supabase/migrations/20261110140000_uretim.sql) =====
@@ -314,4 +322,47 @@ export type PartiGirdisi = {
   maliyet: number | null;
   maliyet_tahmini: boolean;
   created_at: string;
+};
+
+// ===== İade (supabase/migrations/20261111120000_iade_iskonto.sql) =====
+
+export type Iade = {
+  id: string;
+  iade_no: number;
+  tur: "satis" | "alis";
+  satis_fatura_id: string | null;
+  alis_fatura_id: string | null;
+  cari_id: string;
+  tarih: string;
+  belge_no: string | null;
+  aciklama: string | null;
+  ara_toplam: number;
+  kdv_toplam: number;
+  genel_toplam: number;
+  maliyet_toplam: number;
+  odeme_hesap_id: string | null;
+  durum: BelgeDurumu;
+  iptal_nedeni: string | null;
+  fis_id: string | null;
+  iptal_fis_id: string | null;
+  olusturan: string | null;
+  created_at: string;
+};
+
+export type IadeKalemi = {
+  id: number;
+  iade_id: string;
+  sira: number;
+  satis_kalem_id: number | null;
+  alis_kalem_id: number | null;
+  stok_karti_id: string;
+  lot_no: string | null;
+  miktar: number;
+  birim_fiyat: number;
+  kdv_orani: number;
+  tutar: number;
+  kdv_tutari: number;
+  stoga_alindi: boolean;
+  birim_maliyet: number;
+  maliyet_tutari: number;
 };

@@ -3,6 +3,7 @@ type Json = Record<string, unknown> | null;
 export const KAYIT_TURLERI: Record<string, { ad: string; yol?: (id: string) => string }> = {
   alis_faturalari: { ad: "Alış faturası", yol: (id) => `/alis/${id}` },
   satis_faturalari: { ad: "Satış", yol: (id) => `/satis/${id}` },
+  iadeler: { ad: "İade", yol: (id) => `/iade/${id}` },
   para_hareketleri: { ad: "Kasa/banka hareketi", yol: () => "/kasa" },
   uretim_partileri: { ad: "Üretim partisi", yol: (id) => `/uretim/${id}` },
   sayimlar: { ad: "Sayım", yol: (id) => `/stok/sayim/${id}` },
@@ -35,6 +36,7 @@ export function kayitEtiketi(tablo: string, j: Json): string {
   if (tablo === "alis_faturalari") return `Fatura ${v("belge_no")}`;
   if (tablo === "uretim_partileri") return `Parti ${v("parti_no")}`;
   if (tablo === "sayimlar") return `Sayım ${v("sayim_no")}`;
+  if (tablo === "iadeler") return `İADE-${v("iade_no")}`;
   if (tablo === "para_hareketleri") return [v("tur"), v("tutar") && `${Number(v("tutar")).toLocaleString("tr-TR")} ₺`, v("aciklama")].filter(Boolean).join(" · ");
   return v("unvan") ?? v("ad") ?? v("kod") ?? v("oran") ?? v("donem") ?? "";
 }

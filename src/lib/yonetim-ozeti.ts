@@ -25,9 +25,18 @@ async function satisOzeti(s: Istemci, bas: string, son: string): Promise<SatisOz
     .eq("durum", "kayitli")
     .gte("tarih", bas)
     .lte("tarih", son);
+  const { data: iadeler } = await s
+    .from("iadeler")
+    .select("ara_toplam, maliyet_toplam")
+    .eq("tur", "satis")
+    .eq("durum", "kayitli")
+    .gte("tarih", bas)
+    .lte("tarih", son);
   const liste = data ?? [];
-  const ciro = liste.reduce((t, f) => t + Number(f.ara_toplam), 0);
-  const maliyet = liste.reduce((t, f) => t + Number(f.maliyet_toplam), 0);
+  const ciro =
+    liste.reduce((t, f) => t + Number(f.ara_toplam), 0) - (iadeler ?? []).reduce((t, i) => t + Number(i.ara_toplam), 0);
+  const maliyet =
+    liste.reduce((t, f) => t + Number(f.maliyet_toplam), 0) - (iadeler ?? []).reduce((t, i) => t + Number(i.maliyet_toplam), 0);
   const tahminiMaliyetVar = liste.some((f) =>
     (f.satis_kalemleri as { maliyet_tahmini: boolean }[] | null)?.some((k) => k.maliyet_tahmini)
   );
