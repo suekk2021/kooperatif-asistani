@@ -74,7 +74,7 @@ export default async function IslemGecmisiPage({
           <label htmlFor="kisi">Kişi</label>
           <select id="kisi" name="kisi" defaultValue={q.kisi ?? ""}>
             <option value="">Herkes</option>
-            {(kisiler ?? []).map((k) => (
+            {(kisiler ?? []).filter((k) => k.rol !== "destek").map((k) => (
               <option key={k.id} value={k.id}>
                 {k.ad_soyad}
               </option>
@@ -134,8 +134,8 @@ export default async function IslemGecmisiPage({
                 </span>
                 <div style={{ minWidth: 0 }}>
                   <b>
-                    {yapan ? yapan.ad_soyad : k.kullanici ? "silinmiş kullanıcı" : "sistem / Telegram"}
-                    {yapan && <span className="soluk" style={{ fontWeight: 400 }}> ({rolAdi(yapan.rol as KullaniciRolu)})</span>}
+                    {yapan ? (yapan.rol === "destek" ? "Teknik destek" : yapan.ad_soyad) : k.kullanici ? "silinmiş kullanıcı" : "sistem / Telegram"}
+                    {yapan && yapan.rol !== "destek" && <span className="soluk" style={{ fontWeight: 400 }}> ({rolAdi(yapan.rol as KullaniciRolu)})</span>}
                     {" · "}
                     {tur?.ad ?? k.tablo}
                     {etiket && (yol ? <> <Link href={yol}>{etiket}</Link></> : ` ${etiket}`)}
