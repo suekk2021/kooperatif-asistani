@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IptalFormu } from "@/components/IptalFormu";
+import { KayitIzi } from "@/components/KayitIzi";
+import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
@@ -17,6 +19,8 @@ type Sayim = {
   iptal_nedeni: string | null;
   fis_id: string | null;
   iptal_fis_id: string | null;
+  olusturan: string | null;
+  created_at: string;
 };
 type Kalem = {
   id: number;
@@ -42,6 +46,7 @@ export default async function SayimDetayPage({ params }: { params: Promise<{ id:
     fisIdleri.length ? supabase.from("yevmiye_satirlari").select("*").in("fis_id", fisIdleri).order("sira") : Promise.resolve({ data: [] }),
     mevcutRol(),
   ]);
+  const kim = await oturum();
   const kalemler = ((kalemVeri ?? []) as Kalem[]).sort((a, b) => Number(a.fark_tutari) - Number(b.fark_tutari));
   const { data: kartVeri } = await supabase.from("stok_kartlari").select("id, ad, kod, birim").in("id", kalemler.map((k) => k.stok_karti_id));
   const kart = new Map(((kartVeri ?? []) as Pick<StokKarti, "id" | "ad" | "kod" | "birim">[]).map((k) => [k.id, k]));
@@ -151,12 +156,16 @@ export default async function SayimDetayPage({ params }: { params: Promise<{ id:
         <MuhasebeKarsiligi baslik="İptal (ters kayıt)" etiket="iptal" satirlar={satirlar.filter((x) => x.fis_id === s.iptal_fis_id)} hesapAdlari={hesapAdlari} />
       )}
 
+      <KayitIzi tablo="sayimlar" id={s.id} olusturan={s.olusturan} zaman={s.created_at} />
+
       {!iptal && duzenlemeYetkisiVarMi(rol) && (
         <div className="kart kart-ic" style={{ marginTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span className="soluk" style={{ maxWidth: 560 }}>
-            Sayım yanlış girildiyse iptal edin: stoklar sayım öncesine döner, sonra doğru sayımı yeniden girin.
+            {iptalEdebilir(kim, s)
+              ? "Sayım yanlış girildiyse iptal edin: stoklar sayım öncesine döner, sonra doğru sayımı yeniden girin."
+              : IPTAL_YETKI_NOTU}
           </span>
-          <IptalFormu tur="sayim" id={s.id} etiket="Sayımı iptal et" />
+          {iptalEdebilir(kim, s) && <IptalFormu tur="sayim" id={s.id} etiket="Sayımı iptal et" />}
         </div>
       )}
     </>

@@ -79,7 +79,8 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
 
   const ayarli = Boolean(ayar?.tarih && ayar?.karsi_hesap);
   const yonetici = yoneticiMi(rol);
-  const yazabilir = duzenlemeYetkisiVarMi(rol);
+  // Açılış bakiyesi girmek/iptal etmek yalnız yöneticinin işi (migration 20261111100000).
+  const yazabilir = duzenlemeYetkisiVarMi(rol) && yoneticiMi(rol);
   const karsiAd = hesaplar.find((h) => h.kod === ayar?.karsi_hesap)?.ad;
 
   return (
@@ -124,7 +125,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
         {yazabilir ? (
           <AcilisTablosu key={sekme} tur={sekme} satirlar={tablo} kilitli={!ayarli} />
         ) : (
-          <p className="bos">Açılış girme yetkiniz yok.</p>
+          <p className="bos">Açılış bakiyelerini yönetici (başkan veya operasyon yöneticisi) girer.</p>
         )}
       </div>
 

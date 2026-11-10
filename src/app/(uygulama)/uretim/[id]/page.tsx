@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IptalFormu } from "@/components/IptalFormu";
+import { KayitIzi } from "@/components/KayitIzi";
+import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { GirdiFormu, GirdiSilDugmesi, PartiBitirFormu } from "@/components/uretim/UretimFormlari";
 import { sayi, tarihTR, tl } from "@/lib/imece";
@@ -43,6 +45,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
 
   const acik = p.durum === "acik";
   const yazabilir = duzenlemeYetkisiVarMi(rol);
+  const iptalOlur = iptalEdebilir(await oturum(), p);
   const dk = partiSuresiDk(p);
   const toplamCikti = Number(p.uretilen_miktar ?? 0) + Number(p.bozuk_miktar ?? 0);
   const fire = uretimFiresi(p);
@@ -248,7 +251,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
               </ul>
             </div>
           )}
-          {acik && yazabilir && (
+          {acik && iptalOlur && (
             <div className="kart kart-ic" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span className="soluk" style={{ fontSize: 13 }}>Yanlışlıkla açıldıysa</span>
               <IptalFormu tur="parti" id={p.id} etiket="Partiyi iptal et" />
@@ -264,13 +267,16 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
         <MuhasebeKarsiligi baslik="İptal (ters kayıt)" etiket="iptal" satirlar={satirlar.filter((s) => s.fis_id === p.iptal_fis_id)} hesapAdlari={hesapAdlari} />
       )}
 
+      <KayitIzi tablo="uretim_partileri" id={p.id} olusturan={p.olusturan} zaman={p.created_at} />
+
       {p.durum === "tamamlandi" && yazabilir && (
         <div className="kart kart-ic" style={{ marginTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span className="soluk" style={{ maxWidth: 560 }}>
-            Yanlış girildiyse parti silinmez, iptal edilir: malzemeler stoğa geri döner, ürün stoktan çıkar, muhasebe kaydı ters
-            kayıtla geri alınır.
+            {iptalOlur
+              ? "Yanlış girildiyse parti silinmez, iptal edilir: malzemeler stoğa geri döner, ürün stoktan çıkar, muhasebe kaydı ters kayıtla geri alınır."
+              : IPTAL_YETKI_NOTU}
           </span>
-          <IptalFormu tur="parti" id={p.id} etiket="Partiyi iptal et" />
+          {iptalOlur && <IptalFormu tur="parti" id={p.id} etiket="Partiyi iptal et" />}
         </div>
       )}
     </>

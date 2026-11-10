@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { IptalFormu } from "@/components/IptalFormu";
+import { oturum, iptalEdebilir } from "@/lib/yetki";
 import { ParaIslemleri } from "@/components/kasa/ParaIslemleri";
 import { FisOzeti } from "@/components/MuhasebeKarsiligi";
 import { PARA_HAREKETI_TURU_ADI, PARA_HESABI_TURU_ADI, tarihTR, tl } from "@/lib/imece";
@@ -20,7 +21,8 @@ export default async function KasaPage() {
   ]);
   const hesaplar = (hesapVeri ?? []) as KasaBankaHesabi[];
   const cariler = (cariVeri ?? []) as Pick<Cari, "id" | "unvan" | "tur">[];
-  const hareketler = (hareketVeri ?? []) as ParaHareketi[];
+  const hareketler = (hareketVeri ?? []) as (ParaHareketi & { olusturan: string | null })[];
+  const kim = await oturum();
 
   const fisIdleri = hareketler.flatMap((h) => [h.fis_id]).filter(Boolean) as string[];
   const [{ data: bakiyeVeri }, { data: satirVeri }] = await Promise.all([
@@ -135,7 +137,7 @@ export default async function KasaPage() {
                         <FisOzeti satirlar={satirlar.filter((s) => s.fis_id === h.fis_id)} />
                       </td>
                       <td data-label="" className="sag">
-                        {!iptal && !h.alis_fatura_id && !h.satis_fatura_id && duzenlemeYetkisiVarMi(rol) && <IptalFormu tur="para" id={h.id} />}
+                        {!iptal && !h.alis_fatura_id && !h.satis_fatura_id && iptalEdebilir(kim, h) && <IptalFormu tur="para" id={h.id} />}
                       </td>
                     </tr>
                   );

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { IptalFormu } from "@/components/IptalFormu";
+import { KayitIzi } from "@/components/KayitIzi";
+import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
@@ -21,6 +23,7 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
     supabase.from("hesap_plani").select("kod, ad"),
     mevcutRol(),
   ]);
+  const kim = await oturum();
   const kalemler = (kalemVeri ?? []) as SatisKalemi[];
   const cari = cariVeri as Cari;
   const tahsilatlar = (tahsilatVeri ?? []) as ParaHareketi[];
@@ -155,13 +158,16 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
         />
       )}
 
+      <KayitIzi tablo="satis_faturalari" id={f.id} olusturan={f.olusturan} zaman={f.created_at} />
+
       {!iptal && duzenlemeYetkisiVarMi(rol) && (
         <div className="kart kart-ic" style={{ marginTop: 16, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <span className="soluk" style={{ maxWidth: 560 }}>
-            Yanlış girildiyse ya da ürün iade geldiyse satış silinmez, iptal edilir: stok, alacak ve tahsilat ters kayıtla geri
-            alınır.
+            {iptalEdebilir(kim, f)
+              ? "Yanlış girildiyse ya da ürün iade geldiyse satış silinmez, iptal edilir: stok, alacak ve tahsilat ters kayıtla geri alınır."
+              : IPTAL_YETKI_NOTU}
           </span>
-          <IptalFormu tur="satis" id={f.id} etiket="Satışı iptal et" />
+          {iptalEdebilir(kim, f) && <IptalFormu tur="satis" id={f.id} etiket="Satışı iptal et" />}
         </div>
       )}
     </>

@@ -209,6 +209,7 @@ export type ParaHareketi = {
   iptal_nedeni: string | null;
   fis_id: string | null;
   iptal_fis_id: string | null;
+  olusturan: string | null;
   created_at: string;
 };
 
@@ -241,6 +242,7 @@ export type SatisFaturasi = {
   iptal_nedeni: string | null;
   fis_id: string | null;
   iptal_fis_id: string | null;
+  olusturan: string | null;
   created_at: string;
 };
 
@@ -299,6 +301,7 @@ export type UretimPartisi = {
   iptal_nedeni: string | null;
   fis_id: string | null;
   iptal_fis_id: string | null;
+  olusturan: string | null;
   created_at: string;
 };
 
