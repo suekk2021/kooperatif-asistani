@@ -46,7 +46,7 @@ const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
   {
     grup: "Muhasebe",
     ogeler: [
-      { yol: "/raporlar", ad: "Raporlar", ikon: "rapor", yakinda: true },
+      { yol: "/raporlar", ad: "Raporlar", ikon: "rapor", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
       { yol: "/hesap-plani", ad: "Hesap Planı", ikon: "hesap", kimler: [...KAYIT_GIRENLER, "muhasebeci"] },
       { yol: "/aktarim", ad: "Muhasebe Aktarımı", ikon: "aktarim", yakinda: true },
     ],

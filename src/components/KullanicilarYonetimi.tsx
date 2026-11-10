@@ -102,8 +102,14 @@ function KullaniciSatiri({
             <input value={gorev} onChange={(e) => setGorev(e.target.value)} placeholder="Genel Müdür · ortak şirket" />
           </div>
           <div className="alan" style={{ flex: "1 1 180px" }}>
-            <label>Telegram Chat ID (yedek bildirim)</label>
-            <input value={chatId} onChange={(e) => setChatId(e.target.value)} placeholder="İsteğe bağlı" />
+            <label>Telegram numarası</label>
+            <input
+              value={chatId}
+              onChange={(e) => setChatId(e.target.value)}
+              inputMode="numeric"
+              placeholder="Kişi bota yazınca öğrenir"
+              title="Kişi Telegram'da kooperatif botuna herhangi bir mesaj yazar; bot ona numarasını söyler. O numarayı buraya yazıp kaydedin."
+            />
           </div>
           <div className="alan" style={{ flex: "0 0 auto", justifyContent: "flex-end" }}>
             <button type="button" className="btn btn-cizgi" disabled={bekliyor} onClick={() => kaydet({ gorev, telegram_chat_id: chatId })}>

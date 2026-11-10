@@ -166,22 +166,41 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false }, { status: 401 });
   }
 
-  const izinliChatIdler = chatIdListesiCikar(ayarlar?.telegram_chat_id);
-
-  if (!ayarlar?.telegram_bot_token || izinliChatIdler.length === 0) {
+  if (!ayarlar?.telegram_bot_token) {
     return NextResponse.json({ ok: true });
   }
 
-  // Guvenlik: sadece ayarlarda kayitli kisilerin sohbetlerinden gelen mesajlara yanit ver.
+  // Güvenlik: yalnızca kayıtlı kişilere cevap verilir — Ayarlar'daki liste ya da
+  // Kişiler ekranında profiline Telegram numarası yazılmış biri.
   const gelenChatId = String(mesaj.chat.id);
-  if (!izinliChatIdler.includes(gelenChatId)) {
+  const { data: profil } = await supabase
+    .from("profiller")
+    .select("ad_soyad")
+    .eq("telegram_chat_id", gelenChatId)
+    .limit(1)
+    .maybeSingle();
+  const listede = chatIdListesiCikar(ayarlar.telegram_chat_id).includes(gelenChatId);
+  if (!profil && !listede) {
+    // Tanınmayan kişiye sadece kendi numarasını söyler (başka bilgi vermez); yönetici bu
+    // numarayı Ayarlar → Kişiler'de profiline yazınca bot onu tanır.
+    if (mesaj.text) {
+      try {
+        await telegramMesajGonder(
+          ayarlar.telegram_bot_token,
+          gelenChatId,
+          `Bu bot ${KURUM_ADI} çalışanları içindir.\n\nTelegram numaranız: <code>${gelenChatId}</code>\n\nBu numarayı yöneticinize iletin; İMECE'de profilinize eklendiğinde bot size cevap vermeye başlar.`
+        );
+      } catch {
+        // Cevap gitmese de sorun değil.
+      }
+    }
     return NextResponse.json({ ok: true });
   }
 
   const botToken = ayarlar.telegram_bot_token;
   const chatId = gelenChatId;
 
-  const gonderenIsim = telegramGondereniBul(ayarlar.telegram_chat_id, gelenChatId) ?? gelenChatId;
+  const gonderenIsim = profil?.ad_soyad ?? telegramGondereniBul(ayarlar.telegram_chat_id, gelenChatId) ?? gelenChatId;
   const yzAyarlari: YapayZekaAyarlari | null =
     ayarlar.ocr_saglayici === "gemini" && ayarlar.gemini_api_key
       ? { saglayici: "gemini", apiKey: ayarlar.gemini_api_key }
