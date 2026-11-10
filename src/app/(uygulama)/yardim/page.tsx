@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { YazdirDugmesi } from "@/components/YazdirDugmesi";
+import { mevcutRol, yoneticiMi } from "@/lib/rol";
+import { ROLLER } from "@/lib/roller";
 
 type Bolum = { baslik: string; alt: string; icerik: React.ReactNode };
 
@@ -216,6 +218,184 @@ const BOLUMLER: Bolum[] = [
       </ul>
     ),
   },
+  {
+    baslik: "İskontolu satış ya da alış",
+    alt: "Müşteriye ya da tedarikçiden gelen indirim",
+    icerik: (
+      <>
+        <ol>
+          <li>
+            Satış (ya da Alış) formunda ürün satırındaki <b>İskonto %</b> alanına yüzdeyi yazın; yalnızca o satır indirilir.
+          </li>
+          <li>
+            Faturanın tamamına indirim varsa <b>Genel iskonto %</b> alanına yazın; satır iskontosundan sonra uygulanır.
+          </li>
+          <li>Formun altında brüt tutar ve iskonto görünür; KDV indirimli tutar üzerinden hesaplanır.</li>
+        </ol>
+        <p className="not">
+          İndirimli fiyatı fiyat alanına yazmayın; yüzdeyi iskonto alanına yazın ki program iskontoyu ayrı izleyebilsin. Alışta iskonto ürünün maliyetini düşürür.
+          Telefonda bu alanlar <B>Daha fazla</B> altındadır.
+        </p>
+      </>
+    ),
+  },
+  {
+    baslik: "Ana Panel'i okumak",
+    alt: "Güne başlarken bir bakın",
+    icerik: (
+      <ul>
+        <li>
+          <b>Nakit:</b> kasa, banka ve POS&apos;taki paranın toplamı.
+        </li>
+        <li>
+          <b>Alacak (müşterilerden):</b> müşterilerin bize toplam borcu; altında vadesi geçmiş kısmı yazar.
+        </li>
+        <li>
+          <b>Borç:</b> tedarikçilere ve şirket kredi kartına olan borç.
+        </li>
+        <li>
+          <b>Bu ay net satış (KDV hariç):</b> iadeler düşülmüş satış; geçen ayın aynı gününe göre artış ya da azalış gösterilir.
+        </li>
+        <li>
+          <b>Bu ay üretim:</b> parti sayısı ve ortalama fire.
+        </li>
+        <li>
+          <b>Dikkat edilecekler:</b> vadesi geçen alacaklar, son kullanma tarihi 30 gün içinde dolacak ürünler, eksiye düşen stok, dünden kalan açık parti ve
+          vadesi yaklaşan çek/senetler. Bu kutu boşsa acil bir şey yok demektir.
+        </li>
+        <li>
+          Altta <b>Yaklaşan hatırlatıcılar</b> var. Kuruluş bitene kadar <b>Kurulum adımları</b> kutusu da görünür.
+        </li>
+        <li>Depo görevlisi para kartlarını görmez.</li>
+      </ul>
+    ),
+  },
+  {
+    baslik: "Raporlar ve Excel'e aktarma",
+    alt: "Muhasebe → Raporlar",
+    icerik: (
+      <>
+        <ol>
+          <li>
+            Üstteki sekmelerden raporu seçin: <b>Satış ve kârlılık</b> (ürün ve müşteri bazında ciro, maliyet, kâr), <b>Fire ve kaçak</b> (üretim firesi, sayım
+            farkları), <b>Alacak yaşlandırma</b> (kim ne kadar borçlu, ne kadar gecikmiş), <b>Mizan</b> (hesap kodlu borç/alacak/bakiye), <b>KDV özeti</b>.
+          </li>
+          <li>
+            Aylık raporlarda sağ üstten ayı seçip <B>Göster</B>&apos;e basın. Alacak yaşlandırma her zaman bugünkü durumu gösterir.
+          </li>
+          <li>
+            <B>Excel indir</B> ile raporu dosya olarak alın; her bölüm ayrı sayfa olur. Mali müşavire ya da arşive göndermek için kullanılır.
+          </li>
+        </ol>
+        <p className="not">
+          KDV özeti beyanname değildir, kontrol içindir. Raporları depo görevlisi göremez; muhasebeci ve izleyici görür, indirir.
+        </p>
+      </>
+    ),
+  },
+  {
+    baslik: "Çek / senet",
+    alt: "Kooperatif kullanırsa — Finans → Çek / Senet",
+    icerik: (
+      <ol>
+        <li>
+          Sayfanın üstündeki formda <B>Müşteriden aldık</B> ya da <B>Tedarikçiye verdik</B>, sonra <B>Çek</B> ya da <B>Senet</B> seçin; cari, <b>Tutar</b>, <b>Vade</b> ve
+          tarihi yazıp <B>Kaydet</B> deyin.
+        </li>
+        <li>
+          Sekmeler: <b>Portföy (alınan)</b>, <b>Ödenecek (verilen)</b>, <b>Kapananlar</b>.
+        </li>
+        <li>
+          Evrakı açıp işlem yapın: <B>Tahsil et</B> (paranın girdiği hesabı seçin), <B>Tedarikçiye ciro et</B>, <B>Karşılıksız / protestolu</B>, verilen evrak için{" "}
+          <B>Ödendi olarak işle</B>.
+        </li>
+        <li>
+          Yanlış işlem yaptıysanız yalnızca <b>son işlem</b> <B>Bu işlemi geri al</B> ile geri alınır.
+        </li>
+        <li>Vadesi 7 gün içinde gelen ya da geçen evraklar Ana Panel&apos;de uyarı olarak çıkar.</li>
+      </ol>
+    ),
+  },
+  {
+    baslik: "Hatırlatıcılar ve notlar",
+    alt: "Genel → Hatırlatıcılar / Notlar",
+    icerik: (
+      <ul>
+        <li>
+          <b>Hatırlatıcı:</b> <b>Yeni Hatırlatıcı</b> kutusuna başlığı ve tarihi yazın, <b>Kime</b> alanından kişiyi seçin (boş bırakırsanız size gelir), <B>Ekle</B>.
+          Günü gelince kişiye Telegram&apos;dan haber gider.
+        </li>
+        <li>İşi yaptıysanız hatırlatıcıdaki kutuyu işaretleyin; işaretlenmeyen hatırlatma tekrar gönderilebilir.</li>
+        <li>
+          <b>Notlar:</b> &quot;Bir not bırak…&quot; kutusuna yazıp <B>Not Ekle</B>&apos;ye basın ya da Telegram&apos;dan yazın.
+        </li>
+      </ul>
+    ),
+  },
+];
+
+const YONETICI_BOLUMLERI: Bolum[] = [
+  {
+    baslik: "Açılış tarihi ve karşı hesabı girmek",
+    alt: "Açılış ekranının üstündeki sarı kutu",
+    icerik: (
+      <ol>
+        <li>
+          Mali müşavirden iki bilgi alın: açılış tarihi ve açılış farkının yazılacağı hesap (570, 580, 500 ya da müşavirin söylediği başka bir hesap).
+        </li>
+        <li>
+          Ana Panel&apos;deki kurulum adımlarından <b>Açılış bakiyeleri</b> satırına girin, üstteki kutuya <b>Açılış tarihi</b> ve <b>Karşı hesap</b>&apos;ı yazıp{" "}
+          <B>Ayarı kaydet</B> deyin.
+        </li>
+        <li>
+          Bundan sonra ön muhasebe (Nagihan Hanım) açılış bakiyelerini girebilir. Ayarı yalnızca yönetici değiştirebilir; değiştirmeniz gerekirse önce mali müşavire
+          sorun.
+        </li>
+      </ol>
+    ),
+  },
+  {
+    baslik: "Yeni kişi ekleme ve roller",
+    alt: "Ayarlar → Kişiler ve yetkiler",
+    icerik: (
+      <>
+        <ol>
+          <li>
+            Bilgisayarda soldaki menünün altından, telefonda <B>Menü</B>&apos;den <B>Ayarlar</B>&apos;a girin; <b>Kişiler ve yetkiler</b> bölümünde <b>Yeni kişi ekle</b>&apos;yi
+            bulun.
+          </li>
+          <li>
+            <b>Ad soyad</b>, <b>E-posta (giriş adı)</b>, <b>Geçici şifre</b> (en az 6 karakter), <b>Rol</b> ve <b>Görev</b>&apos;i yazıp <B>Kişiyi ekle</B> deyin.
+          </li>
+          <li>Geçici şifreyi kişiye siz iletirsiniz; ilk girişte Hesabım&apos;dan değiştirmesini söyleyin.</li>
+          <li>
+            Telegram bildirimi için: kişi Telegram&apos;da kooperatif botuna bir mesaj yazar, bot ona numarasını söyler; siz kişinin satırındaki <b>Telegram numarası</b>{" "}
+            alanına yazıp kaydedin.
+          </li>
+        </ol>
+        <p>
+          <b>Roller:</b>
+        </p>
+        <ul>
+          {ROLLER.filter((r) => r.deger !== "destek").map((r) => (
+            <li key={r.deger}>
+              <b>{r.ad}:</b> {r.aciklama}
+            </li>
+          ))}
+        </ul>
+      </>
+    ),
+  },
+  {
+    baslik: "İşlem geçmişi: kim ne yaptı?",
+    alt: "Muhasebe → İşlem Geçmişi",
+    icerik: (
+      <p>
+        Programda kimin, ne zaman, hangi kaydı eklediğini, değiştirdiğini ya da iptal ettiğini gösterir. <b>Kişi</b>, <b>Kayıt türü</b> ve tarih aralığıyla
+        süzebilirsiniz; değişen alanlarda eski ve yeni değer yan yana görünür. Liste değiştirilemez. Başkan, Operasyon yöneticisi ve muhasebeci görür.
+      </p>
+    ),
+  },
 ];
 
 const KURALLAR = [
@@ -227,7 +407,8 @@ const KURALLAR = [
   "Ekrandaki “Muhasebe karşılığı” kutusu bilgi içindir; bir şey seçmeniz gerekmez, program kendisi oluşturur.",
 ];
 
-export default function YardimPage() {
+export default async function YardimPage() {
+  const yonetici = yoneticiMi(await mevcutRol());
   return (
     <div className="yardim">
       <div className="sayfa-bas">
@@ -294,6 +475,28 @@ export default function YardimPage() {
           </details>
         ))}
       </div>
+
+      {yonetici && (
+        <div className="kart" style={{ marginTop: 16 }}>
+          <div className="kart-bas">
+            <h2>Yöneticiler için</h2>
+            <span className="soluk" style={{ fontSize: 13 }}>Bu bölümü yalnızca yöneticiler görür</span>
+          </div>
+          {YONETICI_BOLUMLERI.map((b, i) => (
+            <details className="hp" key={b.baslik}>
+              <summary>
+                <span className="grup-no">{i + 1}</span>
+                <span>
+                  {b.baslik}
+                  <br />
+                  <small>{b.alt}</small>
+                </span>
+              </summary>
+              <div className="yardim-icerik">{b.icerik}</div>
+            </details>
+          ))}
+        </div>
+      )}
 
       <p className="soluk" style={{ fontSize: 13, marginTop: 16 }}>
         Raporlar (Muhasebe → Raporlar) her an bakılabilir ve Excel olarak indirilebilir. Takıldığınız yeri not alın; kılavuza
