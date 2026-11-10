@@ -92,7 +92,8 @@ async function ozetMetniOlustur(supabase: ReturnType<typeof createAdminClient>) 
 async function siniflandirmaSonucunuIsle(
   supabase: ReturnType<typeof createAdminClient>,
   cikarim: Record<string, unknown>,
-  gonderenIsim: string
+  gonderenIsim: string,
+  gelenChatId: string
 ): Promise<string> {
   const niyet = cikarim.niyet;
   const cevap = typeof cikarim.cevap === "string" ? cikarim.cevap : "Anladım.";
@@ -102,11 +103,20 @@ async function siniflandirmaSonucunuIsle(
   }
 
   if (niyet === "hatirlatici" && cikarim.hatirlatici_baslik && cikarim.hatirlatici_tarihi) {
+    // Söyleyen kişinin profili varsa hatırlatıcı ona bağlanır; yoksa geldiği sohbete döner.
+    const { data: profil } = await supabase
+      .from("profiller")
+      .select("id")
+      .eq("telegram_chat_id", gelenChatId)
+      .limit(1)
+      .maybeSingle();
     await supabase.from("hatirlaticilar").insert({
       baslik: String(cikarim.hatirlatici_baslik),
       hatirlatma_tarihi: String(cikarim.hatirlatici_tarihi),
       tamamlandi: false,
-      olusturan: null,
+      olusturan: profil?.id ?? null,
+      hedef_kullanici_id: profil?.id ?? null,
+      kaynak_chat_id: gelenChatId,
       telegram_gonderen: gonderenIsim,
     });
     return cevap;
@@ -207,7 +217,7 @@ export async function POST(request: NextRequest) {
         asistanPromptOlustur(mesaj.text, ayarlar.asistan_promptu),
         ASISTAN_SEMASI
       );
-      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim));
+      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim, gelenChatId));
       return NextResponse.json({ ok: true });
     }
 
@@ -233,7 +243,7 @@ export async function POST(request: NextRequest) {
         cikarim = await jsonUret(yzAyarlari, asistanPromptOlustur(metin, ayarlar.asistan_promptu), ASISTAN_SEMASI);
       }
 
-      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim));
+      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim, gelenChatId));
       return NextResponse.json({ ok: true });
     }
 

@@ -12,25 +12,37 @@ import type { Hatirlatici } from "@/types/database";
 
 type HatirlaticiVerisi = Pick<
   Hatirlatici,
-  "id" | "baslik" | "hatirlatma_tarihi" | "tamamlandi" | "telegram_gonderen"
+  "id" | "baslik" | "hatirlatma_tarihi" | "tamamlandi" | "telegram_gonderen" | "hedef_kullanici_id"
 > & {
   profiller: { ad_soyad: string } | null;
+  hedef: { ad_soyad: string } | null;
 };
+
+type Kisi = { id: string; ad_soyad: string };
 
 function kimEkledi(hatirlatici: HatirlaticiVerisi): string | null {
   return hatirlatici.telegram_gonderen ?? hatirlatici.profiller?.ad_soyad ?? null;
 }
 
+function kimeGidiyor(hatirlatici: HatirlaticiVerisi): string | null {
+  const hedef = hatirlatici.hedef?.ad_soyad;
+  if (!hedef || hedef === kimEkledi(hatirlatici)) return null;
+  return hedef;
+}
+
 function HatirlaticiSatiri({
   hatirlatici,
+  kisiler,
   duzenlenebilir,
 }: {
   hatirlatici: HatirlaticiVerisi;
+  kisiler: Kisi[];
   duzenlenebilir: boolean;
 }) {
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [baslik, setBaslik] = useState(hatirlatici.baslik);
   const [tarih, setTarih] = useState(hatirlatici.hatirlatma_tarihi);
+  const [hedef, setHedef] = useState(hatirlatici.hedef_kullanici_id ?? "");
   const [islemYapiliyor, islemBaslat] = useTransition();
   const [hata, setHata] = useState<string | null>(null);
 
@@ -49,7 +61,7 @@ function HatirlaticiSatiri({
     setHata(null);
     islemBaslat(async () => {
       try {
-        await hatirlaticiGuncelle(hatirlatici.id, baslik, tarih);
+        await hatirlaticiGuncelle(hatirlatici.id, baslik, tarih, hedef || null);
         setDuzenlemeModu(false);
       } catch (e) {
         setHata(e instanceof Error ? e.message : "Kaydedilemedi.");
@@ -83,6 +95,19 @@ function HatirlaticiSatiri({
             onChange={(e) => setTarih(e.target.value)}
             className="rounded-md border border-line px-3 py-2 text-sm"
           />
+          <select
+            value={hedef}
+            onChange={(e) => setHedef(e.target.value)}
+            aria-label="Kime hatırlatılsın"
+            className="rounded-md border border-line px-3 py-2 text-sm"
+          >
+            <option value="">Kime: ekleyen kişi</option>
+            {kisiler.map((k) => (
+              <option key={k.id} value={k.id}>
+                Kime: {k.ad_soyad}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="mt-2 flex gap-2">
           <button
@@ -96,6 +121,7 @@ function HatirlaticiSatiri({
             onClick={() => {
               setBaslik(hatirlatici.baslik);
               setTarih(hatirlatici.hatirlatma_tarihi);
+              setHedef(hatirlatici.hedef_kullanici_id ?? "");
               setDuzenlemeModu(false);
             }}
             className="rounded-md border border-line px-3 py-1.5 text-xs text-ink-soft hover:bg-paper"
@@ -130,6 +156,7 @@ function HatirlaticiSatiri({
           <p className="text-xs text-ink-soft/70">
             {hatirlatici.hatirlatma_tarihi}
             {kimEkledi(hatirlatici) && ` · ${kimEkledi(hatirlatici)}`}
+            {kimeGidiyor(hatirlatici) && ` → ${kimeGidiyor(hatirlatici)}`}
           </p>
           {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
         </div>
@@ -152,9 +179,11 @@ type Filtre = "hepsi" | "aktif" | "tamamlanan";
 
 export function HatirlaticilarListesi({
   hatirlaticilar,
+  kisiler,
   duzenlenebilir,
 }: {
   hatirlaticilar: HatirlaticiVerisi[];
+  kisiler: Kisi[];
   duzenlenebilir: boolean;
 }) {
   const [filtre, setFiltre] = useState<Filtre>("aktif");
@@ -193,7 +222,7 @@ export function HatirlaticilarListesi({
           <li className="py-3 text-sm text-ink-soft/70">Bu filtrede hatırlatıcı yok.</li>
         )}
         {filtrelenmis.map((h) => (
-          <HatirlaticiSatiri key={h.id} hatirlatici={h} duzenlenebilir={duzenlenebilir} />
+          <HatirlaticiSatiri key={h.id} hatirlatici={h} kisiler={kisiler} duzenlenebilir={duzenlenebilir} />
         ))}
       </ul>
     </div>

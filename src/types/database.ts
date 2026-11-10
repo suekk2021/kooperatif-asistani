@@ -103,6 +103,8 @@ export type Hatirlatici = {
   telegram_gonderildi: boolean;
   olusturan: string | null;
   telegram_gonderen?: string | null;
+  hedef_kullanici_id?: string | null;
+  kaynak_chat_id?: string | null;
   created_at: string;
 };
 

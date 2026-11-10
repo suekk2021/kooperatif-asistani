@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { telegramMesajGonder, chatIdListesiCikar } from "@/lib/telegram";
 import { bugunIstanbul } from "@/lib/tarih";
+import { hatirlaticiAlicilari } from "@/lib/hatirlatici-alici";
 
 // Bu adres, gunu gelmis ve henuz tamamlanmamis hatirlaticilar icin Telegram mesaji gonderir.
 // Vercel Cron (Hobby planda gunde 1 kez, bkz. vercel.json) ve/veya harici bir cron servisi
@@ -21,16 +22,16 @@ export async function GET(request: NextRequest) {
     .eq("id", true)
     .single();
 
-  const aliciListesi = chatIdListesiCikar(ayarlar?.telegram_chat_id);
+  const genelListe = chatIdListesiCikar(ayarlar?.telegram_chat_id);
 
-  if (!ayarlar?.telegram_bot_token || aliciListesi.length === 0) {
+  if (!ayarlar?.telegram_bot_token) {
     return NextResponse.json({ mesaj: "Telegram ayarlanmamış, gönderilecek bir şey yok." });
   }
 
   const bugun = bugunIstanbul();
   const { data: hatirlaticilar } = await supabase
     .from("hatirlaticilar")
-    .select("id, baslik, hatirlatma_tarihi")
+    .select("id, baslik, hatirlatma_tarihi, hedef_kullanici_id, olusturan, kaynak_chat_id")
     .eq("tamamlandi", false)
     .lte("hatirlatma_tarihi", bugun);
 
@@ -38,13 +39,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ mesaj: "Gönderilecek hatırlatıcı yok." });
   }
 
+  const { data: profiller } = await supabase
+    .from("profiller")
+    .select("id, telegram_chat_id")
+    .not("telegram_chat_id", "is", null);
+  const profilChatIdleri = new Map(
+    (profiller ?? []).filter((p) => p.telegram_chat_id?.trim()).map((p) => [p.id, p.telegram_chat_id!.trim()])
+  );
+
+  let mesajSayisi = 0;
   for (const h of hatirlaticilar) {
+    const alicilar = hatirlaticiAlicilari(h, profilChatIdleri, genelListe);
+    if (alicilar.length === 0) continue;
     const metin = `🔔 <b>Hatırlatıcı</b>\n${h.baslik}\nTarih: ${h.hatirlatma_tarihi}\n\nTamamlandığında uygulamadan işaretlemeyi unutmayın, aksi halde hatırlatmaya devam edilir.`;
-    for (const chatId of aliciListesi) {
-      await telegramMesajGonder(ayarlar.telegram_bot_token, chatId, metin);
+    for (const chatId of alicilar) {
+      try {
+        await telegramMesajGonder(ayarlar.telegram_bot_token, chatId, metin);
+        mesajSayisi++;
+      } catch {
+        // Bir kişiye gitmezse (bot engellenmiş vb.) diğer hatırlatıcılar yine gitsin.
+      }
     }
     await supabase.from("hatirlaticilar").update({ telegram_gonderildi: true }).eq("id", h.id);
   }
 
-  return NextResponse.json({ gonderilen: hatirlaticilar.length, alici_sayisi: aliciListesi.length });
+  return NextResponse.json({ hatirlatici: hatirlaticilar.length, mesaj: mesajSayisi });
 }

@@ -15,6 +15,7 @@ export async function hatirlaticiEkle(formData: FormData): Promise<void> {
 
   const baslik = String(formData.get("baslik") ?? "").trim();
   const hatirlatma_tarihi = String(formData.get("hatirlatma_tarihi") ?? "");
+  const hedef_kullanici_id = String(formData.get("hedef_kullanici_id") ?? "").trim() || null;
 
   if (!baslik || !hatirlatma_tarihi) {
     throw new Error("Başlık ve tarih zorunlu.");
@@ -25,6 +26,7 @@ export async function hatirlaticiEkle(formData: FormData): Promise<void> {
     hatirlatma_tarihi,
     tamamlandi: false,
     olusturan: user.id,
+    hedef_kullanici_id,
   });
 
   if (error) {
@@ -50,7 +52,8 @@ export async function hatirlaticiTamamlandiDegistir(id: string, tamamlandi: bool
 export async function hatirlaticiGuncelle(
   id: string,
   baslik: string,
-  hatirlatma_tarihi: string
+  hatirlatma_tarihi: string,
+  hedef_kullanici_id: string | null
 ): Promise<void> {
   if (!baslik.trim() || !hatirlatma_tarihi) {
     throw new Error("Başlık ve tarih zorunlu.");
@@ -59,7 +62,7 @@ export async function hatirlaticiGuncelle(
   const supabase = await createClient();
   const { error } = await supabase
     .from("hatirlaticilar")
-    .update({ baslik: baslik.trim(), hatirlatma_tarihi })
+    .update({ baslik: baslik.trim(), hatirlatma_tarihi, hedef_kullanici_id: hedef_kullanici_id || null })
     .eq("id", id);
 
   if (error) {
