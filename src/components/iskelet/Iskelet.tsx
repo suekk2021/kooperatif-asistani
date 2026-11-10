@@ -3,63 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { cikisYap } from "@/app/actions/auth";
 import { rolAdi, rolBilgisi } from "@/lib/roller";
 import type { KullaniciRolu } from "@/types/database";
-import { ikonlar, type IkonAdi } from "./Ikonlar";
-
-// kimler: menüde kimlerin göreceği (boşsa herkes). Bu sadece sadelik içindir, güvenlik değil:
-// yetkiyi veritabanı kuralları uygular; adresi bilen herkes sayfayı açabilir, yazamıyorsa yazamaz.
-type MenuOgesi = { yol: string; ad: string; ikon: IkonAdi; yakinda?: boolean; kimler?: KullaniciRolu[] };
-
-const KAYIT_GIRENLER: KullaniciRolu[] = ["operasyon", "destek", "on_muhasebe"];
-const IZLEYENLER: KullaniciRolu[] = ["muhasebeci", "izleyici"];
-
-const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
-  {
-    grup: "Genel",
-    ogeler: [
-      { yol: "/panel", ad: "Ana Panel", ikon: "panel" },
-      { yol: "/isler", ad: "İşler ve Siparişler", ikon: "isler", yakinda: true },
-      { yol: "/asistan", ad: "Asistan", ikon: "asistan", yakinda: true },
-      { yol: "/hatirlaticilar", ad: "Hatırlatıcılar", ikon: "hatirlatici" },
-      { yol: "/notlar", ad: "Notlar", ikon: "notlar" },
-      { yol: "/yardim", ad: "Kılavuz", ikon: "notlar" },
-    ],
-  },
-  {
-    grup: "Operasyon",
-    ogeler: [
-      { yol: "/alis", ad: "Alış", ikon: "alis", kimler: [...KAYIT_GIRENLER, "depo", ...IZLEYENLER] },
-      { yol: "/uretim", ad: "Üretim", ikon: "uretim", kimler: [...KAYIT_GIRENLER, "depo"] },
-      { yol: "/satis", ad: "Satış", ikon: "satis", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
-      { yol: "/stok", ad: "Stok", ikon: "stok", kimler: [...KAYIT_GIRENLER, "depo", ...IZLEYENLER] },
-    ],
-  },
-  {
-    grup: "Finans",
-    ogeler: [
-      { yol: "/kasa", ad: "Kasa ve Banka", ikon: "kasa", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
-      { yol: "/cariler", ad: "Cariler", ikon: "cari", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
-      { yol: "/cek-senet", ad: "Çek / Senet", ikon: "aktarim", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
-    ],
-  },
-  {
-    grup: "Muhasebe",
-    ogeler: [
-      { yol: "/raporlar", ad: "Raporlar", ikon: "rapor", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
-      { yol: "/hesap-plani", ad: "Hesap Planı", ikon: "hesap", kimler: [...KAYIT_GIRENLER, "muhasebeci"] },
-      { yol: "/aktarim", ad: "Muhasebe Aktarımı", ikon: "aktarim", yakinda: true },
-      { yol: "/islem-gecmisi", ad: "İşlem Geçmişi", ikon: "notlar", kimler: ["baskan", "operasyon", "destek", "muhasebeci"] },
-    ],
-  },
-];
-
-function gorurMu(o: MenuOgesi, rol: KullaniciRolu | null) {
-  return !o.yakinda && (!o.kimler || (rol !== null && o.kimler.includes(rol)));
-}
-
+import { ikonlar } from "./Ikonlar";
+import { MENU, gorurMu, type MenuOgesi } from "./menu";
+import { MobilKabuk } from "./MobilKabuk";
 
 function basHarfler(ad: string) {
   return ad
@@ -82,22 +31,18 @@ export function Iskelet({
   children: React.ReactNode;
 }) {
   const yol = usePathname();
-  const [menuAcik, setMenuAcik] = useState(false);
   const benimRol = (rol as KullaniciRolu | null) ?? null;
-  const yonetici = Boolean(rolBilgisi(benimRol)?.yonetici);
+  const bilgi = rolBilgisi(benimRol);
+  const yonetici = Boolean(bilgi?.yonetici);
   // Yönetici (ör. temsil görevindeki başkan) kendi listesinde olmayan bölümlere "Diğer bölümler"den ulaşır.
   const digerleri = yonetici ? MENU.flatMap((g) => g.ogeler).filter((o) => !o.yakinda && !gorurMu(o, benimRol)) : [];
 
   const baglanti = (o: MenuOgesi) => (
-    <Link key={o.yol} href={o.yol} className={yol.startsWith(o.yol) ? "aktif" : undefined} onClick={() => setMenuAcik(false)}>
+    <Link key={o.yol} href={o.yol} className={yol.startsWith(o.yol) ? "aktif" : undefined}>
       {ikonlar[o.ikon]}
       {o.ad}
     </Link>
   );
-
-  useEffect(() => {
-    document.body.classList.toggle("menu-acik", menuAcik);
-  }, [menuAcik]);
 
   function temaDegistir() {
     const simdiki = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
@@ -112,8 +57,6 @@ export function Iskelet({
 
   return (
     <div className="uygulama">
-      <div className="perde" onClick={() => setMenuAcik(false)} />
-
       <aside className="yan">
         <Link href="/panel" className="marka">
           <div className="marka-ust">
@@ -154,7 +97,7 @@ export function Iskelet({
           <div className="avatar">{basHarfler(kullaniciAdi) || "?"}</div>
           <div>
             <b style={{ color: "#fff" }}>{kullaniciAdi}</b>
-            <small>{rolAdi(rol as KullaniciRolu | null)}</small>
+            <small>{rolAdi(benimRol)}</small>
             <div className="baglantilar">
               {yonetici && <Link href="/ayarlar">Ayarlar</Link>}
               <Link href="/hesap">Hesabım</Link>
@@ -168,18 +111,14 @@ export function Iskelet({
 
       <div className="ana">
         <header className="ustbar">
-          <button
-            className="btn btn-cizgi btn-ikon menu-btn"
-            aria-label="Menüyü aç"
-            onClick={() => setMenuAcik((a) => !a)}
-          >
-            {ikonlar.menu}
-          </button>
-          <div className="mobil-marka">
+          <Link href="/panel" className="mobil-marka">
             <Image src={logoUrl} alt="" width={32} height={32} unoptimized />
             <b>İMECE</b>
-          </div>
+          </Link>
           <div style={{ flex: 1 }} />
+          <Link href="/hatirlaticilar" className="btn btn-cizgi btn-ikon mobil-zil" aria-label="Hatırlatıcılar">
+            {ikonlar.hatirlatici}
+          </Link>
           <button className="btn btn-cizgi btn-ikon" aria-label="Karanlık / aydınlık mod" onClick={temaDegistir}>
             {ikonlar.ay}
             {ikonlar.gunes}
@@ -187,6 +126,15 @@ export function Iskelet({
         </header>
         <main className="icerik">{children}</main>
       </div>
+
+      <MobilKabuk
+        rol={benimRol}
+        yazar={Boolean(bilgi?.yazar)}
+        yonetici={yonetici}
+        kullaniciAdi={kullaniciAdi}
+        basHarf={basHarfler(kullaniciAdi)}
+        temaDegistir={temaDegistir}
+      />
     </div>
   );
 }

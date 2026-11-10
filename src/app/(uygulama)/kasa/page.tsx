@@ -11,7 +11,8 @@ import type { Cari, HesapBakiyesi, KasaBankaHesabi, ParaHareketi, YevmiyeSatiri 
 
 const TUR_RENGI: Record<string, string> = { tahsilat: "e-yesil", odeme: "e-kirmizi", virman: "e-gri" };
 
-export default async function KasaPage() {
+export default async function KasaPage({ searchParams }: { searchParams: Promise<{ islem?: string }> }) {
+  const { islem } = await searchParams;
   const supabase = await createClient();
   const [{ data: hesapVeri }, { data: cariVeri }, { data: hareketVeri }, { data: evrakVeri }, rol] = await Promise.all([
     supabase.from("kasa_banka_hesaplari").select("*").eq("aktif", true).order("kod"),
@@ -93,7 +94,7 @@ export default async function KasaPage() {
         </div>
       </div>
 
-      {duzenlemeYetkisiVarMi(rol) && <ParaIslemleri hesaplar={hesaplar} cariler={cariler} bugun={bugunIstanbul()} />}
+      {duzenlemeYetkisiVarMi(rol) && <ParaIslemleri key={islem ?? ""} hesaplar={hesaplar} cariler={cariler} bugun={bugunIstanbul()} baslangic={islem} />}
 
       <div className="izgara g3">
         {hesaplar.map((h) => {

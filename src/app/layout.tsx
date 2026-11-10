@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -17,7 +17,13 @@ const kodFontu = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "İMECE · Suluova Üreten Eller",
   description: "Suluova Üreten Eller Kadın Kooperatifi — üretim, muhasebe ve iş takibi.",
-  icons: { icon: "/logo.png" },
+  icons: { icon: "/logo.png", apple: "/ikon/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "İMECE", statusBarStyle: "black-translucent" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#132b4f",
+  viewportFit: "cover",
 };
 
 // Sayfa çizilmeden önce tema seçilsin (aksi halde karanlık modda bir an beyaz parlar).

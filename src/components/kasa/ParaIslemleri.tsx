@@ -20,12 +20,16 @@ export function ParaIslemleri({
   hesaplar,
   cariler,
   bugun,
+  baslangic,
 }: {
   hesaplar: KasaBankaHesabi[];
   cariler: Pick<Cari, "id" | "unvan" | "tur">[];
   bugun: string;
+  /** Alt çubuktaki ＋ düğmesinden gelince ilgili form açık gelir (?islem=tahsilat). */
+  baslangic?: string;
 }) {
-  const [sekme, setSekme] = useState<Sekme | null>(hesaplar.length <= 1 ? "hesap" : null);
+  const istenen = SEKMELER.find((s) => s.id === baslangic)?.id ?? null;
+  const [sekme, setSekme] = useState<Sekme | null>(istenen ?? (hesaplar.length <= 1 ? "hesap" : null));
   const [yeniTur, setYeniTur] = useState<ParaHesabiTuru>("banka");
   const formRef = useRef<HTMLFormElement>(null);
 

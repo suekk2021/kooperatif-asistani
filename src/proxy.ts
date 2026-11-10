@@ -46,5 +46,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Uygulama simgesi ve manifest girişsiz okunabilmeli: telefon "ana ekrana ekle"de bunları çerezsiz ister.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|ikon/|logo.png).*)"],
 };

@@ -94,6 +94,51 @@ export const ikonlar = {
       <path d="M14 4v6h6M9 14l3 3 3-3M12 17v-6" />
     </svg>
   ),
+  yardim: (
+    <svg {...ortak}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01" />
+    </svg>
+  ),
+  gecmis: (
+    <svg {...ortak}>
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+      <path d="M3 3v5h5M12 7v5l3 2" />
+    </svg>
+  ),
+  sayim: (
+    <svg {...ortak}>
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M9 8h6M9 12h6M9 16h3" />
+    </svg>
+  ),
+  tahsilat: (
+    <svg {...ortak}>
+      <path d="M12 3v11M7 9l5 5 5-5" />
+      <path d="M4 19h16" />
+    </svg>
+  ),
+  odeme: (
+    <svg {...ortak}>
+      <path d="M12 15V4M7 9l5-5 5 5" />
+      <path d="M4 19h16" />
+    </svg>
+  ),
+  virman: (
+    <svg {...ortak}>
+      <path d="M4 8h14l-3-3M20 16H6l3 3" />
+    </svg>
+  ),
+  arti: (
+    <svg {...ortak} strokeWidth={2.4}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  ),
+  kapat: (
+    <svg {...ortak}>
+      <path d="M6 6l12 12M18 6 6 18" />
+    </svg>
+  ),
   menu: (
     <svg {...ortak}>
       <path d="M4 6h16M4 12h16M4 18h16" />
