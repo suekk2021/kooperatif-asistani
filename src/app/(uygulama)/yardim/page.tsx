@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { YazdirDugmesi } from "@/components/YazdirDugmesi";
 
 type Bolum = { baslik: string; alt: string; icerik: React.ReactNode };
@@ -238,6 +239,13 @@ export default function YardimPage() {
           <YazdirDugmesi />
         </div>
       </div>
+
+      <Link href="/yardim/ilk-kurulum" className="kart kart-ic" style={{ display: "block", marginBottom: 16, textDecoration: "none", color: "inherit" }}>
+        <b>İlk kurulum rehberi →</b>
+        <span className="soluk" style={{ display: "block", marginTop: 4, fontSize: 13.5 }}>
+          Programı baştan kuran kişi için görsel, adım adım rehber: hesaplar, kartlar, açılış bakiyeleri.
+        </span>
+      </Link>
 
       <div className="kart" style={{ marginBottom: 16 }}>
         <div className="kart-bas">

@@ -23,7 +23,7 @@ export type Islem = "alis" | "uretim" | "sayim" | "satis" | "kasa" | "acilis";
 export function islemIzni(rol: KullaniciRolu | null, islem: Islem): boolean {
   if (yoneticiMi(rol)) return true;
   if (islem === "alis" || islem === "uretim" || islem === "sayim") return rol === "on_muhasebe" || rol === "depo";
-  if (islem === "satis" || islem === "kasa") return rol === "on_muhasebe";
+  if (islem === "satis" || islem === "kasa" || islem === "acilis") return rol === "on_muhasebe";
   return false;
 }
 

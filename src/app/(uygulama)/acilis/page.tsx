@@ -2,7 +2,8 @@ import Link from "next/link";
 import { AcilisAyarFormu, AcilisTablosu, type AcilisSatiri } from "@/components/acilis/AcilisFormlari";
 import { IptalFormu } from "@/components/IptalFormu";
 import { PARA_HESABI_TURU_ADI, STOK_TURU_ADI, tarihTR, tl } from "@/lib/imece";
-import { duzenlemeYetkisiVarMi, mevcutRol, yoneticiMi } from "@/lib/rol";
+import { mevcutRol, yoneticiMi } from "@/lib/rol";
+import { iptalEdebilir, islemIzni, oturum } from "@/lib/yetki";
 import { createClient } from "@/lib/supabase/server";
 import type { Cari, Hesap, KasaBankaHesabi, StokKarti, YevmiyeSatiri } from "@/types/database";
 
@@ -18,13 +19,14 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
   const sekme: Sekme = sekmeParam === "cari" || sekmeParam === "stok" ? sekmeParam : "para";
 
   const supabase = await createClient();
-  const [{ data: ayar }, { data: fisVeri }, { data: hesapVeri }, rol] = await Promise.all([
+  const [{ data: ayar }, { data: fisVeri }, { data: hesapVeri }, rol, kim] = await Promise.all([
     supabase.from("acilis_ayarlari").select("*").single(),
-    supabase.from("yevmiye_fisleri").select("id, fis_no, tarih, aciklama, created_at").eq("kaynak_tur", "acilis").order("fis_no"),
+    supabase.from("yevmiye_fisleri").select("id, fis_no, tarih, aciklama, created_at, olusturan").eq("kaynak_tur", "acilis").order("fis_no"),
     supabase.from("hesap_plani").select("kod, ad, ust_kod").eq("aktif", true).order("kod"),
     mevcutRol(),
+    oturum(),
   ]);
-  const fisler = (fisVeri ?? []) as { id: string; fis_no: number; tarih: string; aciklama: string; created_at: string }[];
+  const fisler = (fisVeri ?? []) as { id: string; fis_no: number; tarih: string; aciklama: string; created_at: string; olusturan: string | null }[];
   const { data: iptalVeri } = fisler.length
     ? await supabase.from("yevmiye_fisleri").select("iptal_edilen_fis").in("iptal_edilen_fis", fisler.map((f) => f.id))
     : { data: [] };
@@ -79,8 +81,8 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
 
   const ayarli = Boolean(ayar?.tarih && ayar?.karsi_hesap);
   const yonetici = yoneticiMi(rol);
-  // Açılış bakiyesi girmek/iptal etmek yalnız yöneticinin işi (migration 20261111100000).
-  const yazabilir = duzenlemeYetkisiVarMi(rol) && yoneticiMi(rol);
+  // Açılış bakiyesini yönetici ve ön muhasebe girer (migration 20261111180000); tarih + karşı hesap ayarı yalnız yönetici.
+  const yazabilir = islemIzni(rol, "acilis");
   const karsiAd = hesaplar.find((h) => h.kod === ayar?.karsi_hesap)?.ad;
 
   return (
@@ -106,7 +108,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
         ) : (
           <p style={{ margin: "0 0 10px" }}>
             <b>Açılış kaydedilmeden önce muhasebeciden iki bilgi alınmalı:</b> açılış tarihi ve açılış kaydının karşı hesabı.
-            {yonetici ? " Gelince aşağıya girin." : " Başkan veya Operasyon yöneticisi girecek."} Tablolar şimdiden doldurulabilir ama
+            {yonetici ? " Gelince aşağıya girin." : " Ayarı Başkan veya Operasyon yöneticisi girer; muhasebeciden aldığınız bilgiyi ona iletin."} Tablolar şimdiden doldurulabilir ama
             kaydedilemez.
           </p>
         )}
@@ -125,7 +127,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
         {yazabilir ? (
           <AcilisTablosu key={sekme} tur={sekme} satirlar={tablo} kilitli={!ayarli} />
         ) : (
-          <p className="bos">Açılış bakiyelerini yönetici (başkan veya operasyon yöneticisi) girer.</p>
+          <p className="bos">Açılış bakiyelerini yönetici ya da ön muhasebe girer.</p>
         )}
       </div>
 
@@ -152,7 +154,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
                         {tl(toplam)}
                       </td>
                       <td data-label="" className="sag">
-                        {!iptal && yazabilir && <IptalFormu tur="acilis" id={f.id} />}
+                        {!iptal && yazabilir && iptalEdebilir(kim, f) && <IptalFormu tur="acilis" id={f.id} />}
                       </td>
                     </tr>
                   );
