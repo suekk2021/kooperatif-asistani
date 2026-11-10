@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Aciklama, Alan, Dugme, Maket, No, Secim } from "@/components/yardim/Maket";
+import { Aciklama, Ekran, Maket, No } from "@/components/yardim/Maket";
 import { YazdirDugmesi } from "@/components/YazdirDugmesi";
 import { ikonlar } from "@/components/iskelet/Ikonlar";
 
@@ -112,22 +112,7 @@ export default function IlkKurulumPage() {
         <p>
           &quot;Merkez kasa&quot; hazır gelir. Bankalarınızı, kartlı ödeme cihazınızı (POS) ve varsa şirket kredi kartınızı siz açarsınız.
         </p>
-        <Maket>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-            <Dugme ad="+ Tahsilat" />
-            <Dugme ad="Ödeme" />
-            <Dugme ad="Virman" />
-            <Dugme ad="Yeni hesap" ana no={1} />
-          </div>
-          <div className="form-satir">
-            <Secim ad="Tür" deger="Banka" no={2} />
-            <Alan ad="Hesap adı *" deger="Ziraat vadesiz" no={3} genis />
-            <Alan ad="Banka" deger="Ziraat" />
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <Dugme ad="Kaydet" ana no={4} />
-          </div>
-        </Maket>
+        <Ekran ad="kasa-yeni-hesap" alt="Kasa ve Banka ekranında Yeni hesap formu" />
         <Aciklama
           maddeler={[
             <>
@@ -146,27 +131,12 @@ export default function IlkKurulumPage() {
       </Adim>
 
       <Adim no={3} baslik="Müşterileri ve tedarikçileri açın" alt="Cariler → Müşteriler / Tedarikçiler">
-        <Maket>
-          <div className="sekmeler" style={{ marginBottom: 10 }}>
-            <span className="aktif" style={{ border: "1px solid var(--mavi)", background: "var(--mavi-acik)", color: "var(--mavi)", borderRadius: 9, padding: "8px 14px", fontWeight: 700 }}>
-              Müşteriler <No n={1} />
-            </span>
-            <span style={{ border: "1px solid var(--cizgi)", borderRadius: 9, padding: "8px 14px", fontWeight: 700 }}>Tedarikçiler</span>
-          </div>
-          <div style={{ marginBottom: 10 }}>
-            <Dugme ad="+ Yeni müşteri" ana no={2} />
-          </div>
-          <div className="form-satir">
-            <Alan ad="Ünvan / ad *" deger="Yılmaz Market" no={3} genis />
-            <Alan ad="Telefon" deger="0532 000 00 00" />
-            <Alan ad="Vade (gün)" deger="30" no={4} />
-          </div>
-        </Maket>
+        <Ekran ad="cariler-yeni-musteri" alt="Cariler ekranında yeni müşteri formu" />
         <Aciklama
           maddeler={[
-            <>Önce doğru sekmede olun: satış yaptığınız yerler <b>Müşteriler</b>, mal aldığınız firmalar <b>Tedarikçiler</b>.</>,
+            <>Önce doğru sekmede olun (Müşteriler / Tedarikçiler): satış yaptığınız yerler <b>Müşteriler</b>, mal aldığınız firmalar <b>Tedarikçiler</b>.</>,
             <>
-              <B>+ Yeni müşteri</B> (tedarikçi sekmesinde <B>+ Yeni tedarikçi</B>) ile formu açın.
+              <B>+ Yeni müşteri</B> (tedarikçi sekmesinde <B>+ Yeni tedarikçi</B>) düğmesiyle formu açın; açılınca form başlığı burada görünür.
             </>,
             <>Yalnızca <b>Ünvan / ad</b> zorunlu. Aynı kişiyi iki kez açmamak için önce listeye bakın.</>,
             <>
@@ -178,26 +148,10 @@ export default function IlkKurulumPage() {
       </Adim>
 
       <Adim no={4} baslik="Stok kartlarını açın" alt="Stok → + Yeni stok kartı">
-        <Maket>
-          <div style={{ marginBottom: 10 }}>
-            <Dugme ad="+ Yeni stok kartı" ana no={1} />
-          </div>
-          <div className="form-satir">
-            <Alan ad="Ad *" deger="Un" genis />
-            <Secim ad="Tür *" deger="Hammadde" no={2} />
-            <Secim ad="Birim *" deger="kg" no={3} />
-          </div>
-          <div className="form-satir" style={{ marginTop: 12 }}>
-            <Secim ad="KDV" deger="%1" />
-            <Alan ad="Asgari stok (uyarı sınırı)" deger="50" no={4} />
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <Dugme ad="Kartı aç" ana no={5} />
-          </div>
-        </Maket>
+        <Ekran ad="stok-yeni-kart" alt="Stok ekranında yeni stok kartı formu" />
         <Aciklama
           maddeler={[
-            <>Stok ekranının üstünden formu açın.</>,
+            <><B>+ Yeni stok kartı</B> düğmesiyle formu açın; açılınca form başlığı burada görünür.</>,
             <>
               <b>Tür</b> önemli: aşağıdaki tabloya bakın.
             </>,
@@ -248,46 +202,7 @@ export default function IlkKurulumPage() {
           <b>Ana Panel&apos;deki kurulum adımlarından</b> &quot;Açılış bakiyeleri ve ilk stok sayımı&quot; satırının <B>Aç</B> / <B>Ekle</B> düğmesiyle gidersiniz. Girmeden
           önce kartların (2, 3 ve 4. adımlar) açık olması gerekir, çünkü bakiyeler kartların karşısına yazılır.
         </p>
-        <Maket>
-          <div className="soluk" style={{ border: "1px dashed var(--cizgi)", borderRadius: 10, padding: "10px 12px", marginBottom: 10, fontSize: 13 }}>
-            Açılış tarihi ve karşı hesap burada görünür <No n={1} />
-          </div>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
-            <Dugme ad="Kasa ve Banka" />
-            <Dugme ad="Cariler" />
-            <Dugme ad="Depo sayımı" />
-            <No n={2} />
-          </div>
-          <table className="yardim-tablo">
-            <thead>
-              <tr>
-                <th>Hesap</th>
-                <th style={{ textAlign: "right" }}>Daha önce girilen</th>
-                <th style={{ textAlign: "right" }}>Açılış günündeki bakiye (₺)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Merkez kasa</td>
-                <td style={{ textAlign: "right" }}>0,00</td>
-                <td style={{ textAlign: "right" }}>
-                  <input readOnly tabIndex={-1} defaultValue="12.500,00" style={{ maxWidth: 130, textAlign: "right" }} />
-                  <No n={3} />
-                </td>
-              </tr>
-              <tr>
-                <td>Ziraat vadesiz</td>
-                <td style={{ textAlign: "right" }}>0,00</td>
-                <td style={{ textAlign: "right" }}>
-                  <input readOnly tabIndex={-1} placeholder="0,00" style={{ maxWidth: 130, textAlign: "right" }} />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div style={{ marginTop: 12 }}>
-            <Dugme ad="Açılışa kaydet" ana no={4} />
-          </div>
-        </Maket>
+        <Ekran ad="acilis" alt="Açılış ekranı" />
         <Aciklama
           maddeler={[
             <>

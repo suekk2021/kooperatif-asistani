@@ -1,4 +1,6 @@
+import Image from "next/image";
 import type { ReactNode } from "react";
+import pinler from "./pinler.json";
 
 // Rehber sayfaları için ekran maketleri: programın gerçek stil sınıflarıyla çizilir, tıklanmaz.
 // Numaralı kırmızı daireler (No) maketin altındaki açıklama listesindeki numaralarla eşleşir.
@@ -60,5 +62,29 @@ export function Dugme({ ad, ana, no }: { ad: string; ana?: boolean; no?: number 
       {ad}
       {no && <No n={no} />}
     </span>
+  );
+}
+
+
+type Pin = { n: number; x?: number; y?: number; yok?: boolean };
+type Ekranlar = Record<string, { boyut: number[]; pinler: Pin[] }>;
+
+/** Programın gerçek ekran görüntüsü (public/rehber) + üzerinde numaralı işaretler (pinler.json'da yüzde olarak). */
+export function Ekran({ ad, alt }: { ad: string; alt: string }) {
+  const e = (pinler as Ekranlar)[ad];
+  return (
+    <div className="ekran-kutu">
+      <div className="ekran-ic">
+        <Image src={`/rehber/${ad}.png`} alt={alt} width={e.boyut[0]} height={e.boyut[1]} unoptimized />
+        {e.pinler
+          .filter((p) => !p.yok && p.x !== undefined && p.y !== undefined)
+          .map((p) => (
+            <i key={p.n} className="mk-no ekran-pin" style={{ left: `${p.x}%`, top: `${p.y}%` }}>
+              {p.n}
+            </i>
+          ))}
+      </div>
+      <span className="ekran-not">Programın gerçek ekranı (yalnızca ilgili bölüm)</span>
+    </div>
   );
 }
