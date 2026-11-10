@@ -430,4 +430,19 @@ details.form-ac[open]>summary{display:none}
   .yardim details.hp{break-inside:avoid}
   .yardim details.hp summary::after{content:none}
 }
+.test-seridi{background:var(--amber-acik);color:#6d4500;border-bottom:1px solid #f0d29c;padding:8px 28px;font-size:13px;line-height:1.4}
+[data-theme="dark"] .test-seridi{color:#f0cf93;border-color:#5a4520}
+@media (max-width:1000px){.test-seridi{padding:8px 14px;font-size:12.5px}}
+@media print{.test-seridi{display:none}}
+.yukleniyor{display:flex;flex-direction:column;gap:12px;max-width:720px}
+.yukleniyor .kart-ic{display:flex;flex-direction:column;gap:14px}
+.yk-cizgi{height:14px;border-radius:7px;background:var(--cizgi);animation:yk-nabiz 1.1s ease-in-out infinite alternate}
+.yk-baslik{height:26px;width:42%}
+.yk-alt{width:60%;margin-bottom:8px}
+@keyframes yk-nabiz{from{opacity:.45}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.yk-cizgi,.mc-panel,.mc-perde{animation:none}}
 }
+/* Küçük yazı düğmeleri (Düzenle / Sil) telefonda parmakla basılacak büyüklükte olsun */
+@media (max-width:1000px){.dokun{min-height:40px;min-width:44px;padding:0 6px;font-size:13.5px!important}}
+/* Katman dışı (Tailwind sınıflarını da ezer): 16px altı yazı iPhone'da alana dokununca sayfayı yakınlaştırır. */
+@media (max-width:640px){input:not([type="checkbox"]):not([type="radio"]),select,textarea{font-size:16px!important}}

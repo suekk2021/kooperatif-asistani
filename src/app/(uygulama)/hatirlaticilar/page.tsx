@@ -27,11 +27,17 @@ export default async function HatirlaticilarPage() {
 
   return (
     <div className="space-y-6">
+      <div className="sayfa-bas" style={{ marginBottom: 0 }}>
+        <div>
+          <h1>Hatırlatıcılar</h1>
+          <p>Günü gelince Telegram&apos;dan haber verir</p>
+        </div>
+      </div>
       {duzenlenebilir && (
         <div className="rounded-xl border border-line bg-card p-5">
           <h2 className="text-sm font-semibold text-ink">Yeni Hatırlatıcı</h2>
           <p className="mt-1 text-xs text-ink-soft">
-            Tarihi geldiğinde seçtiğin kişiye Telegram'dan bildirim gider. Kimseyi seçmezsen sana gelir.
+            Tarihi geldiğinde seçtiğin kişiye Telegram&apos;dan bildirim gider. Kimseyi seçmezsen sana gelir.
             Telegram asistanına sesli ya da yazılı söylersen, hatırlatıcı söyleyen kişiye gider.
           </p>
           <form action={hatirlaticiEkle} className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-6">

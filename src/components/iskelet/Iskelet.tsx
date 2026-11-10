@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cikisYap } from "@/app/actions/auth";
+import { tarihTR } from "@/lib/imece";
 import { rolAdi, rolBilgisi } from "@/lib/roller";
+import { TEST_DONEMI_BITIS } from "@/lib/test-donemi";
 import type { KullaniciRolu } from "@/types/database";
 import { ikonlar } from "./Ikonlar";
 import { MENU, gorurMu, type MenuOgesi } from "./menu";
@@ -124,6 +126,12 @@ export function Iskelet({
             {ikonlar.gunes}
           </button>
         </header>
+        {TEST_DONEMI_BITIS && (
+          <div className="test-seridi" role="note">
+            <b>TEST DÖNEMİ</b> · {tarihTR(TEST_DONEMI_BITIS)} tarihine kadar. Bu sürede girilen tüm kayıtlar denemedir ve dönem sonunda
+            silinecektir.
+          </div>
+        )}
         <main className="icerik">{children}</main>
       </div>
 

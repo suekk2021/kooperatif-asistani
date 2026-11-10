@@ -146,7 +146,12 @@ type TelegramGuncelleme = {
 
 // Telegram'ın gönderdiği her mesajda bu adres tetiklenir (bkz. setWebhook kurulumu).
 export async function POST(request: NextRequest) {
-  const guncelleme: TelegramGuncelleme = await request.json();
+  let guncelleme: TelegramGuncelleme;
+  try {
+    guncelleme = await request.json();
+  } catch {
+    return NextResponse.json({ ok: false }, { status: 400 });
+  }
   const mesaj = guncelleme.message;
 
   if (!mesaj) {

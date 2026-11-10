@@ -62,7 +62,7 @@ export default async function GirisPage({
 
         <button
           type="submit"
-          className="w-full rounded-md bg-pine px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-pine-deep"
+          className="w-full rounded-md bg-pine px-3 py-3 text-base font-semibold text-white transition-colors hover:bg-pine-deep"
         >
           Giriş Yap
         </button>

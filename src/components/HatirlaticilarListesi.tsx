@@ -8,6 +8,7 @@ import {
 } from "@/app/actions/hatirlaticilar";
 import { TarihAraligiFiltresi, type TarihAraligi } from "@/components/TarihAraligiFiltresi";
 import { AyGezici } from "@/components/AyGezici";
+import { tarihTR } from "@/lib/imece";
 import type { Hatirlatici } from "@/types/database";
 
 type HatirlaticiVerisi = Pick<
@@ -141,7 +142,7 @@ function HatirlaticiSatiri({
           onClick={tamamlandiDegistir}
           disabled={islemYapiliyor || !duzenlenebilir}
           aria-label={hatirlatici.tamamlandi ? "Tamamlanmadı olarak işaretle" : "Tamamlandı olarak işaretle"}
-          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+          className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded border text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
             hatirlatici.tamamlandi
               ? "border-pine bg-pine text-white"
               : "border-line bg-card hover:border-ochre"
@@ -154,7 +155,7 @@ function HatirlaticiSatiri({
             {hatirlatici.baslik}
           </p>
           <p className="text-xs text-ink-soft/70">
-            {hatirlatici.hatirlatma_tarihi}
+            {tarihTR(hatirlatici.hatirlatma_tarihi)}
             {kimEkledi(hatirlatici) && ` · ${kimEkledi(hatirlatici)}`}
             {kimeGidiyor(hatirlatici) && ` → ${kimeGidiyor(hatirlatici)}`}
           </p>
@@ -163,10 +164,10 @@ function HatirlaticiSatiri({
       </div>
       {duzenlenebilir && (
         <div className="flex shrink-0 gap-3">
-          <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
+          <button onClick={() => setDuzenlemeModu(true)} className="dokun text-xs text-ink-soft hover:text-ink">
             Düzenle
           </button>
-          <button onClick={sil} disabled={islemYapiliyor} className="text-xs text-expense/70 hover:text-expense">
+          <button onClick={sil} disabled={islemYapiliyor} className="dokun text-xs text-expense/70 hover:text-expense">
             Sil
           </button>
         </div>

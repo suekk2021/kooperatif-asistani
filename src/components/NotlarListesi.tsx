@@ -94,10 +94,10 @@ function NotSatiri({ not, duzenlenebilir }: { not: NotSatiriVerisi; duzenlenebil
         </p>
         {duzenlenebilir && (
           <div className="flex gap-3">
-            <button onClick={() => setDuzenlemeModu(true)} className="text-xs text-ink-soft hover:text-ink">
+            <button onClick={() => setDuzenlemeModu(true)} className="dokun text-xs text-ink-soft hover:text-ink">
               Düzenle
             </button>
-            <button onClick={sil} disabled={kaydediliyor} className="text-xs text-expense/70 hover:text-expense">
+            <button onClick={sil} disabled={kaydediliyor} className="dokun text-xs text-expense/70 hover:text-expense">
               Sil
             </button>
           </div>
