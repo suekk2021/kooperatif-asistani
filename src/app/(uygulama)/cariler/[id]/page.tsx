@@ -20,6 +20,7 @@ const KAYNAK_ADI: Record<string, string> = {
   acilis: "Açılış",
   manuel: "Elle kayıt",
   iade: "İade",
+  evrak: "Çek/Senet",
 };
 
 export default async function CariEkstrePage({ params }: { params: Promise<{ id: string }> }) {
@@ -29,8 +30,12 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
   if (!cariVeri) notFound();
   const cari = cariVeri as Cari;
 
-  const { data: iadeVeri } = await supabase.from("iadeler").select("id").eq("cari_id", id);
+  const [{ data: iadeVeri }, { data: evrakHareketVeri }] = await Promise.all([
+    supabase.from("iadeler").select("id").eq("cari_id", id),
+    supabase.from("evrak_hareketleri").select("id, evrak_id").eq("cari_id", id),
+  ]);
   const iadeIdleri = new Set((iadeVeri ?? []).map((i) => i.id as string));
+  const evrakHareketi = new Map((evrakHareketVeri ?? []).map((h) => [h.id as string, h.evrak_id as string]));
   const [{ data: satirVeri }, { data: alisVeri }, { data: satisVeri }, rol] = await Promise.all([
     supabase
       .from("yevmiye_satirlari")
@@ -65,6 +70,7 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
     if (alisIdleri.has(kaynakId)) return `/alis/${kaynakId}`;
     if (satisIdleri.has(kaynakId)) return `/satis/${kaynakId}`;
     if (iadeIdleri.has(kaynakId)) return `/iade/${kaynakId}`;
+    if (evrakHareketi.has(kaynakId)) return `/cek-senet/${evrakHareketi.get(kaynakId)}`;
     if (tur === "tahsilat" || tur === "odeme") return "/kasa";
     return null;
   }

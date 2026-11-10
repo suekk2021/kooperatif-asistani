@@ -8,10 +8,11 @@ import { acilisIptal } from "@/app/actions/acilis";
 import { sayimIptal } from "@/app/actions/sayim";
 import { paraHareketiIptal } from "@/app/actions/kasa";
 import { iadeIptal } from "@/app/actions/iade";
+import { evrakHareketiIptal } from "@/app/actions/cek-senet";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { FormMesaji } from "@/components/FormMesaji";
 
-const ISLEMLER = { alis: alisIptal, satis: satisIptal, para: paraHareketiIptal, parti: partiIptal, acilis: acilisIptal, sayim: sayimIptal, iade: iadeIptal };
+const ISLEMLER = { alis: alisIptal, satis: satisIptal, para: paraHareketiIptal, parti: partiIptal, acilis: acilisIptal, sayim: sayimIptal, iade: iadeIptal, evrak: evrakHareketiIptal };
 
 // Tarayıcının onay penceresi (confirm) yerine satır içinde açılan küçük form:
 // iptal nedeni zorunlu, kayıt silinmez, ters kayıt oluşur.

@@ -4,6 +4,8 @@ export const KAYIT_TURLERI: Record<string, { ad: string; yol?: (id: string) => s
   alis_faturalari: { ad: "Alış faturası", yol: (id) => `/alis/${id}` },
   satis_faturalari: { ad: "Satış", yol: (id) => `/satis/${id}` },
   iadeler: { ad: "İade", yol: (id) => `/iade/${id}` },
+  evraklar: { ad: "Çek/senet", yol: (id) => `/cek-senet/${id}` },
+  evrak_hareketleri: { ad: "Çek/senet işlemi", yol: () => "/cek-senet" },
   para_hareketleri: { ad: "Kasa/banka hareketi", yol: () => "/kasa" },
   uretim_partileri: { ad: "Üretim partisi", yol: (id) => `/uretim/${id}` },
   sayimlar: { ad: "Sayım", yol: (id) => `/stok/sayim/${id}` },
@@ -37,6 +39,8 @@ export function kayitEtiketi(tablo: string, j: Json): string {
   if (tablo === "uretim_partileri") return `Parti ${v("parti_no")}`;
   if (tablo === "sayimlar") return `Sayım ${v("sayim_no")}`;
   if (tablo === "iadeler") return `İADE-${v("iade_no")}`;
+  if (tablo === "evraklar") return `${v("tur") === "cek" ? "Çek" : "Senet"} #${v("evrak_no")} · ${Number(v("tutar")).toLocaleString("tr-TR")} ₺`;
+  if (tablo === "evrak_hareketleri") return v("islem") ?? "";
   if (tablo === "para_hareketleri") return [v("tur"), v("tutar") && `${Number(v("tutar")).toLocaleString("tr-TR")} ₺`, v("aciklama")].filter(Boolean).join(" · ");
   return v("unvan") ?? v("ad") ?? v("kod") ?? v("oran") ?? v("donem") ?? "";
 }

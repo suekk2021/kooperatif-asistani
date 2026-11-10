@@ -144,5 +144,21 @@ export async function yonetimOzeti(s: Istemci, bugun: string) {
     ad: (p.stok_kartlari as unknown as { ad: string } | null)?.ad ?? "?",
   }));
 
-  return { finans, buAySatis, gecenAySatis, uretim, gecikenler, sktYaklasan, eksiStok, acikPartiler: acik };
+  const { data: evrakVeri } = await s
+    .from("evraklar")
+    .select("id, evrak_no, tur, yon, tutar, vade, cariler(unvan)")
+    .in("durum", ["portfoyde", "odenmedi"])
+    .lte("vade", gunEkle(bugun, 7))
+    .order("vade");
+  const vadesiGelenEvrak = (evrakVeri ?? []).map((e) => ({
+    id: e.id as string,
+    evrak_no: e.evrak_no as number,
+    tur: e.tur as string,
+    yon: e.yon as string,
+    tutar: Number(e.tutar),
+    vade: e.vade as string,
+    unvan: ((Array.isArray(e.cariler) ? e.cariler[0] : e.cariler) as { unvan: string } | null)?.unvan ?? "",
+  }));
+
+  return { finans, buAySatis, gecenAySatis, uretim, gecikenler, sktYaklasan, eksiStok, acikPartiler: acik, vadesiGelenEvrak };
 }

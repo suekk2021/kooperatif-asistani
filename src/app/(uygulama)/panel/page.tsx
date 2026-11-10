@@ -59,7 +59,7 @@ export default async function PanelPage() {
     weekday: "long",
   }).format(new Date());
   const yaklasan = hatirlaticilar.data ?? [];
-  const { finans, buAySatis, gecenAySatis, uretim, gecikenler, sktYaklasan, eksiStok, acikPartiler } = ozet;
+  const { finans, buAySatis, gecenAySatis, uretim, gecikenler, sktYaklasan, eksiStok, acikPartiler, vadesiGelenEvrak } = ozet;
   const gecikmisToplam = gecikenler.reduce((t, c) => t + c.gecikmis, 0);
   const marj = buAySatis.ciro > 0 ? (buAySatis.kar / buAySatis.ciro) * 100 : null;
 
@@ -86,6 +86,20 @@ export default async function PanelPage() {
     }
     if (gecikenler.length > 4) {
       uyarilar.push({ anahtar: "g-diger", renk: "amber", baslik: `+${gecikenler.length - 4} müşteride daha geciken tahsilat`, aciklama: "Alacak yaşlandırma raporunda tamamı", yol: "/raporlar?r=yaslandirma" });
+    }
+    for (const e of vadesiGelenEvrak.slice(0, 4)) {
+      const gecti = e.vade < bugun;
+      const ad = `${e.tur === "cek" ? "Çek" : "Senet"} #${e.evrak_no}`;
+      uyarilar.push({
+        anahtar: `ev-${e.id}`,
+        renk: gecti ? "kirmizi" : "amber",
+        baslik:
+          e.yon === "alinan"
+            ? `${ad} (${e.unvan}): ${tl(e.tutar)} tahsil ${gecti ? "edilmedi, vadesi geçti" : `vadesi ${tarihTR(e.vade)}`}`
+            : `${ad} (${e.unvan}): ${tl(e.tutar)} ödeme ${gecti ? "vadesi geçti" : `vadesi ${tarihTR(e.vade)}`}`,
+        aciklama: e.yon === "alinan" ? "Tahsil edildiyse çek/senet ekranından işleyin" : "Bankada karşılığı hazır mı? Ödendiyse işleyin",
+        yol: `/cek-senet/${e.id}`,
+      });
     }
   }
   for (const l of sktYaklasan.slice(0, 4)) {
