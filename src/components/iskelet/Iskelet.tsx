@@ -25,6 +25,7 @@ const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
       { yol: "/asistan", ad: "Asistan", ikon: "asistan", yakinda: true },
       { yol: "/hatirlaticilar", ad: "Hatırlatıcılar", ikon: "hatirlatici" },
       { yol: "/notlar", ad: "Notlar", ikon: "notlar" },
+      { yol: "/yardim", ad: "Kılavuz", ikon: "notlar" },
     ],
   },
   {
