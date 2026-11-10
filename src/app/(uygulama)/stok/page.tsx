@@ -77,7 +77,7 @@ export default async function StokPage({
           <p className="bos">Bu grupta henüz kart yok.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Ad</th>
@@ -98,29 +98,29 @@ export default async function StokPage({
                   const azaldi = k.min_stok !== null && miktar < Number(k.min_stok);
                   return (
                   <tr key={k.id}>
-                    <td>
-                      <Link href={`/stok/${k.id}`} style={{ fontWeight: 700, color: "inherit" }}>
+                    <td className="liste-baslik">
+                      <Link className="satir-link" href={`/stok/${k.id}`} style={{ fontWeight: 700, color: "inherit" }}>
                         {k.ad}
                       </Link>
                     </td>
-                    <td data-label="Kod">
+                    <td data-label="Kod" className="mobil-gizle">
                       <span className="kod">{k.kod}</span>
                     </td>
                     <td data-label="Tür">{STOK_TURU_ADI[k.tur]}</td>
-                    <td data-label="Depo">{k.depo_id ? depoAdi.get(k.depo_id) : ""}</td>
-                    <td data-label="KDV" className="sag num">
+                    <td data-label="Depo" className="mobil-gizle">{k.depo_id ? depoAdi.get(k.depo_id) : ""}</td>
+                    <td data-label="KDV" className="sag num mobil-gizle">
                       %{Number(k.kdv_orani)}
                     </td>
-                    <td data-label="Asgari" className="sag num">
+                    <td data-label="Asgari" className="sag num mobil-gizle">
                       {k.min_stok !== null ? `${sayi(k.min_stok)} ${k.birim}` : ""}
                     </td>
-                    <td data-label="Miktar" className="sag num">
+                    <td data-label="Miktar" className="sag num ana-deger">
                       <b className={miktar < 0 || azaldi ? "kirmizi" : undefined}>
                         {sayi(miktar)} {k.birim}
                       </b>
                       {azaldi && <div className="kirmizi" style={{ fontSize: 12 }}>asgarinin altında</div>}
                     </td>
-                    <td data-label="Ort. maliyet" className="sag num">
+                    <td data-label="Ort. maliyet" className="sag num mobil-gizle">
                       {miktar > 0 ? tl(d?.ortalama_maliyet) : ""}
                     </td>
                     <td data-label="Değer" className="sag num">

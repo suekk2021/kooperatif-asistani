@@ -167,7 +167,11 @@ export function IadeFormu({
         <input id="aciklama" value={aciklama} onChange={(e) => setAciklama(e.target.value)} placeholder="Örn: soğuk zincir kırılmış, paket yırtık" />
       </div>
 
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+      <div className="form-alt" style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <span className="form-alt-toplam num">
+          <small>Toplam</small>
+          {tl(genel)}
+        </span>
         <FormMesaji sonuc={sonuc.id ? {} : sonuc} />
         <button type="button" className="btn btn-ana" disabled={bekliyor} onClick={kaydet}>
           {bekliyor ? "Kaydediliyor…" : "İadeyi kaydet"}

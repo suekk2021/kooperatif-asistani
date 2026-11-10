@@ -4,6 +4,8 @@ type Bolum = { baslik: string; alt: string; icerik: React.ReactNode };
 
 const B = ({ children }: { children: React.ReactNode }) => <b className="yardim-dugme">{children}</b>;
 
+const T = ({ yol }: { yol: string }) => <span className="yardim-telefon">📱 Telefonda: {yol}</span>;
+
 const BOLUMLER: Bolum[] = [
   {
     baslik: "Satış yaptım",
@@ -11,7 +13,7 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ol>
         <li>
-          Menüden <B>Satış</B> → <B>+ Yeni satış</B>.
+          Menüden <B>Satış</B> → <B>+ Yeni satış</B>. <T yol="＋ → Satış" />
         </li>
         <li>
           <b>Müşteri</b>yi seçin. Listede yoksa önce müşteriyi açın (aşağıda &quot;Yeni müşteri / tedarikçi&quot;).
@@ -38,7 +40,7 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ol>
         <li>
-          Menüden <B>Kasa ve Banka</B> → <B>+ Tahsilat</B>.
+          Menüden <B>Kasa ve Banka</B> → <B>+ Tahsilat</B>. <T yol="＋ → Tahsilat" />
         </li>
         <li>
           <b>Para nereye girdi?</b> (kasa, banka, POS) · <b>Kimden?</b> (müşteri) · <b>Tutar</b>.
@@ -55,7 +57,7 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ol>
         <li>
-          Menüden <B>Alış</B> → <B>+ Yeni alış</B>.
+          Menüden <B>Alış</B> → <B>+ Yeni alış</B>. <T yol="＋ → Alış" />
         </li>
         <li>
           <b>Tedarikçi</b>yi seçin, <b>Fatura no</b> yazın (zorunlu), fatura tarihini kontrol edin.
@@ -78,7 +80,7 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ol>
         <li>
-          <B>Kasa ve Banka</B> → <B>Ödeme</B>.
+          <B>Kasa ve Banka</B> → <B>Ödeme</B>. <T yol="＋ → Ödeme" />
         </li>
         <li>
           <b>Para nereden çıktı?</b> · <b>Kime?</b> (tedarikçi) · <b>Tutar</b> · <B>Kaydet</B>.
@@ -92,7 +94,7 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ol>
         <li>
-          <B>Kasa ve Banka</B> → <B>Virman</B>.
+          <B>Kasa ve Banka</B> → <B>Virman</B>. <T yol="＋ → Virman" />
         </li>
         <li>
           <b>Kaynak hesap</b> (paranın çıktığı) · <b>Hedef hesap</b> (girdiği) · <b>Tutar</b>.
@@ -109,7 +111,7 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ol>
         <li>
-          Menüden <B>Üretim</B> → <b>Ne üretilecek?</b> seçin → <B>▶ Partiyi başlat</B>.
+          Menüden <B>Üretim</B> → <b>Ne üretilecek?</b> seçin → <B>▶ Partiyi başlat</B>. <T yol="＋ → Üretim" />
         </li>
         <li>
           Kullanılan her malzemeyi tartıp yazın: <b>Malzeme</b> + <b>Tartılan</b> → <B>+ Ekle</B>. Yanlış girdiyseniz satırdaki{" "}
@@ -168,7 +170,7 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ol>
         <li>
-          <B>Stok</B> → <B>Sayım yap</B>.
+          <B>Stok</B> → <B>Sayım yap</B>. <T yol="＋ → Sayım" />
         </li>
         <li>
           Rafta gerçekten olan miktarı <b>Sayılan</b> sütununa yazın (<b>Sistemde</b> sütunu programın beklediği miktardır).
@@ -220,6 +222,7 @@ const KURALLAR = [
   "Aynı gün girin. Ertesi güne kalan kayıt unutulur; aynı gün girilen yanlışı da kendiniz iptal edebilirsiniz.",
   "Belge numarasını (fatura, dekont) yazın; sonradan aramak kolaylaşır.",
   "Sayıları yazarken virgül kullanabilirsiniz: 12,5",
+  "Telefonda tarih, vade, iskonto gibi az kullanılan alanlar “Daha fazla” altındadır; dokununca açılır.",
   "Ekrandaki “Muhasebe karşılığı” kutusu bilgi içindir; bir şey seçmeniz gerekmez, program kendisi oluşturur.",
 ];
 
@@ -244,6 +247,27 @@ export default function YardimPage() {
           {KURALLAR.map((k) => (
             <li key={k}>{k}</li>
           ))}
+        </ul>
+      </div>
+
+      <div className="kart" style={{ marginBottom: 16 }}>
+        <div className="kart-bas">
+          <h2>Telefondan kullanım</h2>
+        </div>
+        <ul className="kart-ic yardim-liste" style={{ margin: 0 }}>
+          <li>
+            Alttaki çubuk: <b>Ana sayfa</b>, en çok kullanılan bölümler, ortada büyük <B>＋</B> ve <B>Menü</B>.
+          </li>
+          <li>
+            <B>＋</B> yeni kayıt içindir: satış, tahsilat, alış, ödeme, üretim, sayım… Tek dokunuşla ilgili form açılır.
+          </li>
+          <li>
+            <B>Menü</B> tüm bölümleri gösterir; en altta hesabınız ve <b>Çıkış</b> var.
+          </li>
+          <li>
+            <b>Ana ekrana ekleyin</b>, uygulama gibi açılsın: iPhone&apos;da Safari → Paylaş (kare ve ok) → <b>Ana Ekrana Ekle</b>.
+            Android&apos;de Chrome → sağ üstte ⋮ → <b>Ana ekrana ekle</b> (ya da <b>Uygulamayı yükle</b>).
+          </li>
         </ul>
       </div>
 

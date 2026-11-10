@@ -113,7 +113,7 @@ export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun
           </tbody>
         </table>
       </div>
-      <div className="kart-ic" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", borderTop: "1px solid var(--cizgi)" }}>
+      <div className="kart-ic form-alt" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", borderTop: "1px solid var(--cizgi)" }}>
         <span className="soluk num">
           {girilen.length} kart sayıldı · toplam fark{" "}
           <b className={toplamFark < 0 ? "kirmizi" : undefined}>{tl(toplamFark)}</b>

@@ -73,6 +73,7 @@ export function AlisFormu({
   const [odeme, setOdeme] = useState<string>("");
   const [genelIsk, setGenelIsk] = useState("");
   const [kalemler, setKalemler] = useState<Kalem[]>([bosKalem()]);
+  const [ayrinti, setAyrinti] = useState(false);
   const [sonuc, setSonuc] = useState<FormSonucu & { id?: string }>({});
   const [bekliyor, baslat] = useTransition();
 
@@ -168,7 +169,7 @@ export function AlisFormu({
   }
 
   return (
-    <>
+    <div className={`mobil-form${ayrinti ? " ayrinti-acik" : ""}`}>
       <div className="kart kart-ic" style={{ display: "flex", flexDirection: "column", gap: 18 }}>
         <div className="form-satir">
           <div className="alan" style={{ flex: "2 1 260px" }}>
@@ -190,7 +191,7 @@ export function AlisFormu({
             <label htmlFor="tarih">Fatura tarihi</label>
             <input id="tarih" type="date" value={tarih} onChange={(e) => setTarih(e.target.value)} />
           </div>
-          <div className="alan" style={{ flexBasis: 150 }}>
+          <div className="alan mobil-ek" style={{ flexBasis: 150 }}>
             <label htmlFor="vade">Vade</label>
             <input id="vade" type="date" value={vade} onChange={(e) => setVade(e.target.value)} />
           </div>
@@ -279,7 +280,7 @@ export function AlisFormu({
                     ))}
                   </select>
                 </div>
-                <div className="alan" style={{ flex: "0 1 90px" }}>
+                <div className="alan mobil-ek" style={{ flex: "0 1 90px" }}>
                   <label>İskonto %</label>
                   <input
                     inputMode="decimal"
@@ -341,7 +342,7 @@ export function AlisFormu({
               ))}
             </div>
           </div>
-          <div className="alan" style={{ flex: "0 1 140px" }}>
+          <div className="alan mobil-ek" style={{ flex: "0 1 140px" }}>
             <label htmlFor="genel-isk">Genel iskonto %</label>
             <input
               id="genel-isk"
@@ -362,12 +363,20 @@ export function AlisFormu({
           </div>
         </div>
 
-        <div className="alan">
+        <button type="button" className="mobil-daha" onClick={() => setAyrinti((a) => !a)}>
+          {ayrinti ? "Daha az göster" : "Daha fazla: vade, iskonto, not"}
+        </button>
+
+        <div className="alan mobil-ek">
           <label htmlFor="aciklama">Not</label>
           <input id="aciklama" value={aciklama} onChange={(e) => setAciklama(e.target.value)} placeholder="İsteğe bağlı" />
         </div>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <div className="form-alt" style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <span className="form-alt-toplam num">
+            <small>Toplam</small>
+            {tl(genel)}
+          </span>
           <FormMesaji sonuc={sonuc.id ? {} : sonuc} />
           <button type="button" className="btn btn-ana" disabled={bekliyor} onClick={kaydet}>
             {bekliyor ? "Kaydediliyor…" : "Kaydet"}
@@ -375,7 +384,7 @@ export function AlisFormu({
         </div>
       </div>
 
-      <div className="muh">
+      <div className="muh mobil-ek">
         <div className="kart-bas">
           <h2>
             ⇄ Muhasebe karşılığı <span className="etk e-gri">önizleme</span>
@@ -421,6 +430,6 @@ export function AlisFormu({
           </p>
         )}
       </div>
-    </>
+    </div>
   );
 }

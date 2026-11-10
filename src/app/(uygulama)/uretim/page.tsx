@@ -82,7 +82,7 @@ export default async function UretimPage() {
           <p className="bos">Henüz biten parti yok.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Parti</th>
@@ -100,8 +100,8 @@ export default async function UretimPage() {
                   const fire = uretimFiresi(p);
                   return (
                     <tr key={p.id} style={p.durum === "iptal" ? { opacity: 0.55 } : undefined}>
-                      <td>
-                        <Link href={`/uretim/${p.id}`} style={{ fontWeight: 700, color: "inherit" }}>
+                      <td className="liste-baslik">
+                        <Link className="satir-link" href={`/uretim/${p.id}`} style={{ fontWeight: 700, color: "inherit" }}>
                           #{p.parti_no} · {u?.ad}
                         </Link>
                         {p.durum === "iptal" && <span className="etk e-kirmizi" style={{ marginLeft: 6 }}>iptal</span>}
@@ -110,7 +110,7 @@ export default async function UretimPage() {
                         {tarihTR(p.tarih)}
                       </td>
                       <td data-label="Sorumlu">{p.sorumlu}</td>
-                      <td data-label="Paketlenen" className="sag num">
+                      <td data-label="Paketlenen" className="sag num ana-deger">
                         {p.uretilen_miktar !== null ? `${sayi(p.uretilen_miktar)} ${u?.birim ?? ""}` : ""}
                       </td>
                       <td data-label="Fire" className={`sag num${fire !== null && fire >= 5 ? " amber" : ""}`}>

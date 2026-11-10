@@ -132,7 +132,7 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
           <p className="bos">Bu cariyle henüz hareket yok.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Tarih</th>
@@ -149,7 +149,7 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
                   return (
                     <tr key={s.id} style={f.kaynak_tur === "iptal" ? { opacity: 0.7 } : undefined}>
                       <td className="num">{tarihTR(f.tarih)}</td>
-                      <td data-label="İşlem">
+                      <td data-label="İşlem" className="liste-baslik">
                         <span className={`etk ${f.kaynak_tur === "iptal" ? "e-kirmizi" : "e-gri"}`}>{KAYNAK_ADI[f.kaynak_tur] ?? f.kaynak_tur}</span>{" "}
                         {yol ? <Link href={yol}>{f.aciklama}</Link> : f.aciklama}
                       </td>
@@ -159,7 +159,7 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
                       <td data-label="Alacak" className="sag num">
                         {Number(s.alacak) > 0 ? tl(s.alacak) : ""}
                       </td>
-                      <td data-label="Bakiye" className="sag num">
+                      <td data-label="Bakiye" className="sag num ana-deger">
                         <b>{tl(bakiye)}</b>
                       </td>
                     </tr>

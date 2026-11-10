@@ -47,7 +47,7 @@ export default async function SatisPage() {
           <p className="bos">Henüz satış yok. &quot;+ Yeni satış&quot; ile ilkini girin.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Müşteri</th>
@@ -63,8 +63,8 @@ export default async function SatisPage() {
                   const h = f.odeme_hesap_id ? hesap.get(f.odeme_hesap_id) : undefined;
                   return (
                     <tr key={f.id} style={f.durum === "iptal" ? { opacity: 0.55 } : undefined}>
-                      <td>
-                        <Link href={`/satis/${f.id}`} style={{ fontWeight: 700, color: "inherit" }}>
+                      <td className="liste-baslik">
+                        <Link className="satir-link" href={`/satis/${f.id}`} style={{ fontWeight: 700, color: "inherit" }}>
                           {cariAdi.get(f.cari_id)}
                         </Link>
                         {f.durum === "iptal" && <span className="etk e-kirmizi" style={{ marginLeft: 6 }}>iptal</span>}
@@ -85,7 +85,7 @@ export default async function SatisPage() {
                       <td data-label="Vade" className="num">
                         {tarihTR(f.vade_tarihi)}
                       </td>
-                      <td data-label="Toplam" className="sag num">
+                      <td data-label="Toplam" className="sag num ana-deger">
                         <b>{tl(f.genel_toplam)}</b>
                       </td>
                     </tr>

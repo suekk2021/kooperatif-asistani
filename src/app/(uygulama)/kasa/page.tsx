@@ -129,7 +129,7 @@ export default async function KasaPage({ searchParams }: { searchParams: Promise
           <p className="bos">Henüz hareket yok. Alış faturası peşin ödenince veya tahsilat/ödeme girilince burada görünür.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Tarih</th>
@@ -152,7 +152,7 @@ export default async function KasaPage({ searchParams }: { searchParams: Promise
                         {hesapAdi.get(h.hesap_id)}
                         {iptal && <span className="etk e-kirmizi" style={{ marginLeft: 6 }}>iptal</span>}
                       </td>
-                      <td data-label="Kimden / kime">
+                      <td data-label="Kimden / kime" className="liste-baslik">
                         {h.tur === "virman" ? `→ ${hesapAdi.get(h.karsi_hesap_id ?? "") ?? ""}` : cariAdi.get(h.cari_id ?? "")}
                         {h.alis_fatura_id && (
                           <>
@@ -182,15 +182,15 @@ export default async function KasaPage({ searchParams }: { searchParams: Promise
                         )}
                         {h.aciklama && !h.alis_fatura_id && !h.satis_fatura_id && !h.iade_id && <span className="soluk"> · {h.aciklama}</span>}
                       </td>
-                      <td data-label="Tutar" className={`sag num ${h.tur === "tahsilat" ? "yesil" : h.tur === "odeme" ? "kirmizi" : ""}`}>
+                      <td data-label="Tutar" className={`sag num ana-deger ${h.tur === "tahsilat" ? "yesil" : h.tur === "odeme" ? "kirmizi" : ""}`}>
                         {isaret}
                         {tl(h.tutar)}
                         {Number(h.komisyon) > 0 && <div className="soluk" style={{ fontSize: 12 }}>komisyon {tl(h.komisyon)}</div>}
                       </td>
-                      <td data-label="Muhasebe" className="sag">
+                      <td data-label="Muhasebe" className="sag mobil-gizle">
                         <FisOzeti satirlar={satirlar.filter((s) => s.fis_id === h.fis_id)} />
                       </td>
-                      <td data-label="" className="sag">
+                      <td data-label="" className="sag eylem">
                         {/* Faturaya, iadeye ya da çek/senede bağlı hareket kendi belgesinden iptal edilir. */}
                         {!iptal && !h.alis_fatura_id && !h.satis_fatura_id && !h.iade_id && !h.evrak && iptalEdebilir(kim, h) && <IptalFormu tur="para" id={h.id} />}
                       </td>

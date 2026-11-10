@@ -71,7 +71,7 @@ export default async function IadeDetayPage({ params }: { params: Promise<{ id: 
 
       <div className="kart">
         <div className="tablo-kutu">
-          <table className="kart-tablo">
+          <table className="kart-tablo liste-tablo">
             <thead>
               <tr>
                 <th>Ürün</th>
@@ -87,7 +87,7 @@ export default async function IadeDetayPage({ params }: { params: Promise<{ id: 
                 const u = kart.get(k.stok_karti_id);
                 return (
                   <tr key={k.id}>
-                    <td>
+                    <td className="liste-baslik">
                       <b>{u?.ad}</b> <span className="kod">{u?.kod}</span>
                     </td>
                     <td data-label="Miktar" className="sag num">
@@ -96,10 +96,10 @@ export default async function IadeDetayPage({ params }: { params: Promise<{ id: 
                     <td data-label="Birim fiyat" className="sag num">
                       {tl(k.birim_fiyat)}
                     </td>
-                    <td data-label="KDV" className="sag num">
+                    <td data-label="KDV" className="sag num mobil-gizle">
                       %{Number(k.kdv_orani)} · {tl(k.kdv_tutari)}
                     </td>
-                    <td data-label="Tutar" className="sag num">
+                    <td data-label="Tutar" className="sag num ana-deger">
                       {tl(k.tutar)}
                     </td>
                     {satisIadesi && (

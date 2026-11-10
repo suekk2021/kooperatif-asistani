@@ -79,7 +79,7 @@ export default async function CekSenetPage({ searchParams }: { searchParams: Pro
           <p className="bos">Bu bölümde çek/senet yok.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Vade</th>
@@ -102,8 +102,8 @@ export default async function CekSenetPage({ searchParams }: { searchParams: Pro
                         {tarihTR(e.vade)}
                         {gecti ? " · geçti" : yakin ? " · yaklaştı" : ""}
                       </td>
-                      <td data-label="Evrak">
-                        <Link href={`/cek-senet/${e.id}`}>
+                      <td data-label="Evrak" className="liste-baslik">
+                        <Link className="satir-link" href={`/cek-senet/${e.id}`}>
                           <b>
                             {evrakAdi(e.tur)} #{e.evrak_no}
                           </b>
@@ -113,7 +113,7 @@ export default async function CekSenetPage({ searchParams }: { searchParams: Pro
                       <td data-label="Cari">
                         {cari?.unvan} <span className="kod">{cari?.kod}</span>
                       </td>
-                      <td data-label="Tutar" className="sag num">
+                      <td data-label="Tutar" className="sag num ana-deger">
                         {tl(e.tutar)}
                       </td>
                       <td data-label="Durum">

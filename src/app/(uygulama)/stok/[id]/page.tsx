@@ -128,7 +128,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
           <p className="bos">Henüz hareket yok. Alış, üretim veya satışla oluşur.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Tarih</th>
@@ -149,7 +149,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
                   return (
                     <tr key={h.id}>
                       <td className="num">{tarihTR(h.tarih)}</td>
-                      <td data-label="İşlem">
+                      <td data-label="İşlem" className="liste-baslik">
                         <span className={`etk ${k.renk}`}>{k.ad}</span> {yol && <Link href={yol}>belge ›</Link>}
                       </td>
                       <td data-label="Lot / SKT">
@@ -165,7 +165,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
                       <td data-label="Birim maliyet" className="sag num">
                         {tl(h.birim_maliyet)}
                       </td>
-                      <td data-label="Kalan" className="sag num">
+                      <td data-label="Kalan" className="sag num ana-deger">
                         <b className={kalan < 0 ? "kirmizi" : undefined}>{sayi(kalan)}</b>
                       </td>
                     </tr>

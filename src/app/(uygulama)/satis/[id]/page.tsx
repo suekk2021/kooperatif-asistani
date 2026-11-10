@@ -75,7 +75,7 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
 
       <div className="kart">
         <div className="tablo-kutu">
-          <table className="kart-tablo">
+          <table className="kart-tablo liste-tablo">
             <thead>
               <tr>
                 <th>Ürün</th>
@@ -92,7 +92,7 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
                 const u = urun.get(k.stok_karti_id);
                 return (
                   <tr key={k.id}>
-                    <td>
+                    <td className="liste-baslik">
                       <b>{u?.ad}</b> <span className="kod">{u?.kod}</span>
                     </td>
                     <td data-label="Lot">{k.lot_no}</td>
@@ -103,10 +103,10 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
                       {tl(k.birim_fiyat)}
                       {Number(k.iskonto_orani) > 0 && <div className="soluk" style={{ fontSize: 12 }}>%{Number(k.iskonto_orani)} iskonto</div>}
                     </td>
-                    <td data-label="KDV" className="sag num">
+                    <td data-label="KDV" className="sag num mobil-gizle">
                       %{Number(k.kdv_orani)} · {tl(k.kdv_tutari)}
                     </td>
-                    <td data-label="Tutar" className="sag num">
+                    <td data-label="Tutar" className="sag num ana-deger">
                       {tl(k.tutar)}
                     </td>
                     <td data-label="Maliyet" className="sag num">

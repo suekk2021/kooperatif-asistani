@@ -45,7 +45,7 @@ export default async function AlisPage() {
           <p className="bos">Henüz alış faturası yok. &quot;+ Yeni alış&quot; ile ilkini girin.</p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Tedarikçi</th>
@@ -59,8 +59,8 @@ export default async function AlisPage() {
               <tbody>
                 {faturalar.map((f) => (
                   <tr key={f.id} style={f.durum === "iptal" ? { opacity: 0.55 } : undefined}>
-                    <td>
-                      <Link href={`/alis/${f.id}`} style={{ fontWeight: 700, color: "inherit" }}>
+                    <td className="liste-baslik">
+                      <Link className="satir-link" href={`/alis/${f.id}`} style={{ fontWeight: 700, color: "inherit" }}>
                         {cariAdi.get(f.cari_id)}
                       </Link>
                       {f.durum === "iptal" && <span className="etk e-kirmizi" style={{ marginLeft: 6 }}>iptal</span>}
@@ -81,7 +81,7 @@ export default async function AlisPage() {
                     <td data-label="Vade" className="num">
                       {tarihTR(f.vade_tarihi)}
                     </td>
-                    <td data-label="Toplam" className="sag num">
+                    <td data-label="Toplam" className="sag num ana-deger">
                       <b>{tl(f.genel_toplam)}</b>
                     </td>
                   </tr>

@@ -70,7 +70,7 @@ export default async function CarilerPage({
           </p>
         ) : (
           <div className="tablo-kutu">
-            <table className="kart-tablo">
+            <table className="kart-tablo liste-tablo">
               <thead>
                 <tr>
                   <th>Ünvan</th>
@@ -86,20 +86,20 @@ export default async function CarilerPage({
                   const bakiye = isaret * (bakiyeMap.get(c.kod) ?? 0);
                   return (
                     <tr key={c.id}>
-                      <td>
-                        <Link href={`/cariler/${c.id}`} style={{ fontWeight: 700, color: "inherit" }}>
+                      <td className="liste-baslik">
+                        <Link className="satir-link" href={`/cariler/${c.id}`} style={{ fontWeight: 700, color: "inherit" }}>
                           {c.unvan}
                         </Link>
                       </td>
-                      <td data-label="Kod">
+                      <td data-label="Kod" className="mobil-gizle">
                         <span className="kod">{c.kod}</span>
                       </td>
                       <td data-label="Telefon">{c.telefon}</td>
-                      <td data-label="Vergi no">{c.vergi_no}</td>
+                      <td data-label="Vergi no" className="mobil-gizle">{c.vergi_no}</td>
                       <td data-label="Vade" className="sag num">
                         {c.vade_gun ? `${c.vade_gun} gün` : "Peşin"}
                       </td>
-                      <td data-label={tur === "musteri" ? "Alacağımız" : "Borcumuz"} className="sag num">
+                      <td data-label={tur === "musteri" ? "Alacağımız" : "Borcumuz"} className="sag num ana-deger">
                         <b className={bakiye < 0 ? "kirmizi" : undefined}>{tl(bakiye)}</b>
                       </td>
                     </tr>
