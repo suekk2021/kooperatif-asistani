@@ -181,9 +181,7 @@ export function AyarlarFormu({
 
       <div className="border-t border-line pt-4">
         <p className="mb-2 text-sm font-medium text-ink-soft">Mali Müşavir</p>
-        <p className="mb-3 text-xs text-ink-soft">
-          Aylık rapor hazır olduğunda gönderileceği e-posta adresi (rapor formatı netleşince aktif olacak).
-        </p>
+        <p className="mb-3 text-xs text-ink-soft">Mali müşavirin e-posta adresi.</p>
         <input
           name="muhasebeci_email"
           type="email"

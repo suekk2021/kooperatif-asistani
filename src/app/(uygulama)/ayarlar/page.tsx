@@ -31,7 +31,7 @@ export default async function AyarlarPage() {
       <div>
         <h1 className="mb-1 text-lg font-semibold text-ink">Ayarlar</h1>
         <p className="mb-4 text-sm text-ink-soft">
-          Fiş okuma (OCR) sağlayıcısı, Telegram bildirimi ve kullanıcı yönetimi.
+          Kooperatif bilgileri ve kullanıcı yönetimi.
         </p>
         <div className="rounded-xl border border-line bg-card p-6">
           <AyarlarFormu

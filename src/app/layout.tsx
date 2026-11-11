@@ -15,8 +15,18 @@ const kodFontu = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://imece.suluovaureteneller.com"),
   title: "İMECE · Suluova Üreten Eller",
   description: "Suluova Üreten Eller Kadın Kooperatifi — üretim, muhasebe ve iş takibi.",
+  openGraph: {
+    title: "İMECE · Suluova Üreten Eller",
+    description: "Suluova Üreten Eller Kadın Kooperatifi — üretim, muhasebe ve iş takibi.",
+    siteName: "İMECE",
+    locale: "tr_TR",
+    type: "website",
+    images: [{ url: "/og-gorsel.png", width: 1200, height: 630, alt: "Suluova Üreten Eller Kadın Kooperatifi logosu" }],
+  },
+  twitter: { card: "summary_large_image", images: ["/og-gorsel.png"] },
   icons: { icon: "/logo.png", apple: "/ikon/apple-touch-icon.png" },
   appleWebApp: { capable: true, title: "İMECE", statusBarStyle: "black-translucent" },
 };
