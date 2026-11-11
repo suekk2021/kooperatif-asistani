@@ -25,10 +25,16 @@ export async function notGuncelle(id: string, icerik: string): Promise<void> {
 
 export async function notSil(id: string): Promise<void> {
   const supabase = await createClient();
+  const { data: not } = await supabase.from("notlar").select("medya_yol").eq("id", id).maybeSingle();
   const { error } = await supabase.from("notlar").delete().eq("id", id);
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  // Nota eklenmiş dosya varsa depodan da kaldırılır (yazma izni yalnız sunucudadır).
+  if (not?.medya_yol) {
+    await createAdminClient().storage.from("not-medya").remove([not.medya_yol]);
   }
 
   revalidatePath("/notlar");

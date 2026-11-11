@@ -7,9 +7,37 @@ import { AyGezici } from "@/components/AyGezici";
 import { gunIstanbul } from "@/lib/tarih";
 import type { Not } from "@/types/database";
 
-type NotSatiriVerisi = Pick<Not, "id" | "icerik" | "kaynak" | "created_at" | "telegram_gonderen"> & {
+type NotSatiriVerisi = Pick<Not, "id" | "icerik" | "kaynak" | "created_at" | "telegram_gonderen" | "medya_tur" | "medya_adi" | "medya_boyut"> & {
   kime: string | null;
+  medyaUrl: string | null;
 };
+
+function MedyaGosterimi({ not }: { not: NotSatiriVerisi }) {
+  if (!not.medya_tur) return null;
+  if (!not.medyaUrl) {
+    return (
+      <p className="mt-1 text-xs text-ink-soft/70">
+        📎 {not.medya_adi ?? "Ek"} — panelde görüntülenemiyor (Telegram&apos;da 20 MB&apos;tan büyük ya da kaydedilemedi).
+      </p>
+    );
+  }
+  if (not.medya_tur === "foto") {
+    return (
+      <a href={not.medyaUrl} target="_blank" rel="noreferrer">
+        {/* eslint-disable-next-line @next/next/no-img-element -- kısa ömürlü imzalı bağlantı, optimizasyon gerekmez */}
+        <img src={not.medyaUrl} alt="Nota eklenen fotoğraf" className="mt-2 max-h-64 rounded-md border border-line" />
+      </a>
+    );
+  }
+  if (not.medya_tur === "video" || not.medya_tur === "video_notu" || not.medya_tur === "animasyon") {
+    return <video src={not.medyaUrl} controls preload="metadata" className="mt-2 max-h-64 rounded-md border border-line" />;
+  }
+  return (
+    <a href={not.medyaUrl} target="_blank" rel="noreferrer" className="mt-2 inline-block text-xs text-pine underline">
+      📎 {not.medya_adi ?? "Dosyayı aç"}
+    </a>
+  );
+}
 
 function formatZamanIstanbul(iso: string) {
   return new Date(iso).toLocaleString("tr-TR", {
@@ -86,6 +114,7 @@ function NotSatiri({ not, duzenlenebilir }: { not: NotSatiriVerisi; duzenlenebil
   return (
     <li className="py-3">
       <p className="text-sm text-ink">{not.icerik}</p>
+      <MedyaGosterimi not={not} />
       <div className="mt-1 flex items-center justify-between">
         <p className="text-xs text-ink-soft/70">
           {formatZamanIstanbul(not.created_at)} · {not.kaynak === "telegram" ? "Telegram" : "Web"}

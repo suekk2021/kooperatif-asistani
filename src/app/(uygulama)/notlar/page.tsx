@@ -15,16 +15,27 @@ export default async function NotlarPage() {
   const [{ data: notlar }, { data: kullanicilar }] = await Promise.all([
     supabase
       .from("notlar")
-      .select("id, icerik, kaynak, created_at, telegram_gonderen, hedef_kullanici_id, hedef_kullanici_idler")
+      .select("id, icerik, kaynak, created_at, telegram_gonderen, hedef_kullanici_id, hedef_kullanici_idler, medya_tur, medya_yol, medya_adi, medya_boyut")
       .order("created_at", { ascending: false }),
     // Alıcı olarak seçilebilen roller (bkz. ALICI_ROLLERI, lib/roller.ts).
     supabase.from("profiller").select("id, ad_soyad, rol").in("rol", ALICI_ROLLERI).order("ad_soyad", { ascending: true }),
   ]);
 
+  // Notlara eklenen fotoğraf/video özel depoda durur; ekranda göstermek için kısa ömürlü bağlantı üretilir.
+  const yollar = (notlar ?? []).map((n) => n.medya_yol).filter((y): y is string => Boolean(y));
+  const baglantilar = new Map<string, string>();
+  if (yollar.length > 0) {
+    const { data: imzali } = await supabase.storage.from("not-medya").createSignedUrls(yollar, 3600);
+    (imzali ?? []).forEach((i) => {
+      if (i.path && i.signedUrl) baglantilar.set(i.path, i.signedUrl);
+    });
+  }
+
   const kisiler = (kullanicilar ?? []) as AliciKisi[];
   const adlar = new Map(kisiler.map((k) => [k.id, aliciAdi(k)]));
   const notlarDuz = (notlar ?? []).map((n) => ({
     ...n,
+    medyaUrl: n.medya_yol ? (baglantilar.get(n.medya_yol) ?? null) : null,
     kime: kimeMetni(n.hedef_kullanici_idler?.length ? n.hedef_kullanici_idler : n.hedef_kullanici_id ? [n.hedef_kullanici_id] : [], adlar, kisiler.length - 1),
   }));
 
@@ -35,8 +46,8 @@ export default async function NotlarPage() {
       <div className="rounded-xl border border-line bg-card p-5">
         <h1 className="text-lg font-semibold text-ink">Notlar</h1>
         <p className="mt-1 text-xs text-ink-soft">
-          Telegram üzerinden bırakılan serbest notlar. Yeni not eklemek için asistana Telegram&apos;dan yazabilir
-          ya da sesli mesaj gönderebilirsiniz.
+          Çalışanların birbirine bıraktığı notlar. Yeni not eklemek için buraya yazabilir ya da Telegram&apos;dan yazıp,
+          sesli mesaj, fotoğraf, video veya dosya gönderebilirsiniz (Telegram&apos;dan en fazla 20 MB).
         </p>
 
         {duzenlenebilir && (

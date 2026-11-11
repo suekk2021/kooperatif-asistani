@@ -215,6 +215,15 @@ const BOLUMLER: Bolum[] = [
           Yazarak ya da sesli mesajla hatırlatıcı kurun: <i>&quot;15 Aralık&apos;ta SGK ödemesini hatırlat&quot;</i>. Hatırlatma
           size gelir.
         </li>
+        <li>
+          Not bırakın ve kime gideceğini söyleyin: <i>&quot;yarın sayım var, depocu arkadaşlar erken gelsin&quot;</i> ya da{" "}
+          <i>&quot;Fatih Bey&apos;e not: ...&quot;</i>. Bot kime gittiğini size yazar; not <b>Notlar</b> sayfasında da görünür.
+        </li>
+        <li>
+          <b>Fotoğraf, video ya da dosya</b> da gönderebilirsiniz (en fazla 20 MB). Açıklamasına kime gideceğini yazarsanız o
+          kişilere iletilir; hepsi <b>Notlar</b> sayfasına kaydolur. Telegram&apos;dan fatura ya da fiş kaydı yapılmaz; onlar web
+          panelinden girilir.
+        </li>
         <li>Bot sizi tanımıyorsa size bir numara söyler; o numarayı teknik desteğe iletin.</li>
       </ul>
     ),

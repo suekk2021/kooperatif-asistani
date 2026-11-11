@@ -117,6 +117,11 @@ export type Not = {
   telegram_gonderen?: string | null;
   hedef_kullanici_id?: string | null;
   hedef_kullanici_idler?: string[];
+  medya_tur?: "foto" | "video" | "video_notu" | "animasyon" | "belge" | null;
+  medya_yol?: string | null;
+  medya_dosya_id?: string | null;
+  medya_adi?: string | null;
+  medya_boyut?: number | null;
   created_at: string;
 };
 
