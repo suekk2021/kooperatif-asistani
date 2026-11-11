@@ -40,6 +40,22 @@ export const ROLLER: {
 /** Operasyonda kişi olarak seçilmeyen roller (görev atama, @ çağırma, bildirim listeleri). */
 export const OPERASYON_DISI_ROLLER: KullaniciRolu[] = ["destek"];
 
+/**
+ * GEÇİCİ: true iken teknik destek hesabı not/hatırlatıcı alıcı seçiminde "Teknik destek" adıyla görünür
+ * (ekip programla ilgili bir şey yazabilsin diye). Program oturunca false yap; hesap listelerden yine gizlenir.
+ */
+export const DESTEK_ALICI_LISTESINDE = true;
+
+/** Not / hatırlatıcı alıcısı olarak seçilebilen roller. */
+export const ALICI_ROLLERI: KullaniciRolu[] = ROLLER.map((r) => r.deger).filter(
+  (r) => DESTEK_ALICI_LISTESINDE || !OPERASYON_DISI_ROLLER.includes(r)
+);
+
+/** Alıcı listesinde görünen ad: teknik destek hesabı kişisel adıyla değil "Teknik destek" olarak görünür. */
+export function aliciAdi(k: { ad_soyad: string; rol: KullaniciRolu | null }): string {
+  return k.rol === "destek" ? "Teknik destek" : k.ad_soyad;
+}
+
 /** Bu rolleri sadece aynı roldeki kişi verebilir (başkanı başkan, teknik desteği teknik destek). */
 export const KORUNAN_ROLLER: KullaniciRolu[] = ["baskan", "destek"];
 

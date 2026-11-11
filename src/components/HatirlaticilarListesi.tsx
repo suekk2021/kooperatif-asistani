@@ -10,6 +10,7 @@ import { TarihAraligiFiltresi, type TarihAraligi } from "@/components/TarihArali
 import { AyGezici } from "@/components/AyGezici";
 import { AliciSecici, type AliciKisi } from "@/components/AliciSecici";
 import { kimeMetni } from "@/lib/alici-metni";
+import { aliciAdi } from "@/lib/roller";
 import { tarihTR } from "@/lib/imece";
 import type { Hatirlatici } from "@/types/database";
 
@@ -28,7 +29,7 @@ function kimEkledi(hatirlatici: HatirlaticiVerisi): string | null {
 }
 
 function kimeGidiyor(hatirlatici: HatirlaticiVerisi, kisiler: Kisi[]): string | null {
-  const adlar = new Map(kisiler.map((k) => [k.id, k.ad_soyad]));
+  const adlar = new Map(kisiler.map((k) => [k.id, aliciAdi(k)]));
   const ekleyen = kimEkledi(hatirlatici);
   const hedefler = hatirlatici.hedef_kullanici_idler.filter((id) => adlar.get(id) !== ekleyen);
   return kimeMetni(hedefler, adlar, kisiler.length - (ekleyen && kisiler.some((k) => k.ad_soyad === ekleyen) ? 1 : 0));

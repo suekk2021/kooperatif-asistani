@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { telegramMesajGonder, telegramDosyaIndir, chatIdListesiCikar, telegramGondereniBul } from "@/lib/telegram";
 import { jsonUret, sesiMetneCevir, type YapayZekaAyarlari } from "@/lib/ai";
 import { bugunIstanbul } from "@/lib/tarih";
-import { rolBilgisi } from "@/lib/roller";
+import { rolBilgisi, aliciAdi } from "@/lib/roller";
 import { notBildirimiGonder } from "@/lib/not-bildirimi";
 import { GRUP_ROLLERI, GRUP_ACIKLAMASI, aliciCoz, kimeIsteginiOku, type KimeIstegi } from "@/lib/telegram-alici";
 import type { KullaniciRolu } from "@/types/database";
@@ -270,7 +270,7 @@ export async function POST(request: NextRequest) {
   const gelenChatId = String(mesaj.chat.id);
   const { data: profil } = await supabase
     .from("profiller")
-    .select("ad_soyad")
+    .select("ad_soyad, rol")
     .eq("telegram_chat_id", gelenChatId)
     .limit(1)
     .maybeSingle();
@@ -295,7 +295,7 @@ export async function POST(request: NextRequest) {
   const botToken = ayarlar.telegram_bot_token;
   const chatId = gelenChatId;
 
-  const gonderenIsim = profil?.ad_soyad ?? telegramGondereniBul(ayarlar.telegram_chat_id, gelenChatId) ?? gelenChatId;
+  const gonderenIsim = (profil ? aliciAdi(profil) : null) ?? telegramGondereniBul(ayarlar.telegram_chat_id, gelenChatId) ?? gelenChatId;
   const yzAyarlari: YapayZekaAyarlari | null =
     ayarlar.ocr_saglayici === "gemini" && ayarlar.gemini_api_key
       ? { saglayici: "gemini", apiKey: ayarlar.gemini_api_key }

@@ -4,6 +4,7 @@ import { notEkle } from "@/app/actions/notlar";
 import { NotlarListesi } from "@/components/NotlarListesi";
 import { AliciSecici, type AliciKisi } from "@/components/AliciSecici";
 import { kimeMetni } from "@/lib/alici-metni";
+import { ALICI_ROLLERI, aliciAdi } from "@/lib/roller";
 
 export default async function NotlarPage() {
   const supabase = await createClient();
@@ -16,12 +17,12 @@ export default async function NotlarPage() {
       .from("notlar")
       .select("id, icerik, kaynak, created_at, telegram_gonderen, hedef_kullanici_id, hedef_kullanici_idler")
       .order("created_at", { ascending: false }),
-    // Teknik destek hesabı operasyonda kişi olarak seçilmez (bkz. lib/roller.ts).
-    supabase.from("profiller").select("id, ad_soyad, rol").neq("rol", "destek").order("ad_soyad", { ascending: true }),
+    // Alıcı olarak seçilebilen roller (bkz. ALICI_ROLLERI, lib/roller.ts).
+    supabase.from("profiller").select("id, ad_soyad, rol").in("rol", ALICI_ROLLERI).order("ad_soyad", { ascending: true }),
   ]);
 
   const kisiler = (kullanicilar ?? []) as AliciKisi[];
-  const adlar = new Map(kisiler.map((k) => [k.id, k.ad_soyad]));
+  const adlar = new Map(kisiler.map((k) => [k.id, aliciAdi(k)]));
   const notlarDuz = (notlar ?? []).map((n) => ({
     ...n,
     kime: kimeMetni(n.hedef_kullanici_idler?.length ? n.hedef_kullanici_idler : n.hedef_kullanici_id ? [n.hedef_kullanici_id] : [], adlar, kisiler.length - 1),

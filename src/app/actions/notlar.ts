@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notBildirimiGonder } from "@/lib/not-bildirimi";
+import { aliciAdi } from "@/lib/roller";
+import type { KullaniciRolu } from "@/types/database";
 import { aliciIdleriniOku } from "@/lib/alicilar";
 
 export async function notGuncelle(id: string, icerik: string): Promise<void> {
@@ -75,9 +77,9 @@ async function hedeflereBildir(
   icerik: string,
   gonderenId: string
 ) {
-  const { data: gonderen } = await supabase.from("profiller").select("ad_soyad").eq("id", gonderenId).single();
+  const { data: gonderen } = await supabase.from("profiller").select("ad_soyad, rol").eq("id", gonderenId).single();
   // Bot anahtarı tarayıcıya kapalı; sadece sunucu okur (migration 20261110230000).
   const { data: ayarlar } = await createAdminClient().from("ayarlar").select("telegram_bot_token").eq("id", true).single();
   if (!ayarlar?.telegram_bot_token) return;
-  await notBildirimiGonder(supabase, ayarlar.telegram_bot_token, hedefIdler, icerik, gonderen?.ad_soyad ?? "Biri");
+  await notBildirimiGonder(supabase, ayarlar.telegram_bot_token, hedefIdler, icerik, gonderen ? aliciAdi({ ad_soyad: gonderen.ad_soyad, rol: gonderen.rol as KullaniciRolu | null }) : "Biri");
 }

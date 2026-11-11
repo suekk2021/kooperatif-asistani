@@ -1,9 +1,9 @@
-import { ROLLER, OPERASYON_DISI_ROLLER, rolBilgisi } from "@/lib/roller";
+import { ROLLER, ALICI_ROLLERI, rolBilgisi, aliciAdi } from "@/lib/roller";
 import type { createAdminClient } from "@/lib/supabase/admin";
 import type { KullaniciRolu } from "@/types/database";
 
 /** Yapay zekânın seçebileceği iş grupları: roller.ts'teki roller (teknik destek hariç). Yeni rol eklenince kendiliğinden girer. */
-export const GRUP_ROLLERI = ROLLER.map((r) => r.deger).filter((r) => !OPERASYON_DISI_ROLLER.includes(r));
+export const GRUP_ROLLERI = ALICI_ROLLERI;
 
 export const GRUP_ACIKLAMASI = ROLLER.filter((r) => GRUP_ROLLERI.includes(r.deger))
   .map((r) => `${r.deger} = ${r.ad} (${r.aciklama})`)
@@ -45,17 +45,17 @@ export async function aliciCoz(
   istek: KimeIstegi,
   haricId?: string
 ): Promise<AliciCozumu> {
-  const { data } = await supabase.from("profiller").select("id, ad_soyad, rol").neq("rol", "destek");
+  const { data } = await supabase.from("profiller").select("id, ad_soyad, rol").in("rol", ALICI_ROLLERI);
   const tumu = (data ?? []) as { id: string; ad_soyad: string; rol: KullaniciRolu | null }[];
   const secilen = new Map<string, string>();
   const sorunlar: string[] = [];
 
-  if (istek.herkes) tumu.forEach((k) => secilen.set(k.id, k.ad_soyad));
+  if (istek.herkes) tumu.forEach((k) => secilen.set(k.id, aliciAdi(k)));
 
   for (const rol of istek.gruplar) {
     const uyeler = tumu.filter((k) => k.rol === rol);
     if (uyeler.length === 0) sorunlar.push(`"${rolBilgisi(rol)?.ad ?? rol}" grubunda kimse yok.`);
-    uyeler.forEach((k) => secilen.set(k.id, k.ad_soyad));
+    uyeler.forEach((k) => secilen.set(k.id, aliciAdi(k)));
   }
 
   for (const soylenen of istek.kisiler) {
@@ -66,8 +66,8 @@ export async function aliciCoz(
       return parcalar.every((p) => adParcalari.some((a) => a === p || (p.length >= 3 && a.startsWith(p))));
     });
     if (adaylar.length === 0) sorunlar.push(`"${soylenen}" adında bir kişi bulamadım.`);
-    else if (adaylar.length > 1) sorunlar.push(`"${soylenen}" için birden fazla kişi var (${adaylar.map((a) => a.ad_soyad).join(", ")}).`);
-    else secilen.set(adaylar[0].id, adaylar[0].ad_soyad);
+    else if (adaylar.length > 1) sorunlar.push(`"${soylenen}" için birden fazla kişi var (${adaylar.map(aliciAdi).join(", ")}).`);
+    else secilen.set(adaylar[0].id, aliciAdi(adaylar[0]));
   }
 
   if (haricId) secilen.delete(haricId);

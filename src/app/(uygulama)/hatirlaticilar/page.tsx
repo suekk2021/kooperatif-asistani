@@ -3,6 +3,7 @@ import { mevcutRol, duzenlemeYetkisiVarMi } from "@/lib/rol";
 import { hatirlaticiEkle } from "@/app/actions/hatirlaticilar";
 import { HatirlaticilarListesi } from "@/components/HatirlaticilarListesi";
 import { AliciSecici, type AliciKisi } from "@/components/AliciSecici";
+import { ALICI_ROLLERI } from "@/lib/roller";
 
 export default async function HatirlaticilarPage() {
   const supabase = await createClient();
@@ -13,8 +14,8 @@ export default async function HatirlaticilarPage() {
         "id, baslik, hatirlatma_tarihi, tamamlandi, telegram_gonderen, hedef_kullanici_id, hedef_kullanici_idler, profiller:profiller!olusturan(ad_soyad)"
       )
       .order("hatirlatma_tarihi", { ascending: true }),
-    // Teknik destek hesabı operasyonda kişi olarak seçilmez (bkz. lib/roller.ts).
-    supabase.from("profiller").select("id, ad_soyad, rol").neq("rol", "destek").order("ad_soyad", { ascending: true }),
+    // Alıcı olarak seçilebilen roller (bkz. ALICI_ROLLERI, lib/roller.ts).
+    supabase.from("profiller").select("id, ad_soyad, rol").in("rol", ALICI_ROLLERI).order("ad_soyad", { ascending: true }),
   ]);
 
   const tekil = <T,>(x: T | T[] | null): T | null => (Array.isArray(x) ? (x[0] ?? null) : x);

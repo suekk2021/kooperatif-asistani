@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ROLLER, rolBilgisi } from "@/lib/roller";
+import { ROLLER, rolBilgisi, aliciAdi } from "@/lib/roller";
 import type { KullaniciRolu } from "@/types/database";
 
 export type AliciKisi = { id: string; ad_soyad: string; rol: KullaniciRolu | null };
@@ -57,7 +57,7 @@ export function AliciSecici({
   // Gruplar kişilerin gerçek rollerinden çıkar (roller.ts'e eklenen yeni rol, birine verilince kendiliğinden görünür);
   // sıra roller.ts'deki sıradır.
   const mevcutRoller = new Set(liste.map((k) => k.rol).filter((r): r is KullaniciRolu => Boolean(r)));
-  const roller = [...ROLLER.map((r) => r.deger).filter((r) => mevcutRoller.has(r)), ...Array.from(mevcutRoller).filter((r) => !rolBilgisi(r))];
+  const roller = [...ROLLER.map((r) => r.deger).filter((r) => r !== "destek" && mevcutRoller.has(r)), ...Array.from(mevcutRoller).filter((r) => !rolBilgisi(r))];
   const hepsi = liste.map((k) => k.id);
   const herkesSecili = hepsi.length > 0 && hepsi.every((id) => seciliKume.has(id));
 
@@ -92,7 +92,7 @@ export function AliciSecici({
               }`}
             >
               {acik ? "✓ " : ""}
-              {k.ad_soyad}
+              {aliciAdi(k)}
             </button>
           );
         })}
