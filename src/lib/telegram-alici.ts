@@ -59,12 +59,23 @@ export async function aliciCoz(
   }
 
   for (const soylenen of istek.kisiler) {
-    const parcalar = sade(soylenen).filter((p) => !UNVANLAR.has(p));
-    if (parcalar.length === 0) continue;
-    const adaylar = tumu.filter((k) => {
+    const tumParcalar = sade(soylenen).filter((p) => !UNVANLAR.has(p));
+    // Ses tanıma "Fatih Bey"i "Fatih P." gibi yazabilir: 1-2 harflik parçalar eşleşme şartı değil, yalnız
+    // aynı isimde birden fazla kişi varsa ayırt etmek için ipucudur.
+    const parcalar = tumParcalar.filter((p) => p.length >= 3);
+    const ipuclari = tumParcalar.filter((p) => p.length < 3);
+    if (parcalar.length === 0) {
+      if (tumParcalar.length > 0) sorunlar.push(`"${soylenen}" adını net anlayamadım.`);
+      continue;
+    }
+    let adaylar = tumu.filter((k) => {
       const adParcalari = sade(k.ad_soyad);
-      return parcalar.every((p) => adParcalari.some((a) => a === p || (p.length >= 3 && a.startsWith(p))));
+      return parcalar.every((p) => adParcalari.some((a) => a === p || a.startsWith(p)));
     });
+    if (adaylar.length > 1 && ipuclari.length > 0) {
+      const daraltilmis = adaylar.filter((k) => ipuclari.every((i) => sade(k.ad_soyad).some((a) => a.startsWith(i))));
+      if (daraltilmis.length > 0) adaylar = daraltilmis;
+    }
     if (adaylar.length === 0) sorunlar.push(`"${soylenen}" adında bir kişi bulamadım.`);
     else if (adaylar.length > 1) sorunlar.push(`"${soylenen}" için birden fazla kişi var (${adaylar.map(aliciAdi).join(", ")}).`);
     else secilen.set(adaylar[0].id, aliciAdi(adaylar[0]));
