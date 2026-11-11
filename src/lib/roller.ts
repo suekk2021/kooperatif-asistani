@@ -17,6 +17,14 @@ export const ROLLER: {
     yazar: true,
     yonetici: true,
   },
+  {
+    deger: "bilgi_islem",
+    ad: "Bilgi işlem",
+    aciklama:
+      "Programın kurulum ve bakımından sorumlu; her şeyi görür ve girer, kişi ekler, programın teknik ayarlarını (yapay zekâ anahtarları, Telegram listesi) yönetir. Listelerde adıyla görünür.",
+    yazar: true,
+    yonetici: true,
+  },
   { deger: "on_muhasebe", ad: "Ön muhasebe", aciklama: "Alış, satış, kasa, cari, stok ve üretim kaydı girer.", yazar: true, yonetici: false },
   { deger: "depo", ad: "Depo / üretim görevlisi", aciklama: "Mal girişi, üretim partisi ve stok kaydı girer.", yazar: true, yonetici: false },
   {
@@ -44,7 +52,7 @@ export const OPERASYON_DISI_ROLLER: KullaniciRolu[] = ["destek"];
  * GEÇİCİ: true iken teknik destek hesabı not/hatırlatıcı alıcı seçiminde "Teknik destek" adıyla görünür
  * (ekip programla ilgili bir şey yazabilsin diye). Program oturunca false yap; hesap listelerden yine gizlenir.
  */
-export const DESTEK_ALICI_LISTESINDE = true;
+export const DESTEK_ALICI_LISTESINDE = false;
 
 /** Not / hatırlatıcı alıcısı olarak seçilebilen roller. */
 export const ALICI_ROLLERI: KullaniciRolu[] = ROLLER.map((r) => r.deger).filter(
@@ -57,7 +65,12 @@ export function aliciAdi(k: { ad_soyad: string; rol: KullaniciRolu | null }): st
 }
 
 /** Bu rolleri sadece aynı roldeki kişi verebilir (başkanı başkan, teknik desteği teknik destek). */
-export const KORUNAN_ROLLER: KullaniciRolu[] = ["baskan", "destek"];
+export const KORUNAN_ROLLER: KullaniciRolu[] = ["baskan", "destek", "bilgi_islem"];
+
+/** Programın teknik ayarlarını yöneten ve korunan rolleri verebilen roller (teknik destek ve bilgi işlem). */
+export function teknikYetkiliMi(rol: KullaniciRolu | null | undefined): boolean {
+  return rol === "destek" || rol === "bilgi_islem";
+}
 
 export function rolBilgisi(rol: KullaniciRolu | null | undefined) {
   return ROLLER.find((r) => r.deger === rol);

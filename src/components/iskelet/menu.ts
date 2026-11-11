@@ -5,7 +5,7 @@ import type { IkonAdi } from "./Ikonlar";
 // yetkiyi veritabanı kuralları uygular; adresi bilen herkes sayfayı açabilir, yazamıyorsa yazamaz.
 export type MenuOgesi = { yol: string; ad: string; ikon: IkonAdi; yakinda?: boolean; kimler?: KullaniciRolu[] };
 
-const KAYIT_GIRENLER: KullaniciRolu[] = ["operasyon", "destek", "on_muhasebe"];
+const KAYIT_GIRENLER: KullaniciRolu[] = ["operasyon", "destek", "bilgi_islem", "on_muhasebe"];
 const IZLEYENLER: KullaniciRolu[] = ["muhasebeci", "izleyici"];
 
 export const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
@@ -43,7 +43,7 @@ export const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
       { yol: "/raporlar", ad: "Raporlar", ikon: "rapor", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
       { yol: "/hesap-plani", ad: "Hesap Planı", ikon: "hesap", kimler: [...KAYIT_GIRENLER, "muhasebeci"] },
       { yol: "/aktarim", ad: "Muhasebe Aktarımı", ikon: "aktarim", yakinda: true },
-      { yol: "/islem-gecmisi", ad: "İşlem Geçmişi", ikon: "gecmis", kimler: ["baskan", "operasyon", "destek", "muhasebeci"] },
+      { yol: "/islem-gecmisi", ad: "İşlem Geçmişi", ikon: "gecmis", kimler: ["baskan", "operasyon", "destek", "bilgi_islem", "muhasebeci"] },
     ],
   },
 ];

@@ -3,12 +3,12 @@
 import { useActionState, useState, useTransition } from "react";
 import { kullaniciEkle, kullaniciGuncelle, kullaniciSifreSifirla, kullaniciSil, type KullaniciSonuc } from "@/app/actions/kullanicilar";
 import { FormMesaji } from "@/components/FormMesaji";
-import { KORUNAN_ROLLER, ROLLER, rolAdi } from "@/lib/roller";
+import { KORUNAN_ROLLER, ROLLER, rolAdi, teknikYetkiliMi } from "@/lib/roller";
 import type { KullaniciRolu, Profil } from "@/types/database";
 
-/** Korunan rolleri (başkan, teknik destek) sadece aynı roldeki kişi verir; teknik destek kurulumda hepsini verir. */
+/** Korunan rolleri (başkan, teknik destek, bilgi işlem) sadece aynı roldeki kişi verir; teknik destek ve bilgi işlem kurulumda hepsini verir. */
 function verebilir(benimRol: KullaniciRolu | null, rol: KullaniciRolu) {
-  return !KORUNAN_ROLLER.includes(rol) || benimRol === rol || benimRol === "destek";
+  return !KORUNAN_ROLLER.includes(rol) || benimRol === rol || teknikYetkiliMi(benimRol);
 }
 
 function KullaniciSatiri({
@@ -32,7 +32,7 @@ function KullaniciSatiri({
   const [yeniSifre, setYeniSifre] = useState("");
   const rolDegisebilir = verebilir(benimRol, kullanici.rol);
   // Teknik destek hesabını her yönetici silebilir: erişimi kesme hakkı kooperatifte.
-  const silinebilir = kullanici.rol === "destek" || kullanici.rol !== "baskan" || benimRol === "baskan" || benimRol === "destek";
+  const silinebilir = kullanici.rol === "destek" || kullanici.rol !== "baskan" || benimRol === "baskan" || teknikYetkiliMi(benimRol);
   const destekMi = kullanici.rol === "destek";
 
   if (silindi) return null;

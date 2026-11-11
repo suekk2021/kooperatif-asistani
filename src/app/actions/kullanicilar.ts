@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { izKaydet } from "@/lib/iz";
-import { KORUNAN_ROLLER, ROLLER, rolBilgisi } from "@/lib/roller";
+import { KORUNAN_ROLLER, ROLLER, rolBilgisi, teknikYetkiliMi } from "@/lib/roller";
 import type { KullaniciRolu, Profil } from "@/types/database";
 
 export type KullaniciSonuc = { hata?: string; basarili?: string };
@@ -22,7 +22,7 @@ async function mevcutKullanici(): Promise<{ id: string; rol: KullaniciRolu | nul
 /** Korunan rolü (başkan, teknik destek) sadece aynı roldeki kişi verir/değiştirir; teknik destek kurulumda hepsini yapabilir. */
 function korunanaDokunabilir(benimRol: KullaniciRolu | null | undefined, hedefRol: KullaniciRolu | null | undefined) {
   if (!hedefRol || !KORUNAN_ROLLER.includes(hedefRol)) return true;
-  return benimRol === hedefRol || benimRol === "destek";
+  return benimRol === hedefRol || teknikYetkiliMi(benimRol);
 }
 
 /** Yönetici (başkan / operasyon / teknik destek) değilse veya korunan rolü vermeye çalışıyorsa hata mesajı döner. */
@@ -125,7 +125,7 @@ export async function kullaniciSil(id: string): Promise<KullaniciSonuc> {
   const supabase = await createClient();
   const { data: hedef } = await supabase.from("profiller").select("ad_soyad, rol").eq("id", id).single();
   // Teknik destek hesabını yöneticiler her zaman silebilir (erişimi kesme hakkı kooperatifte).
-  if (hedef?.rol === "baskan" && ben?.rol !== "baskan" && ben?.rol !== "destek") return { hata: "Başkanı sadece Başkan silebilir." };
+  if (hedef?.rol === "baskan" && ben?.rol !== "baskan" && !teknikYetkiliMi(ben?.rol)) return { hata: "Başkanı sadece Başkan silebilir." };
 
   const admin = createAdminClient();
   // auth.users silinince profil (on delete cascade) de silinir.

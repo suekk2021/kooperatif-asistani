@@ -1,4 +1,4 @@
-export type KullaniciRolu = "baskan" | "operasyon" | "on_muhasebe" | "depo" | "muhasebeci" | "izleyici" | "destek";
+export type KullaniciRolu = "baskan" | "operasyon" | "on_muhasebe" | "depo" | "muhasebeci" | "izleyici" | "destek" | "bilgi_islem";
 // Eski fiş okuma (src/lib/fis.ts) hâlâ kullanıyor; Alış ekranında kalem bazlı okumaya geçince kalkacak.
 export type IslemTuru = "gelir" | "gider";
 export type OcrSaglayici = "gemini" | "openai";

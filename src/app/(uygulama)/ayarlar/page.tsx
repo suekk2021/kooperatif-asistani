@@ -5,6 +5,7 @@ import { kullanicilariGetir } from "@/app/actions/kullanicilar";
 import { AyarlarFormu } from "@/components/AyarlarFormu";
 import { KullanicilarYonetimi } from "@/components/KullanicilarYonetimi";
 import { yoneticiMi } from "@/lib/rol";
+import { teknikYetkiliMi } from "@/lib/roller";
 import type { KullaniciRolu } from "@/types/database";
 
 export default async function AyarlarPage() {
@@ -22,7 +23,7 @@ export default async function AyarlarPage() {
   // Ayarlar yalnızca yöneticilerin: menüde zaten görünmez, adresi bilen başkası da buradan geri gönderilir.
   const yonetici = yoneticiMi((profil?.rol as KullaniciRolu) ?? null);
   if (!yonetici) redirect("/panel");
-  const destek = profil?.rol === "destek";
+  const destek = teknikYetkiliMi((profil?.rol as KullaniciRolu) ?? null);
   const durum = await ayarDurumuGetir();
   const kullanicilar = await kullanicilariGetir();
 

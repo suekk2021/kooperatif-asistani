@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { izKaydet } from "@/lib/iz";
 import { anahtarGecerliMi } from "@/lib/ai";
 import { yoneticiMi } from "@/lib/rol";
+import { teknikYetkiliMi } from "@/lib/roller";
 import type { KullaniciRolu, OcrSaglayici } from "@/types/database";
 
 export type AyarlarSonuc = { hata?: string; basarili?: string };
@@ -75,7 +76,7 @@ export async function ayarKaydet(formData: FormData): Promise<AyarlarSonuc> {
 
   // Fiş okuma, API anahtarları, Telegram bildirimi ve asistan ayarlarını yalnızca teknik destek değiştirir
   // (kullanıcı kararı, 11 Kas 2026); Başkan ve Operasyon yöneticisi kurum kimliği ile mali müşavir e-postasını değiştirir.
-  const destek = profil?.rol === "destek";
+  const destek = teknikYetkiliMi(profil?.rol as KullaniciRolu | undefined);
   const ocrSaglayici = String(formData.get("ocr_saglayici") ?? "gemini") as OcrSaglayici;
   const geminiKey = String(formData.get("gemini_api_key") ?? "").trim();
   const openaiKey = String(formData.get("openai_api_key") ?? "").trim();
