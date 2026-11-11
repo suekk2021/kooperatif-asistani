@@ -8,7 +8,7 @@ import { gunIstanbul } from "@/lib/tarih";
 import type { Not } from "@/types/database";
 
 type NotSatiriVerisi = Pick<Not, "id" | "icerik" | "kaynak" | "created_at" | "telegram_gonderen"> & {
-  hedef: { ad_soyad: string } | null;
+  kime: string | null;
 };
 
 function formatZamanIstanbul(iso: string) {
@@ -90,7 +90,7 @@ function NotSatiri({ not, duzenlenebilir }: { not: NotSatiriVerisi; duzenlenebil
         <p className="text-xs text-ink-soft/70">
           {formatZamanIstanbul(not.created_at)} · {not.kaynak === "telegram" ? "Telegram" : "Web"}
           {not.telegram_gonderen && ` · ${not.telegram_gonderen}`}
-          {not.hedef && ` · Kime: ${not.hedef.ad_soyad}`}
+          {not.kime && ` · Kime: ${not.kime}`}
         </p>
         {duzenlenebilir && (
           <div className="flex gap-3">

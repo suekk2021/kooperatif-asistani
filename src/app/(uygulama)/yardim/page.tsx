@@ -323,12 +323,12 @@ const BOLUMLER: Bolum[] = [
     icerik: (
       <ul>
         <li>
-          <b>Hatırlatıcı:</b> <b>Yeni Hatırlatıcı</b> kutusuna başlığı ve tarihi yazın, <b>Kime</b> alanından kişiyi seçin (boş bırakırsanız size gelir), <B>Ekle</B>.
+          <b>Hatırlatıcı:</b> <b>Yeni Hatırlatıcı</b> kutusuna başlığı ve tarihi yazın, <b>Kime</b> alanından <b>Herkes</b>, bir iş grubu (ör. Depo / üretim) ya da tek tek kişileri seçin; birden fazlası seçilebilir (boş bırakırsanız size gelir), <B>Ekle</B>.
           Günü gelince kişiye Telegram&apos;dan haber gider.
         </li>
         <li>İşi yaptıysanız hatırlatıcıdaki kutuyu işaretleyin; işaretlenmeyen hatırlatma tekrar gönderilebilir.</li>
         <li>
-          <b>Notlar:</b> &quot;Bir not bırak…&quot; kutusuna yazıp <B>Not Ekle</B>&apos;ye basın ya da Telegram&apos;dan yazın.
+          <b>Notlar:</b> &quot;Bir not bırak…&quot; kutusuna yazın, isterseniz <b>Kime</b> alanından kişi, iş grubu ya da Herkes seçin (seçilenlere Telegram bildirimi gider), sonra <B>Not Ekle</B>&apos;ye basın ya da Telegram&apos;dan yazın.
         </li>
       </ul>
     ),

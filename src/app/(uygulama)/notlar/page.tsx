@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { mevcutRol, duzenlemeYetkisiVarMi } from "@/lib/rol";
 import { notEkle } from "@/app/actions/notlar";
 import { NotlarListesi } from "@/components/NotlarListesi";
+import { AliciSecici, type AliciKisi } from "@/components/AliciSecici";
+import { kimeMetni } from "@/lib/alici-metni";
 
 export default async function NotlarPage() {
   const supabase = await createClient();
@@ -12,15 +14,17 @@ export default async function NotlarPage() {
   const [{ data: notlar }, { data: kullanicilar }] = await Promise.all([
     supabase
       .from("notlar")
-      .select("id, icerik, kaynak, created_at, telegram_gonderen, hedef_kullanici_id, hedef:profiller!hedef_kullanici_id(ad_soyad)")
+      .select("id, icerik, kaynak, created_at, telegram_gonderen, hedef_kullanici_id, hedef_kullanici_idler")
       .order("created_at", { ascending: false }),
     // Teknik destek hesabı operasyonda kişi olarak seçilmez (bkz. lib/roller.ts).
-    supabase.from("profiller").select("id, ad_soyad").neq("rol", "destek").order("ad_soyad", { ascending: true }),
+    supabase.from("profiller").select("id, ad_soyad, rol").neq("rol", "destek").order("ad_soyad", { ascending: true }),
   ]);
 
+  const kisiler = (kullanicilar ?? []) as AliciKisi[];
+  const adlar = new Map(kisiler.map((k) => [k.id, k.ad_soyad]));
   const notlarDuz = (notlar ?? []).map((n) => ({
     ...n,
-    hedef: Array.isArray(n.hedef) ? (n.hedef[0] ?? null) : n.hedef,
+    kime: kimeMetni(n.hedef_kullanici_idler?.length ? n.hedef_kullanici_idler : n.hedef_kullanici_id ? [n.hedef_kullanici_id] : [], adlar, kisiler.length - 1),
   }));
 
   const duzenlenebilir = duzenlemeYetkisiVarMi(await mevcutRol());
@@ -43,21 +47,9 @@ export default async function NotlarPage() {
               placeholder="Bir not bırak..."
               className="w-full rounded-md border border-line px-3 py-2 text-sm"
             />
-            <div className="flex flex-wrap items-center gap-2">
-              <select
-                name="hedef_kullanici_id"
-                defaultValue=""
-                className="rounded-md border border-line px-3 py-2 text-sm"
-              >
-                <option value="">Kimseye özel değil (genel not)</option>
-                {(kullanicilar ?? [])
-                  .filter((k) => k.id !== user?.id)
-                  .map((k) => (
-                    <option key={k.id} value={k.id}>
-                      Kime: {k.ad_soyad}
-                    </option>
-                  ))}
-              </select>
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-ink-soft">Kime? (boş bırakırsan genel not olur)</p>
+              <AliciSecici kisiler={kisiler} name="hedef_kullanici_idler" haricId={user?.id} />
               <button
                 type="submit"
                 className="rounded-md bg-pine px-4 py-2 text-sm font-medium text-white hover:bg-pine-deep"
@@ -66,8 +58,9 @@ export default async function NotlarPage() {
               </button>
             </div>
             <p className="text-xs text-ink-soft/70">
-              Bir kişi seçersen, o kişinin Telegram Chat ID&apos;si kayıtlıysa (Ayarlar &gt; Kullanıcılar) otomatik
-              bildirim gider.
+              Herkes, bir iş grubu ya da tek tek kişiler seçebilirsin. Seçilenlerin Telegram numarası kayıtlıysa
+              (Ayarlar &gt; Kullanıcılar) not onlara otomatik bildirilir. Notlar giriş yapan herkese görünür; &quot;kime&quot;
+              yalnızca bildirim içindir.
             </p>
           </form>
         )}

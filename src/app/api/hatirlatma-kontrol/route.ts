@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   const bugun = bugunIstanbul();
   const { data: hatirlaticilar } = await supabase
     .from("hatirlaticilar")
-    .select("id, baslik, hatirlatma_tarihi, hedef_kullanici_id, olusturan, kaynak_chat_id")
+    .select("id, baslik, hatirlatma_tarihi, hedef_kullanici_id, hedef_kullanici_idler, olusturan, kaynak_chat_id")
     .eq("tamamlandi", false)
     .lte("hatirlatma_tarihi", bugun);
 

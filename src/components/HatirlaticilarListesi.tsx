@@ -8,27 +8,30 @@ import {
 } from "@/app/actions/hatirlaticilar";
 import { TarihAraligiFiltresi, type TarihAraligi } from "@/components/TarihAraligiFiltresi";
 import { AyGezici } from "@/components/AyGezici";
+import { AliciSecici, type AliciKisi } from "@/components/AliciSecici";
+import { kimeMetni } from "@/lib/alici-metni";
 import { tarihTR } from "@/lib/imece";
 import type { Hatirlatici } from "@/types/database";
 
 type HatirlaticiVerisi = Pick<
   Hatirlatici,
-  "id" | "baslik" | "hatirlatma_tarihi" | "tamamlandi" | "telegram_gonderen" | "hedef_kullanici_id"
+  "id" | "baslik" | "hatirlatma_tarihi" | "tamamlandi" | "telegram_gonderen"
 > & {
   profiller: { ad_soyad: string } | null;
-  hedef: { ad_soyad: string } | null;
+  hedef_kullanici_idler: string[];
 };
 
-type Kisi = { id: string; ad_soyad: string };
+type Kisi = AliciKisi;
 
 function kimEkledi(hatirlatici: HatirlaticiVerisi): string | null {
   return hatirlatici.telegram_gonderen ?? hatirlatici.profiller?.ad_soyad ?? null;
 }
 
-function kimeGidiyor(hatirlatici: HatirlaticiVerisi): string | null {
-  const hedef = hatirlatici.hedef?.ad_soyad;
-  if (!hedef || hedef === kimEkledi(hatirlatici)) return null;
-  return hedef;
+function kimeGidiyor(hatirlatici: HatirlaticiVerisi, kisiler: Kisi[]): string | null {
+  const adlar = new Map(kisiler.map((k) => [k.id, k.ad_soyad]));
+  const ekleyen = kimEkledi(hatirlatici);
+  const hedefler = hatirlatici.hedef_kullanici_idler.filter((id) => adlar.get(id) !== ekleyen);
+  return kimeMetni(hedefler, adlar, kisiler.length - (ekleyen && kisiler.some((k) => k.ad_soyad === ekleyen) ? 1 : 0));
 }
 
 function HatirlaticiSatiri({
@@ -43,7 +46,7 @@ function HatirlaticiSatiri({
   const [duzenlemeModu, setDuzenlemeModu] = useState(false);
   const [baslik, setBaslik] = useState(hatirlatici.baslik);
   const [tarih, setTarih] = useState(hatirlatici.hatirlatma_tarihi);
-  const [hedef, setHedef] = useState(hatirlatici.hedef_kullanici_id ?? "");
+  const [hedef, setHedef] = useState<string[]>(hatirlatici.hedef_kullanici_idler);
   const [islemYapiliyor, islemBaslat] = useTransition();
   const [hata, setHata] = useState<string | null>(null);
 
@@ -62,7 +65,7 @@ function HatirlaticiSatiri({
     setHata(null);
     islemBaslat(async () => {
       try {
-        await hatirlaticiGuncelle(hatirlatici.id, baslik, tarih, hedef || null);
+        await hatirlaticiGuncelle(hatirlatici.id, baslik, tarih, hedef);
         setDuzenlemeModu(false);
       } catch (e) {
         setHata(e instanceof Error ? e.message : "Kaydedilemedi.");
@@ -96,19 +99,10 @@ function HatirlaticiSatiri({
             onChange={(e) => setTarih(e.target.value)}
             className="rounded-md border border-line px-3 py-2 text-sm"
           />
-          <select
-            value={hedef}
-            onChange={(e) => setHedef(e.target.value)}
-            aria-label="Kime hatırlatılsın"
-            className="rounded-md border border-line px-3 py-2 text-sm"
-          >
-            <option value="">Kime: ekleyen kişi</option>
-            {kisiler.map((k) => (
-              <option key={k.id} value={k.id}>
-                Kime: {k.ad_soyad}
-              </option>
-            ))}
-          </select>
+        </div>
+        <div className="mt-2">
+          <p className="mb-1 text-xs font-medium text-ink-soft">Kime hatırlatılsın? (boş: ekleyen kişi)</p>
+          <AliciSecici kisiler={kisiler} secili={hedef} onDegisti={setHedef} />
         </div>
         <div className="mt-2 flex gap-2">
           <button
@@ -122,7 +116,7 @@ function HatirlaticiSatiri({
             onClick={() => {
               setBaslik(hatirlatici.baslik);
               setTarih(hatirlatici.hatirlatma_tarihi);
-              setHedef(hatirlatici.hedef_kullanici_id ?? "");
+              setHedef(hatirlatici.hedef_kullanici_idler);
               setDuzenlemeModu(false);
             }}
             className="rounded-md border border-line px-3 py-1.5 text-xs text-ink-soft hover:bg-paper"
@@ -157,7 +151,7 @@ function HatirlaticiSatiri({
           <p className="text-xs text-ink-soft/70">
             {tarihTR(hatirlatici.hatirlatma_tarihi)}
             {kimEkledi(hatirlatici) && ` · ${kimEkledi(hatirlatici)}`}
-            {kimeGidiyor(hatirlatici) && ` → ${kimeGidiyor(hatirlatici)}`}
+            {kimeGidiyor(hatirlatici, kisiler) && ` → ${kimeGidiyor(hatirlatici, kisiler)}`}
           </p>
           {hata && <p className="mt-1 text-xs text-expense">{hata}</p>}
         </div>

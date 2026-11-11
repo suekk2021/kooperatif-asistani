@@ -104,6 +104,7 @@ export type Hatirlatici = {
   olusturan: string | null;
   telegram_gonderen?: string | null;
   hedef_kullanici_id?: string | null;
+  hedef_kullanici_idler?: string[];
   kaynak_chat_id?: string | null;
   created_at: string;
 };
@@ -115,6 +116,7 @@ export type Not = {
   olusturan: string | null;
   telegram_gonderen?: string | null;
   hedef_kullanici_id?: string | null;
+  hedef_kullanici_idler?: string[];
   created_at: string;
 };
 

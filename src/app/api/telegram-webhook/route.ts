@@ -3,9 +3,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { telegramMesajGonder, telegramDosyaIndir, chatIdListesiCikar, telegramGondereniBul } from "@/lib/telegram";
 import { jsonUret, sesiMetneCevir, type YapayZekaAyarlari } from "@/lib/ai";
 import { bugunIstanbul } from "@/lib/tarih";
+import { rolBilgisi } from "@/lib/roller";
+import { notBildirimiGonder } from "@/lib/not-bildirimi";
+import { GRUP_ROLLERI, GRUP_ACIKLAMASI, aliciCoz, kimeIsteginiOku, type KimeIstegi } from "@/lib/telegram-alici";
+import type { KullaniciRolu } from "@/types/database";
 
 const KURUM_ADI = "Suluova Üreten Eller Kadın Kooperatifi";
-const KARSILAMA = `Merhaba! Ben ${KURUM_ADI}'nin sanal asistanıyım. Size nasıl yardımcı olabilirim?\n\nBana şunları yapabilirsiniz:\n• "özet" yazıp genel durumu sorabilirsiniz\n• Bir hatırlatıcıyı yazılı ya da sesli olarak söyleyebilirsiniz ("15 Temmuz'da kira ödemesi hatırlat" gibi)\n• Serbest bir not bırakabilirsiniz\n• (Yakında) fatura fotoğrafı gönderip alış kaydı oluşturabileceksiniz`;
+const KARSILAMA = `Merhaba! Ben ${KURUM_ADI}'nin sanal asistanıyım. Size nasıl yardımcı olabilirim?\n\nBana şunları yapabilirsiniz:\n• "özet" yazıp genel durumu sorabilirsiniz\n• Bir hatırlatıcıyı yazılı ya da sesli olarak söyleyebilirsiniz ("15 Temmuz'da kira ödemesi hatırlat" gibi)\n• Serbest bir not bırakabilirsiniz\n• Not ya da hatırlatıcıyı başkalarına yönlendirebilirsiniz ("yarın sayım var, depocu arkadaşlar erken gelsin" ya da "Fatih Bey'e not: ..." gibi)\n• (Yakında) fatura fotoğrafı gönderip alış kaydı oluşturabileceksiniz`;
 
 const ASISTAN_SEMASI = {
   type: "object",
@@ -21,13 +25,35 @@ const ASISTAN_SEMASI = {
       type: "string",
       description: "niyet=hatirlatici ise YYYY-MM-DD formatında tarih (göreceli tarihleri bugüne göre hesapla)",
     },
-    not_icerik: { type: "string", description: "niyet=not ise, notun içeriği" },
+    not_icerik: {
+      type: "string",
+      description:
+        "niyet=not ise, notun içeriği. 'X'e not bırak/ilet' gibi yönlendirme komutunu çıkar, iletilecek mesajı yaz.",
+    },
+    kime_herkes: {
+      type: "boolean",
+      description: "niyet=not/hatirlatici ve kullanıcı 'herkese', 'tüm ekibe', 'hepsine' diyorsa true.",
+    },
+    kime_gruplar: {
+      type: "array",
+      items: { type: "string", enum: GRUP_ROLLERI },
+      description:
+        "niyet=not/hatirlatici ve kullanıcı bir iş grubuna yönlendiriyorsa (ör. 'depocu arkadaşlar', 'ön muhasebeci'): ilgili rol(ler). Roller: " +
+        GRUP_ACIKLAMASI +
+        ". Rol adından ve açıklamasından en uygun olanı seç; emin değilsen boş bırak.",
+    },
+    kime_kisiler: {
+      type: "array",
+      items: { type: "string" },
+      description:
+        "niyet=not/hatirlatici ve kullanıcı belirli kişilere yönlendiriyorsa o kişilerin adları, söylendiği gibi (ör. 'Fatih', 'Nagihan Hanım'). Başkasına yönlendirme yoksa boş bırak.",
+    },
     cevap: {
       type: "string",
       description:
         "Kullanıcıya verilecek cevap. Sıcak ama SOMUT ve BİLGİLENDİRİCİ ol - 'nasıl yardımcı olabilirim' gibi " +
         "muğlak, geri sorulu cümlelerle geçiştirme. 'Sen kimsin/ne yapabilirsin' gibi bir soruya kim olduğunu " +
-        "ve tam olarak hangi 4 şeyi yapabildiğini (özet, hatırlatıcı, not, sesli mesaj) somut örneklerle anlat. " +
+        "ve tam olarak hangi 5 şeyi yapabildiğini (özet, hatırlatıcı, not, başkalarına yönlendirme, sesli mesaj) somut örneklerle anlat. " +
         "Asla sayısal mali veri (tutar, bakiye vb.) UYDURMA - onları sen değil sistem ekler.",
     },
   },
@@ -42,8 +68,9 @@ const ASISTAN_KIMLIGI =
   `1) ÖZET: "özet" veya "durum" yazınca kayıtlı kart sayılarını ve yaklaşan hatırlatıcıları anında verirsin.\n` +
   `2) HATIRLATICI: "15 Temmuz'da kira ödemesi hatırlat" gibi tarihli bir talebi otomatik kaydedersin, günü gelince Telegram'dan haber verirsin.\n` +
   `3) NOT: tarihsiz, serbest bir bilgiyi not olarak kaydedersin.\n` +
-  `4) SESLİ MESAJ: hatırlatıcı ve notları sesli mesajdan da anlarsın. Fatura fotoğrafından alış kaydı yakında açılacak; şu an fotoğraf işlemezsin, sorulursa bunu dürüstçe söyle.\n\n` +
-  `"Sen kimsin", "ne yapabilirsin", "yeteneklerin ne" gibi bir soru geldiğinde bu dört maddeyi somut, kısa örneklerle ` +
+  `4) KİME: not ya da hatırlatıcıyı başkalarına yönlendirebilirsin ("yarın sayım var, depocu arkadaşlar erken gelsin", "ön muhasebeciye not: yarın denetim var", "Fatih Bey'e hatırlatıcı"). Alıcıyı kime_herkes / kime_gruplar / kime_kisiler alanlarına yaz; yönlendirme yoksa bu alanları boş bırak.\n` +
+  `5) SESLİ MESAJ: hatırlatıcı ve notları sesli mesajdan da anlarsın. Fatura fotoğrafından alış kaydı yakında açılacak; şu an fotoğraf işlemezsin, sorulursa bunu dürüstçe söyle.\n\n` +
+  `"Sen kimsin", "ne yapabilirsin", "yeteneklerin ne" gibi bir soru geldiğinde bu maddeleri somut, kısa örneklerle ` +
   `anlat - genel geçer bir "asistanım, size yardımcı olurum" cevabı verme.`;
 
 function asistanPromptOlustur(girdiMetni: string, ozelPrompt: string | null | undefined) {
@@ -89,11 +116,44 @@ async function ozetMetniOlustur(supabase: ReturnType<typeof createAdminClient>) 
   );
 }
 
+const kacis = (m: string) => m.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+type GonderenProfil = { id: string; rol: KullaniciRolu | null };
+
+// Başkalarına yönlendirilen not/hatırlatıcı için alıcıları kişi listesine çevirir. Emin olunamayan
+// her durumda (yetki yok, isim belirsiz/bulunamadı) hiçbir şey kaydedilmez, sebep söylenir.
+async function hedefleriBelirle(
+  supabase: ReturnType<typeof createAdminClient>,
+  istek: KimeIstegi,
+  profil: GonderenProfil | null,
+  gondereniHaricTut: boolean
+): Promise<{ hata: string } | { idler: string[]; adlar: string[] }> {
+  if (!profil || !rolBilgisi(profil.rol)?.yazar) {
+    return {
+      hata: "Başkalarına not ya da hatırlatıcı göndermek için sistemde kayıt girme yetkisi olan bir kişi olarak kayıtlı olmanız gerekir. Kaydetmedim.",
+    };
+  }
+  const coz = await aliciCoz(supabase, istek, gondereniHaricTut ? profil.id : undefined);
+  if (coz.sorunlar.length > 0) {
+    return {
+      hata:
+        "Kime gideceğinden emin olamadığım için kaydetmedim:\n" +
+        coz.sorunlar.map((x) => "• " + kacis(x)).join("\n") +
+        "\n\nİsmi tam söyleyerek ya da grubu belirterek tekrar dener misiniz?",
+    };
+  }
+  if (coz.idler.length === 0) {
+    return { hata: "Gönderilecek kimse kalmadı (kendinize yönlendirmiş olabilirsiniz). Kaydetmedim." };
+  }
+  return { idler: coz.idler, adlar: coz.adlar };
+}
+
 async function siniflandirmaSonucunuIsle(
   supabase: ReturnType<typeof createAdminClient>,
   cikarim: Record<string, unknown>,
   gonderenIsim: string,
-  gelenChatId: string
+  gelenChatId: string,
+  botToken: string
 ): Promise<string> {
   const niyet = cikarim.niyet;
   const cevap = typeof cikarim.cevap === "string" ? cikarim.cevap : "Anladım.";
@@ -102,34 +162,64 @@ async function siniflandirmaSonucunuIsle(
     return ozetMetniOlustur(supabase);
   }
 
+  // Söyleyen kişinin profili varsa kayıt ona bağlanır; yoksa geldiği sohbete döner.
+  const { data: profil } = await supabase
+    .from("profiller")
+    .select("id, rol")
+    .eq("telegram_chat_id", gelenChatId)
+    .limit(1)
+    .maybeSingle();
+  const gonderenProfil = (profil as GonderenProfil | null) ?? null;
+  const istek = kimeIsteginiOku(cikarim);
+
   if (niyet === "hatirlatici" && cikarim.hatirlatici_baslik && cikarim.hatirlatici_tarihi) {
-    // Söyleyen kişinin profili varsa hatırlatıcı ona bağlanır; yoksa geldiği sohbete döner.
-    const { data: profil } = await supabase
-      .from("profiller")
-      .select("id")
-      .eq("telegram_chat_id", gelenChatId)
-      .limit(1)
-      .maybeSingle();
+    const baslik = String(cikarim.hatirlatici_baslik);
+    const tarih = String(cikarim.hatirlatici_tarihi);
+    let hedefIdler = gonderenProfil ? [gonderenProfil.id] : [];
+    let adlar: string[] = [];
+    if (istek) {
+      // Hatırlatıcıda söyleyen kişi de seçildiyse (ör. "herkes") alıcıdır.
+      const hedef = await hedefleriBelirle(supabase, istek, gonderenProfil, false);
+      if ("hata" in hedef) return hedef.hata;
+      hedefIdler = hedef.idler;
+      adlar = hedef.adlar;
+    }
     await supabase.from("hatirlaticilar").insert({
-      baslik: String(cikarim.hatirlatici_baslik),
-      hatirlatma_tarihi: String(cikarim.hatirlatici_tarihi),
+      baslik,
+      hatirlatma_tarihi: tarih,
       tamamlandi: false,
-      olusturan: profil?.id ?? null,
-      hedef_kullanici_id: profil?.id ?? null,
+      olusturan: gonderenProfil?.id ?? null,
+      hedef_kullanici_id: hedefIdler[0] ?? null,
+      hedef_kullanici_idler: hedefIdler,
       kaynak_chat_id: gelenChatId,
       telegram_gonderen: gonderenIsim,
     });
-    return cevap;
+    if (!istek) return cevap;
+    return `🔔 Hatırlatıcı kuruldu: ${kacis(baslik)} (${tarih})\n📨 Günü gelince hatırlatılacak: ${kacis(adlar.join(", "))}`;
   }
 
   if (niyet === "not" && cikarim.not_icerik) {
+    const icerik = String(cikarim.not_icerik);
+    if (!istek) {
+      await supabase.from("notlar").insert({ icerik, kaynak: "telegram", olusturan: null, telegram_gonderen: gonderenIsim });
+      return cevap;
+    }
+    const hedef = await hedefleriBelirle(supabase, istek, gonderenProfil, true);
+    if ("hata" in hedef) return hedef.hata;
     await supabase.from("notlar").insert({
-      icerik: String(cikarim.not_icerik),
+      icerik,
       kaynak: "telegram",
-      olusturan: null,
+      olusturan: gonderenProfil?.id ?? null,
       telegram_gonderen: gonderenIsim,
+      hedef_kullanici_id: hedef.idler[0] ?? null,
+      hedef_kullanici_idler: hedef.idler,
     });
-    return cevap;
+    const sonuc = await notBildirimiGonder(supabase, botToken, hedef.idler, icerik, gonderenIsim);
+    let yanit = `📝 Not kaydedildi.\n📨 Telegram'dan iletildi: ${kacis(sonuc.gitti.join(", ") || "—")}`;
+    if (sonuc.numarasiz.length > 0) {
+      yanit += `\n⚠️ Telegram numarası kayıtlı olmadığı için bildirim gitmedi (notu panelde görürler): ${kacis(sonuc.numarasiz.join(", "))}`;
+    }
+    return yanit;
   }
 
   return cevap;
@@ -241,7 +331,7 @@ export async function POST(request: NextRequest) {
         asistanPromptOlustur(mesaj.text, ayarlar.asistan_promptu),
         ASISTAN_SEMASI
       );
-      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim, gelenChatId));
+      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim, gelenChatId, botToken));
       return NextResponse.json({ ok: true });
     }
 
@@ -267,7 +357,7 @@ export async function POST(request: NextRequest) {
         cikarim = await jsonUret(yzAyarlari, asistanPromptOlustur(metin, ayarlar.asistan_promptu), ASISTAN_SEMASI);
       }
 
-      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim, gelenChatId));
+      await telegramMesajGonder(botToken, chatId, await siniflandirmaSonucunuIsle(supabase, cikarim, gonderenIsim, gelenChatId, botToken));
       return NextResponse.json({ ok: true });
     }
 
