@@ -46,7 +46,7 @@ export default async function NotlarPage() {
       <div className="rounded-xl border border-line bg-card p-5">
         <h1 className="text-lg font-semibold text-ink">Notlar</h1>
         <p className="mt-1 text-xs text-ink-soft">
-          Çalışanların birbirine bıraktığı notlar. Yeni not eklemek için buraya yazabilir ya da Telegram&apos;dan yazıp,
+          Size yazılan, sizin yazdığınız ve herkese açık genel notlar. Yeni not eklemek için buraya yazabilir ya da Telegram&apos;dan yazıp,
           sesli mesaj, fotoğraf, video veya dosya gönderebilirsiniz (Telegram&apos;dan en fazla 20 MB).
         </p>
 
@@ -71,8 +71,8 @@ export default async function NotlarPage() {
             </div>
             <p className="text-xs text-ink-soft/70">
               Herkes, bir iş grubu ya da tek tek kişiler seçebilirsin. Seçilenlerin Telegram numarası kayıtlıysa
-              (Ayarlar &gt; Kullanıcılar) not onlara otomatik bildirilir. Notlar giriş yapan herkese görünür; &quot;kime&quot;
-              yalnızca bildirim içindir.
+              (Ayarlar &gt; Kullanıcılar) not onlara otomatik bildirilir. Kişi seçtiğin not yalnızca sana ve seçtiklerine
+              görünür; kimseyi seçmezsen (genel not) herkes görür.
             </p>
           </form>
         )}

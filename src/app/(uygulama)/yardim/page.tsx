@@ -337,7 +337,7 @@ const BOLUMLER: Bolum[] = [
         </li>
         <li>İşi yaptıysanız hatırlatıcıdaki kutuyu işaretleyin; işaretlenmeyen hatırlatma tekrar gönderilebilir.</li>
         <li>
-          <b>Notlar:</b> &quot;Bir not bırak…&quot; kutusuna yazın, isterseniz <b>Kime</b> alanından kişi, iş grubu ya da Herkes seçin (seçilenlere Telegram bildirimi gider), sonra <B>Not Ekle</B>&apos;ye basın ya da Telegram&apos;dan yazın.
+          <b>Notlar:</b> &quot;Bir not bırak…&quot; kutusuna yazın, isterseniz <b>Kime</b> alanından kişi, iş grubu ya da Herkes seçin (seçilenlere Telegram bildirimi gider; kişi seçtiğiniz not yalnız size ve seçtiklerinize görünür, kimseyi seçmezseniz genel not olur ve herkes görür), sonra <B>Not Ekle</B>&apos;ye basın ya da Telegram&apos;dan yazın.
         </li>
       </ul>
     ),
