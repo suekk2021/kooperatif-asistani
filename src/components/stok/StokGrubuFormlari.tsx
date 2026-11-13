@@ -4,15 +4,8 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { stokGrubuEkle, stokGrubuGuncelle } from "@/app/actions/stok-grup";
 import { FormMesaji } from "@/components/FormMesaji";
-import { STOK_TURU_ADI } from "@/lib/imece";
-import type { StokGrubu, StokTuru } from "@/types/database";
-
-export const ANA_GRUPLAR: { kod: StokGrubu["ana_kod"]; ad: string; turler: StokTuru[] }[] = [
-  { kod: "150", ad: "İlk madde ve malzeme", turler: ["hammadde", "ambalaj", "yardimci"] },
-  { kod: "151", ad: "Yarı mamuller", turler: ["yari_mamul"] },
-  { kod: "152", ad: "Mamuller (ürünler)", turler: ["mamul"] },
-  { kod: "153", ad: "Ticari mallar", turler: ["ticari_mal"] },
-];
+import { ANA_GRUPLAR, STOK_TURU_ADI } from "@/lib/imece";
+import type { StokGrubu } from "@/types/database";
 
 export function YeniStokGrubuFormu({ mevcut }: { mevcut: StokGrubu[] }) {
   const formRef = useRef<HTMLFormElement>(null);

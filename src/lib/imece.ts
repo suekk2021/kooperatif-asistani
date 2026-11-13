@@ -22,6 +22,14 @@ export function kodGoster(kod: string | null | undefined): string {
   return (kod ?? "").replace(/\./g, "");
 }
 
+/** Stok kodunun ana hesapları ve bu ana hesapta açılabilecek türler (veritabanındaki kontrolle aynı). */
+export const ANA_GRUPLAR: { kod: "150" | "151" | "152" | "153"; ad: string; turler: StokTuru[] }[] = [
+  { kod: "150", ad: "İlk madde ve malzeme", turler: ["hammadde", "ambalaj", "yardimci"] },
+  { kod: "151", ad: "Yarı mamuller", turler: ["yari_mamul"] },
+  { kod: "152", ad: "Mamuller (ürünler)", turler: ["mamul"] },
+  { kod: "153", ad: "Ticari mallar", turler: ["ticari_mal"] },
+];
+
 export const STOK_BIRIMLERI: StokBirimi[] = ["kg", "g", "lt", "adet", "paket", "koli"];
 
 export const CARI_TURU_ADI: Record<CariTuru, { tekil: string; cogul: string }> = {
