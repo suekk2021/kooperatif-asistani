@@ -49,15 +49,6 @@ export function YeniStokKartiFormu({
       </div>
       <form ref={formRef} action={action} className="kart-ic">
         <div className="form-satir">
-          <div className="alan" style={{ flexBasis: 300 }}>
-            <label htmlFor="ad">Ad *</label>
-            <input id="ad" name="ad" required list="mevcut-kartlar" autoComplete="off" placeholder="Un (Tip 550)" />
-            <datalist id="mevcut-kartlar">
-              {mevcutAdlar.map((a) => (
-                <option key={a} value={a} />
-              ))}
-            </datalist>
-          </div>
           <div className="alan" style={{ flexBasis: 260 }}>
             <label htmlFor="grup_id">Stok grubu *</label>
             <select id="grup_id" name="grup_id" required value={grupId} onChange={(e) => setGrupId(e.target.value)}>
@@ -72,9 +63,39 @@ export function YeniStokKartiFormu({
               ))}
             </select>
           </div>
+          <div className="alan" style={{ flexBasis: 220 }}>
+            <label htmlFor="kod_son">Kod (son 3 hane; boşsa sıradaki)</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span className="kod">{onEk || "Önce grup seçin"}</span>
+              <input
+                id="kod_son"
+                name="kod_son"
+                inputMode="numeric"
+                maxLength={3}
+                placeholder="003"
+                value={kodSon}
+                onChange={(e) => setKodSon(e.target.value.trim())}
+                autoComplete="off"
+                disabled={!grup}
+              />
+            </div>
+            {kodBicimiYanlis && <small className="kirmizi">Yalnız rakam, en çok 3 hane.</small>}
+            <small className="soluk">Kaydedilince kod değişmez.</small>
+          </div>
           <div className="alan" style={{ flexBasis: 170, flexGrow: 0 }}>
             <label htmlFor="tur_goster">Tür (gruptan gelir)</label>
             <input id="tur_goster" readOnly tabIndex={-1} value={grup ? STOK_TURU_ADI[grup.tur] : ""} placeholder="—" />
+          </div>
+        </div>
+        <div className="form-satir" style={{ marginTop: 12 }}>
+          <div className="alan" style={{ flexBasis: 300 }}>
+            <label htmlFor="ad">Ad *</label>
+            <input id="ad" name="ad" required list="mevcut-kartlar" autoComplete="off" placeholder="Un (Tip 550)" />
+            <datalist id="mevcut-kartlar">
+              {mevcutAdlar.map((a) => (
+                <option key={a} value={a} />
+              ))}
+            </datalist>
           </div>
           <div className="alan" style={{ flexBasis: 120, flexGrow: 0 }}>
             <label htmlFor="birim">Birim *</label>
@@ -111,25 +132,6 @@ export function YeniStokKartiFormu({
                 </option>
               ))}
             </select>
-          </div>
-          <div className="alan" style={{ flexBasis: 200 }}>
-            <label htmlFor="kod_son">Kodun son 3 hanesi (boşsa sıradaki)</label>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span className="kod">{onEk || "…"}</span>
-              <input
-                id="kod_son"
-                name="kod_son"
-                inputMode="numeric"
-                maxLength={3}
-                placeholder="003"
-                value={kodSon}
-                onChange={(e) => setKodSon(e.target.value.trim())}
-                autoComplete="off"
-                disabled={!grup}
-              />
-            </div>
-            {kodBicimiYanlis && <small className="kirmizi">Yalnız rakam, en çok 3 hane.</small>}
-            <small className="soluk">Kaydedilince kod değişmez.</small>
           </div>
           <div className="alan">
             <label htmlFor="min_stok">Asgari stok (uyarı sınırı)</label>
