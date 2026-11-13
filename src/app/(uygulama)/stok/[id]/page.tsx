@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StokKartiDuzenleFormu } from "@/components/KartDuzenleFormlari";
-import { STOK_TURU_ADI, sayi, tarihTR, tl } from "@/lib/imece";
+import { STOK_TURU_ADI, kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { createClient } from "@/lib/supabase/server";
 import type { Depo, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
@@ -68,7 +68,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
             {kart.ad} {!kart.aktif && <span className="etk e-gri">pasif</span>}
           </h1>
           <p>
-            {STOK_TURU_ADI[kart.tur]} <span className="kod">{kart.kod}</span> · birim {kart.birim}
+            {STOK_TURU_ADI[kart.tur]} <span className="kod">{kodGoster(kart.kod)}</span> · birim {kart.birim}
           </p>
         </div>
         <div className="ust-araclar">

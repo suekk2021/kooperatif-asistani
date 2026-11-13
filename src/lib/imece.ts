@@ -12,9 +12,15 @@ export const STOK_TURU_ADI: Record<StokTuru, string> = {
   yari_mamul: "Yarı mamul",
   mamul: "Ürün (mamul)",
   ticari_mal: "Ticari mal",
+  yardimci: "Yardımcı malzeme",
 };
 
 export const STOK_TURLERI = Object.keys(STOK_TURU_ADI) as StokTuru[];
+
+/** Stok kodunu noktasız gösterir: "150.10.003" -> "15010003" (veritabanında noktalı kalır). */
+export function kodGoster(kod: string | null | undefined): string {
+  return (kod ?? "").replace(/\./g, "");
+}
 
 export const STOK_BIRIMLERI: StokBirimi[] = ["kg", "g", "lt", "adet", "paket", "koli"];
 

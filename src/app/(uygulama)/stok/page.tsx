@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { YeniStokKartiFormu } from "@/components/stok/YeniStokKartiFormu";
-import { STOK_TURLERI, STOK_TURU_ADI, sayi, tl } from "@/lib/imece";
+import { STOK_TURLERI, STOK_TURU_ADI, kodGoster, sayi, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { createClient } from "@/lib/supabase/server";
-import type { Depo, KdvOrani, StokDurumu, StokKarti, StokTuru } from "@/types/database";
+import type { Depo, KdvOrani, StokDurumu, StokGrubu, StokKarti, StokTuru } from "@/types/database";
 
 export default async function StokPage({
   searchParams,
@@ -15,11 +15,12 @@ export default async function StokPage({
   const secili = STOK_TURLERI.includes(turParam as StokTuru) ? (turParam as StokTuru) : null;
 
   const supabase = await createClient();
-  const [{ data: kartlar }, { data: depolar }, { data: kdv }, { data: durumVeri }, rol] = await Promise.all([
+  const [{ data: kartlar }, { data: depolar }, { data: kdv }, { data: durumVeri }, { data: grupVeri }, rol] = await Promise.all([
     supabase.from("stok_kartlari").select("*").eq("aktif", !pasifler).is("birlestirildigi_kart", null).order("kod"),
     supabase.from("depolar").select("*").eq("aktif", true).order("id"),
     supabase.from("kdv_oranlari").select("*").eq("aktif", true).order("oran"),
     supabase.from("stok_durumu").select("*"),
+    supabase.from("stok_gruplari").select("*").eq("aktif", true).order("ana_kod").order("grup_kodu"),
     mevcutRol(),
   ]);
   const tumu = (kartlar ?? []) as StokKarti[];
@@ -36,6 +37,9 @@ export default async function StokPage({
           <p>Hammadde, ambalaj ve ürün kartları. Miktar ve değer alış, üretim, satış ve sayımdan otomatik hesaplanır.</p>
         </div>
         <div className="ust-araclar">
+          <Link href="/stok/gruplar" className="btn btn-cizgi">
+            Stok grupları
+          </Link>
           <Link href="/stok/sayim" className="btn btn-cizgi">
             Sayım yap
           </Link>
@@ -59,7 +63,7 @@ export default async function StokPage({
       {duzenlemeYetkisiVarMi(rol) && !pasifler && (
         <YeniStokKartiFormu
           key={secili ?? "tumu"}
-          varsayilanTur={secili ?? "hammadde"}
+          gruplar={((grupVeri ?? []) as StokGrubu[]).filter((g) => !secili || g.tur === secili)}
           depolar={(depolar ?? []) as Depo[]}
           kdvOranlari={(kdv ?? []) as KdvOrani[]}
           mevcutAdlar={tumu.map((k) => k.ad)}
@@ -104,7 +108,7 @@ export default async function StokPage({
                       </Link>
                     </td>
                     <td data-label="Kod" className="mobil-gizle">
-                      <span className="kod">{k.kod}</span>
+                      <span className="kod">{kodGoster(k.kod)}</span>
                     </td>
                     <td data-label="Tür">{STOK_TURU_ADI[k.tur]}</td>
                     <td data-label="Depo" className="mobil-gizle">{k.depo_id ? depoAdi.get(k.depo_id) : ""}</td>

@@ -72,6 +72,11 @@ export function teknikYetkiliMi(rol: KullaniciRolu | null | undefined): boolean 
   return rol === "destek" || rol === "bilgi_islem";
 }
 
+/** Stok gruplarını ekleyen/düzenleyen roller (veritabanında stok_grup_yetkili() ile aynı). */
+export function stokGrubuYetkiliMi(rol: KullaniciRolu | null | undefined): boolean {
+  return rol === "operasyon" || rol === "bilgi_islem" || rol === "destek";
+}
+
 export function rolBilgisi(rol: KullaniciRolu | null | undefined) {
   return ROLLER.find((r) => r.deger === rol);
 }

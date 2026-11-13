@@ -2,27 +2,44 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { STOK_BIRIMLERI, STOK_TURLERI, hataMesaji, metin, ondalik } from "@/lib/imece";
-import type { StokBirimi, StokTuru } from "@/types/database";
+import { STOK_BIRIMLERI, hataMesaji, kodGoster, metin, ondalik } from "@/lib/imece";
+import type { StokBirimi } from "@/types/database";
 import type { FormSonucu } from "./cariler";
 
 export async function stokKartiEkle(formData: FormData): Promise<FormSonucu> {
-  const tur = metin(formData, "tur") as StokTuru | null;
+  const grupId = metin(formData, "grup_id");
   const ad = metin(formData, "ad");
   const birim = metin(formData, "birim") as StokBirimi | null;
-  if (!tur || !STOK_TURLERI.includes(tur)) return { hata: "Kart türü seçilmedi." };
+  const kodSon = metin(formData, "kod_son");
+  if (!grupId) return { hata: "Stok grubu seçilmedi." };
   if (!ad) return { hata: "Kart adı zorunlu." };
   if (!birim || !STOK_BIRIMLERI.includes(birim)) return { hata: "Birim seçilmedi." };
+  if (kodSon && !/^[0-9]{1,3}$/.test(kodSon)) {
+    return { hata: "Kodun son kısmı 1-3 haneli rakam olmalı (örn. 3 ya da 003); harf ve nokta olamaz." };
+  }
 
   const depoId = ondalik(formData, "depo_id");
   const kdv = ondalik(formData, "kdv_orani");
   const minStok = ondalik(formData, "min_stok");
 
   const supabase = await createClient();
+  const { data: grup } = await supabase.from("stok_gruplari").select("*").eq("id", grupId).maybeSingle();
+  if (!grup) return { hata: "Seçilen stok grubu bulunamadı." };
+  if (!grup.aktif) return { hata: "Bu stok grubu kapalı; başka bir grup seçin." };
+
+  let kod: string | undefined;
+  if (kodSon) {
+    kod = `${grup.ana_kod}.${grup.grup_kodu}.${kodSon.padStart(3, "0")}`;
+    const { data: var_ } = await supabase.from("stok_kartlari").select("ad").eq("kod", kod).maybeSingle();
+    if (var_) return { hata: `${kodGoster(kod)} kodu zaten "${var_.ad}" kartında kullanılıyor; başka bir son kısım yazın ya da boş bırakın.` };
+  }
+
   const { data, error } = await supabase
     .from("stok_kartlari")
     .insert({
-      tur,
+      grup_id: grup.id,
+      tur: grup.tur,
+      ...(kod ? { kod } : {}),
       ad,
       birim,
       depo_id: depoId,
@@ -40,7 +57,7 @@ export async function stokKartiEkle(formData: FormData): Promise<FormSonucu> {
 
   revalidatePath("/stok");
   revalidatePath("/panel");
-  return { basarili: `${ad} kartı açıldı (kod ${data.kod}).` };
+  return { basarili: `${ad} kartı açıldı (kod ${kodGoster(data.kod)}).` };
 }
 
 // Kod ve tür değiştirilemez (veritabanı da engeller). Hareket görmüş kartın birimi

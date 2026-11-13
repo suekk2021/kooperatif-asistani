@@ -1,34 +1,42 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { stokKartiEkle } from "@/app/actions/stok";
 import { FormMesaji } from "@/components/FormMesaji";
-import { STOK_BIRIMLERI, STOK_TURLERI, STOK_TURU_ADI } from "@/lib/imece";
-import type { Depo, KdvOrani, StokTuru } from "@/types/database";
+import { STOK_BIRIMLERI, STOK_TURU_ADI } from "@/lib/imece";
+import type { Depo, KdvOrani, StokGrubu } from "@/types/database";
 
 export function YeniStokKartiFormu({
-  varsayilanTur,
+  gruplar,
   depolar,
   kdvOranlari,
   mevcutAdlar,
 }: {
-  varsayilanTur: StokTuru;
+  gruplar: StokGrubu[];
   depolar: Depo[];
   kdvOranlari: KdvOrani[];
   mevcutAdlar: string[];
 }) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [sonuc, action, bekliyor] = useActionState(
-    async (_onceki: FormSonucu, formData: FormData) => stokKartiEkle(formData),
-    {}
-  );
+  const [grupId, setGrupId] = useState("");
+  const [kodSon, setKodSon] = useState("");
+  const [sonuc, action, bekliyor] = useActionState(async (_onceki: FormSonucu, formData: FormData) => {
+    const s = await stokKartiEkle(formData);
+    if (s.basarili) {
+      setGrupId("");
+      setKodSon("");
+    }
+    return s;
+  }, {});
 
   useEffect(() => {
     if (sonuc.basarili) formRef.current?.reset();
   }, [sonuc]);
 
-  const urunMu = varsayilanTur === "mamul" || varsayilanTur === "yari_mamul";
+  const grup = gruplar.find((g) => g.id === grupId);
+  const onEk = grup ? `${grup.ana_kod}${grup.grup_kodu}` : "";
+  const kodBicimiYanlis = kodSon !== "" && !/^[0-9]{1,3}$/.test(kodSon);
 
   return (
     <details className="kart form-ac" style={{ marginBottom: 16 }}>
@@ -50,19 +58,30 @@ export function YeniStokKartiFormu({
               ))}
             </datalist>
           </div>
-          <div className="alan">
-            <label htmlFor="tur">Tür *</label>
-            <select id="tur" name="tur" defaultValue={varsayilanTur}>
-              {STOK_TURLERI.map((t) => (
-                <option key={t} value={t}>
-                  {STOK_TURU_ADI[t]}
+          <div className="alan" style={{ flexBasis: 260 }}>
+            <label htmlFor="grup_id">Stok grubu *</label>
+            <select id="grup_id" name="grup_id" required value={grupId} onChange={(e) => setGrupId(e.target.value)}>
+              <option value="" disabled>
+                Seçiniz
+              </option>
+              {gruplar.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.ana_kod}
+                  {g.grup_kodu} · {g.ad}
                 </option>
               ))}
             </select>
           </div>
+          <div className="alan" style={{ flexBasis: 170, flexGrow: 0 }}>
+            <label htmlFor="tur_goster">Tür (gruptan gelir)</label>
+            <input id="tur_goster" readOnly tabIndex={-1} value={grup ? STOK_TURU_ADI[grup.tur] : ""} placeholder="—" />
+          </div>
           <div className="alan" style={{ flexBasis: 120, flexGrow: 0 }}>
             <label htmlFor="birim">Birim *</label>
-            <select id="birim" name="birim" defaultValue={urunMu ? "adet" : "kg"}>
+            <select id="birim" name="birim" required defaultValue="">
+              <option value="" disabled>
+                Seçiniz
+              </option>
               {STOK_BIRIMLERI.map((b) => (
                 <option key={b} value={b}>
                   {b}
@@ -74,7 +93,7 @@ export function YeniStokKartiFormu({
         <div className="form-satir" style={{ marginTop: 12 }}>
           <div className="alan">
             <label htmlFor="depo_id">Depo</label>
-            <select id="depo_id" name="depo_id" defaultValue={String(depolar[urunMu ? 1 : 0]?.id ?? "")}>
+            <select id="depo_id" name="depo_id" defaultValue="">
               <option value="">—</option>
               {depolar.map((d) => (
                 <option key={d.id} value={d.id}>
@@ -93,6 +112,25 @@ export function YeniStokKartiFormu({
               ))}
             </select>
           </div>
+          <div className="alan" style={{ flexBasis: 200 }}>
+            <label htmlFor="kod_son">Kodun son 3 hanesi (boşsa sıradaki)</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span className="kod">{onEk || "…"}</span>
+              <input
+                id="kod_son"
+                name="kod_son"
+                inputMode="numeric"
+                maxLength={3}
+                placeholder="003"
+                value={kodSon}
+                onChange={(e) => setKodSon(e.target.value.trim())}
+                autoComplete="off"
+                disabled={!grup}
+              />
+            </div>
+            {kodBicimiYanlis && <small className="kirmizi">Yalnız rakam, en çok 3 hane.</small>}
+            <small className="soluk">Kaydedilince kod değişmez.</small>
+          </div>
           <div className="alan">
             <label htmlFor="min_stok">Asgari stok (uyarı sınırı)</label>
             <input id="min_stok" name="min_stok" inputMode="decimal" placeholder="Örn. 50" />
@@ -103,7 +141,7 @@ export function YeniStokKartiFormu({
           </div>
         </div>
         <div style={{ marginTop: 16 }}>
-          <button type="submit" className="btn btn-ana" disabled={bekliyor}>
+          <button type="submit" className="btn btn-ana" disabled={bekliyor || kodBicimiYanlis}>
             {bekliyor ? "Kaydediliyor…" : "Kartı aç"}
           </button>
         </div>

@@ -71,12 +71,24 @@ export type Cari = {
   updated_at: string;
 };
 
-export type StokTuru = "hammadde" | "ambalaj" | "yari_mamul" | "mamul" | "ticari_mal";
+export type StokTuru = "hammadde" | "ambalaj" | "yari_mamul" | "mamul" | "ticari_mal" | "yardimci";
 export type StokBirimi = "kg" | "g" | "lt" | "adet" | "paket" | "koli";
+
+export type StokGrubu = {
+  id: string;
+  ana_kod: "150" | "151" | "152" | "153";
+  grup_kodu: string;
+  ad: string;
+  tur: StokTuru;
+  aktif: boolean;
+  olusturan: string | null;
+  created_at: string;
+};
 
 export type StokKarti = {
   id: string;
   tur: StokTuru;
+  grup_id: string;
   kod: string;
   ad: string;
   birim: StokBirimi;
