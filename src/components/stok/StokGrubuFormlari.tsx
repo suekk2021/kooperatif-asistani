@@ -9,9 +9,17 @@ import type { StokGrubu } from "@/types/database";
 
 // Alanlar her kayıttan sonra baştan kurulur: React form eylemi bitince formu kendisi sıfırlar, seçim kutuları
 // ilk seçeneğe döner ama buradaki durum (ana grup, alt grup) eski kalıp ekranla tutarsız olurdu.
-function GrupAlanlari({ mevcut, bekliyor }: { mevcut: StokGrubu[]; bekliyor: boolean }) {
-  const [anaKod, setAnaKod] = useState("150");
-  const [altKod, setAltKod] = useState("");
+function GrupAlanlari({
+  mevcut,
+  bekliyor,
+  girdi,
+}: {
+  mevcut: StokGrubu[];
+  bekliyor: boolean;
+  girdi: Record<string, string>;
+}) {
+  const [anaKod, setAnaKod] = useState(girdi.ana_kod ?? "150");
+  const [altKod, setAltKod] = useState(girdi.grup_kodu ?? "");
 
   const ana = ANA_GRUPLAR.find((a) => a.kod === anaKod)!;
   const ayni = /^[0-9]{2}$/.test(altKod) ? mevcut.find((g) => g.ana_kod === anaKod && g.grup_kodu === altKod) : undefined;
@@ -22,7 +30,7 @@ function GrupAlanlari({ mevcut, bekliyor }: { mevcut: StokGrubu[]; bekliyor: boo
       <div className="form-satir">
         <div className="alan" style={{ flexBasis: 220 }}>
           <label htmlFor="ana_kod">Ana grup *</label>
-          <select id="ana_kod" name="ana_kod" defaultValue="150" onChange={(e) => setAnaKod(e.target.value)}>
+          <select id="ana_kod" name="ana_kod" defaultValue={girdi.ana_kod ?? "150"} onChange={(e) => setAnaKod(e.target.value)}>
             {ANA_GRUPLAR.map((a) => (
               <option key={a.kod} value={a.kod}>
                 {a.kod} · {a.ad}
@@ -39,18 +47,24 @@ function GrupAlanlari({ mevcut, bekliyor }: { mevcut: StokGrubu[]; bekliyor: boo
             inputMode="numeric"
             maxLength={2}
             placeholder="10"
-            defaultValue=""
+            defaultValue={girdi.grup_kodu ?? ""}
             onChange={(e) => setAltKod(e.target.value.trim())}
             autoComplete="off"
           />
         </div>
         <div className="alan" style={{ flexBasis: 260 }}>
           <label htmlFor="ad">Grup adı *</label>
-          <input id="ad" name="ad" required placeholder="Ambalaj - koli" autoComplete="off" />
+          <input id="ad" name="ad" required placeholder="Ambalaj - koli" autoComplete="off" defaultValue={girdi.ad ?? ""} />
         </div>
         <div className="alan">
           <label htmlFor="tur">Tür *</label>
-          <select id="tur" name="tur" key={anaKod} required defaultValue={ana.turler.length === 1 ? ana.turler[0] : ""}>
+          <select
+            id="tur"
+            name="tur"
+            key={anaKod}
+            required
+            defaultValue={ana.turler.length === 1 ? ana.turler[0] : girdi.ana_kod === anaKod && girdi.tur ? girdi.tur : ""}
+          >
             {ana.turler.length > 1 && <option value="">Seçiniz</option>}
             {ana.turler.map((t) => (
               <option key={t} value={t}>
@@ -77,10 +91,14 @@ function GrupAlanlari({ mevcut, bekliyor }: { mevcut: StokGrubu[]; bekliyor: boo
 }
 
 export function YeniStokGrubuFormu({ mevcut }: { mevcut: StokGrubu[] }) {
-  const [anahtar, setAnahtar] = useState(0);
+  const [durum, setDurum] = useState<{ anahtar: number; girdi: Record<string, string> }>({ anahtar: 0, girdi: {} });
   const [sonuc, action, bekliyor] = useActionState(async (_onceki: FormSonucu, formData: FormData) => {
+    const yazilan: Record<string, string> = {};
+    formData.forEach((v, k) => {
+      if (typeof v === "string") yazilan[k] = v;
+    });
     const s = await stokGrubuEkle(formData);
-    setAnahtar((k) => k + 1);
+    setDurum((d) => ({ anahtar: d.anahtar + 1, girdi: s.basarili ? {} : yazilan }));
     return s;
   }, {});
 
@@ -90,7 +108,7 @@ export function YeniStokGrubuFormu({ mevcut }: { mevcut: StokGrubu[] }) {
         <h2>Yeni stok grubu</h2>
       </div>
       <form action={action} className="kart-ic">
-        <GrupAlanlari key={anahtar} mevcut={mevcut} bekliyor={bekliyor} />
+        <GrupAlanlari key={durum.anahtar} mevcut={mevcut} bekliyor={bekliyor} girdi={durum.girdi} />
         <FormMesaji sonuc={sonuc} />
       </form>
     </div>

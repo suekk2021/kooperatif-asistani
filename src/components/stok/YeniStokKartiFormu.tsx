@@ -7,6 +7,8 @@ import { FormMesaji } from "@/components/FormMesaji";
 import { STOK_BIRIMLERI, STOK_TURU_ADI } from "@/lib/imece";
 import type { Depo, KdvOrani, StokGrubu } from "@/types/database";
 
+type Girdi = Record<string, string>;
+
 type Ortak = {
   gruplar: StokGrubu[];
   depolar: Depo[];
@@ -16,10 +18,18 @@ type Ortak = {
 
 // Alanlar her kayıttan sonra baştan kurulur (key). React form eylemi bitince formu kendisi sıfırlar; seçim
 // kutuları o zaman ilk seçeneğe döner ama buradaki durum (grup, kod) eski kalırdı: kutu "15010" gösterirken kod
-// alanı kapalı kalıyordu. Baştan kurulunca ikisi de boş başlar.
-function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: Ortak & { bekliyor: boolean }) {
-  const [grupId, setGrupId] = useState("");
-  const [kodSon, setKodSon] = useState("");
+// alanı kapalı kalıyordu. Baştan kurulurken başlangıç değerleri verilir: başarılı kayıtta boş, hatada kullanıcının
+// yazdıkları (düzeltip tekrar kaydedebilsin).
+function KartAlanlari({
+  gruplar,
+  depolar,
+  kdvOranlari,
+  mevcutAdlar,
+  bekliyor,
+  girdi,
+}: Ortak & { bekliyor: boolean; girdi: Girdi }) {
+  const [grupId, setGrupId] = useState(girdi.grup_id ?? "");
+  const [kodSon, setKodSon] = useState(girdi.kod_son ?? "");
   const grup = gruplar.find((g) => g.id === grupId);
   const onEk = grup ? `${grup.ana_kod}${grup.grup_kodu}` : "";
   const kodBicimiYanlis = kodSon !== "" && !/^[0-9]{1,3}$/.test(kodSon);
@@ -29,7 +39,7 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
     <div className="form-satir">
       <div className="alan" style={{ flexBasis: 260 }}>
         <label htmlFor="grup_id">Stok grubu *</label>
-        <select id="grup_id" name="grup_id" required defaultValue="" onChange={(e) => setGrupId(e.target.value)}>
+        <select id="grup_id" name="grup_id" required defaultValue={girdi.grup_id ?? ""} onChange={(e) => setGrupId(e.target.value)}>
           <option value="">Seçiniz</option>
           {gruplar.map((g) => (
             <option key={g.id} value={g.id}>
@@ -49,7 +59,7 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
             inputMode="numeric"
             maxLength={3}
             placeholder="003"
-            defaultValue=""
+            defaultValue={girdi.kod_son ?? ""}
             onChange={(e) => setKodSon(e.target.value.trim())}
             autoComplete="off"
             disabled={!grup}
@@ -66,7 +76,7 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
     <div className="form-satir" style={{ marginTop: 12 }}>
       <div className="alan" style={{ flexBasis: 300 }}>
         <label htmlFor="ad">Ad *</label>
-        <input id="ad" name="ad" required list="mevcut-kartlar" autoComplete="off" placeholder="Un (Tip 550)" />
+        <input id="ad" name="ad" required list="mevcut-kartlar" autoComplete="off" placeholder="Un (Tip 550)" defaultValue={girdi.ad ?? ""} />
         <datalist id="mevcut-kartlar">
           {mevcutAdlar.map((a) => (
             <option key={a} value={a} />
@@ -75,7 +85,7 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
       </div>
       <div className="alan" style={{ flexBasis: 120, flexGrow: 0 }}>
         <label htmlFor="birim">Birim *</label>
-        <select id="birim" name="birim" required defaultValue="">
+        <select id="birim" name="birim" required defaultValue={girdi.birim ?? ""}>
           <option value="">Seçiniz</option>
           {STOK_BIRIMLERI.map((b) => (
             <option key={b} value={b}>
@@ -88,7 +98,7 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
     <div className="form-satir" style={{ marginTop: 12 }}>
       <div className="alan">
         <label htmlFor="depo_id">Depo</label>
-        <select id="depo_id" name="depo_id" defaultValue="">
+        <select id="depo_id" name="depo_id" defaultValue={girdi.depo_id ?? ""}>
           <option value="">—</option>
           {depolar.map((d) => (
             <option key={d.id} value={d.id}>
@@ -99,7 +109,7 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
       </div>
       <div className="alan" style={{ flexBasis: 120, flexGrow: 0 }}>
         <label htmlFor="kdv_orani">KDV</label>
-        <select id="kdv_orani" name="kdv_orani" defaultValue="1">
+        <select id="kdv_orani" name="kdv_orani" defaultValue={girdi.kdv_orani ?? "1"}>
           {kdvOranlari.map((k) => (
             <option key={k.oran} value={Number(k.oran)}>
               %{Number(k.oran)}
@@ -109,11 +119,11 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
       </div>
       <div className="alan">
         <label htmlFor="min_stok">Asgari stok (uyarı sınırı)</label>
-        <input id="min_stok" name="min_stok" inputMode="decimal" placeholder="Örn. 50" />
+        <input id="min_stok" name="min_stok" inputMode="decimal" placeholder="Örn. 50" defaultValue={girdi.min_stok ?? ""} />
       </div>
       <div className="alan">
         <label htmlFor="satis_fiyati">Liste satış fiyatı (KDV hariç, ürünse)</label>
-        <input id="satis_fiyati" name="satis_fiyati" inputMode="decimal" placeholder="0,00" />
+        <input id="satis_fiyati" name="satis_fiyati" inputMode="decimal" placeholder="0,00" defaultValue={girdi.satis_fiyati ?? ""} />
       </div>
     </div>
       <div style={{ marginTop: 16 }}>
@@ -126,10 +136,14 @@ function KartAlanlari({ gruplar, depolar, kdvOranlari, mevcutAdlar, bekliyor }: 
 }
 
 export function YeniStokKartiFormu(props: Ortak) {
-  const [anahtar, setAnahtar] = useState(0);
+  const [durum, setDurum] = useState<{ anahtar: number; girdi: Girdi }>({ anahtar: 0, girdi: {} });
   const [sonuc, action, bekliyor] = useActionState(async (_onceki: FormSonucu, formData: FormData) => {
+    const yazilan: Girdi = {};
+    formData.forEach((v, k) => {
+      if (typeof v === "string") yazilan[k] = v;
+    });
     const s = await stokKartiEkle(formData);
-    setAnahtar((k) => k + 1);
+    setDurum((d) => ({ anahtar: d.anahtar + 1, girdi: s.basarili ? {} : yazilan }));
     return s;
   }, {});
 
@@ -143,7 +157,7 @@ export function YeniStokKartiFormu(props: Ortak) {
         <h2>Yeni stok kartı</h2>
       </div>
       <form action={action} className="kart-ic">
-        <KartAlanlari key={anahtar} {...props} bekliyor={bekliyor} />
+        <KartAlanlari key={durum.anahtar} {...props} bekliyor={bekliyor} girdi={durum.girdi} />
         <FormMesaji sonuc={sonuc} />
       </form>
     </details>
