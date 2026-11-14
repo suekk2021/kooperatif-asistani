@@ -13,7 +13,7 @@
 - **Kontrol edilecek:** Hatırlatıcılar için de aynı durum var mı (alıcı seçiliyor, ama okuma kuralı bakılmadı).
 - **Kararlar (12 Kas, kullanıcı):** Başkan/Operasyon yöneticisi başkasının kişiye özel notunu GÖRMEZ; "Herkes" seçilen not seçilen herkese görünür; alıcısız (genel) not herkese görünür; bilgi işlem/teknik destek için uygulamada özel "tüm notları gör" yetkisi YOK (hata araştırmada önce test notu; gerçek not içeriği için gönderen/alıcıdan izin; unutma: veritabanı erişimi teknik olarak var, bu bir söz/kural meselesi).
 - **Yapıldı (yerelde, canlıya alınmadı):** `supabase/migrations/20261112100000_not_gorunurluk.sql` (notlar okuma kuralı + `not-medya` depo kuralı), ekran/kılavuz metinleri güncellendi. Canlı veritabanında geri alınan işlemle 9 kontrol geçti (a/b/c kişileri, medya dosyası, başkasının notunu güncelleme/silme, girişsiz).
-- **Canlıya alma sırası:** önce `supabase db push`, sonra main'e push. Hatırlatıcılar için aynı sorun bakılmadı, ayrı madde.
+- **Canlıda (14 Kas doğrulandı):** migration uzak veritabanında uygulanmış (`supabase migration list`), kod aa37a16 ile main'de. Hatırlatıcılar için aynı sorun bakılmadı, ayrı madde.
 
 ### 2. Lokanta/cafe ön çalışması (12 Kas 2026, kullanıcı)
 - Kooperatif lokanta/cafe açacak; kullanıcı bunu İMECE'nin yanına modül olarak (stok, reçete, menü, adisyon, muhasebe) yapmak istiyor; ücretli iş olarak düşünüyor.
