@@ -88,8 +88,15 @@ export function StokKartiDuzenleFormu({
 }) {
   const [sonuc, action, bekliyor] = useActionState(async (_o: FormSonucu, fd: FormData) => stokKartiGuncelle(kart.id, fd), {});
   const urunMu = kart.tur === "mamul" || kart.tur === "ticari_mal" || kart.tur === "yari_mamul";
+  // React 19 kayıttan sonra formu sıfırlar; <select> ise ilk açılıştaki değere döner.
+  // key kaydedilen değere bağlı: kayıt sonrası form yeni değerlerle yeniden kurulur.
   return (
-    <form action={action} className="kart-ic" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <form
+      key={`${kart.birim}|${kart.depo_id ?? ""}|${Number(kart.kdv_orani)}`}
+      action={action}
+      className="kart-ic"
+      style={{ display: "flex", flexDirection: "column", gap: 12 }}
+    >
       <div className="form-satir">
         <div className="alan" style={{ flexBasis: 300 }}>
           <label htmlFor="ad">Ad *</label>

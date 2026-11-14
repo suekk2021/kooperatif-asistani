@@ -91,7 +91,8 @@ export function PersonelBilgiFormu({ personel }: { personel: Personel }) {
     {}
   );
   return (
-    <form action={action} className="kart-ic">
+    // key: kayıt sonrası React formu sıfırlayınca <select> eski değere dönmesin (bkz. StokKartiDuzenleFormu)
+    <form key={personel.durum} action={action} className="kart-ic">
       <div className="form-satir">
         <div className="alan" style={{ flexBasis: 240 }}>
           <label htmlFor="ad_soyad">Ad soyad *</label>
