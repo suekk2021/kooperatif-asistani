@@ -385,3 +385,71 @@ export type IadeKalemi = {
   birim_maliyet: number;
   maliyet_tutari: number;
 };
+
+// Personel + puantaj (migration 20261114100000). Yalnız maas_gorur() rolleri okur.
+export type PersonelDurumu = "giris_bekliyor" | "calisiyor" | "ayrildi";
+export type UcretTipi = "gunluk" | "saatlik";
+export type GunTuru = "calisti" | "eksik" | "izinli" | "raporlu" | "resmi_tatil" | "hafta_tatili";
+
+export type Personel = {
+  id: string;
+  ad_soyad: string;
+  durum: PersonelDurumu;
+  ise_baslama: string | null;
+  ayrilis: string | null;
+  notlar: string | null;
+  olusturan: string | null;
+  created_at: string;
+};
+
+export type PersonelUcreti = {
+  id: string;
+  personel_id: string;
+  baslangic: string;
+  ucret_tipi: UcretTipi;
+  tutar: number;
+  aciklama: string | null;
+  created_at: string;
+};
+
+export type PersonelEkOdemesi = {
+  id: string;
+  personel_id: string;
+  ad: string;
+  birim: "gunluk" | "aylik";
+  tutar: number;
+  baslangic: string;
+  bitis: string | null;
+};
+
+export type PuantajGunu = {
+  id: string;
+  personel_id: string;
+  tarih: string;
+  gun_turu: GunTuru;
+  miktar: number;
+  elle_tutar: number | null;
+  aciklama: string | null;
+};
+
+export type MaasAyOzeti = {
+  personel_id: string;
+  ad_soyad: string;
+  durum: PersonelDurumu;
+  ucret_tipi: UcretTipi | null;
+  calisilan_gun: number;
+  fazla_gun: number;
+  toplam_miktar: number;
+  eksik_gun: number;
+  izinli_gun: number;
+  raporlu_gun: number;
+  resmi_tatil: number;
+  hafta_tatili: number;
+  ucretsiz_gun: number;
+  hak_edis: number;
+  ek_odeme: number;
+  duzeltme: number;
+  duzeltme_aciklama: string | null;
+  toplam: number;
+  odendi_tarihi: string | null;
+};

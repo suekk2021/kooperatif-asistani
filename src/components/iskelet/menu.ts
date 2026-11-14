@@ -35,6 +35,7 @@ export const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
       { yol: "/kasa", ad: "Kasa ve Banka", ikon: "kasa", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
       { yol: "/cariler", ad: "Cariler", ikon: "cari", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
       { yol: "/cek-senet", ad: "Çek / Senet", ikon: "aktarim", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
+      { yol: "/personel", ad: "Personel ve Puantaj", ikon: "personel", kimler: ["baskan", "operasyon", "on_muhasebe", "bilgi_islem"] },
     ],
   },
   {

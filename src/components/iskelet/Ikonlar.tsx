@@ -77,6 +77,13 @@ export const ikonlar = {
       <path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a5.5 5.5 0 0 1 3.5 6" />
     </svg>
   ),
+  personel: (
+    <svg {...ortak}>
+      <circle cx="12" cy="7.5" r="3.5" />
+      <path d="M5 21a7 7 0 0 1 14 0" />
+      <path d="M9.5 14.5 12 17l2.5-2.5" />
+    </svg>
+  ),
   rapor: (
     <svg {...ortak}>
       <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />

@@ -77,6 +77,11 @@ export function stokGrubuYetkiliMi(rol: KullaniciRolu | null | undefined): boole
   return rol === "operasyon" || rol === "bilgi_islem" || rol === "destek";
 }
 
+/** Personel/puantaj/maaş ekranlarını gören ve yazan roller (veritabanında maas_gorur() ile aynı). */
+export function maasGorurMu(rol: KullaniciRolu | null | undefined): boolean {
+  return rol === "baskan" || rol === "operasyon" || rol === "on_muhasebe" || rol === "bilgi_islem";
+}
+
 export function rolBilgisi(rol: KullaniciRolu | null | undefined) {
   return ROLLER.find((r) => r.deger === rol);
 }
