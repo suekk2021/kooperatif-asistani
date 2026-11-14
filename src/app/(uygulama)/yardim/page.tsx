@@ -2,7 +2,7 @@ import Link from "next/link";
 import { YazdirDugmesi } from "@/components/YazdirDugmesi";
 import { mevcutRol, yoneticiMi } from "@/lib/rol";
 import { TEKNIK_DESTEK } from "@/lib/imza";
-import { ROLLER } from "@/lib/roller";
+import { ROLLER, maasGorurMu } from "@/lib/roller";
 
 type Bolum = { baslik: string; alt: string; icerik: React.ReactNode };
 
@@ -410,6 +410,153 @@ const YONETICI_BOLUMLERI: Bolum[] = [
   },
 ];
 
+// Yalnız maaş yetkilisi görür (Başkan, Operasyon yöneticisi, ön muhasebe, bilgi işlem) — veritabanındaki maas_gorur() ile aynı.
+const MAAS_BOLUMLERI: Bolum[] = [
+  {
+    baslik: "Yeni personel başladı",
+    alt: "Finans → Personel ve Puantaj → Yeni personel",
+    icerik: (
+      <>
+        <ol>
+          <li>
+            Menüden <B>Personel ve Puantaj</B>&apos;a girin. Üstteki <b>Yeni personel</b> kutusuna <b>ad soyad</b> yazın.
+          </li>
+          <li>
+            <b>Durum</b>: işe başladıysa <b>Çalışıyor</b>; evrakı henüz teslim edilmediyse <b>Girişi bekliyor</b>.
+          </li>
+          <li>
+            <b>İşe başlama</b> tarihini, <b>Ücret tipi</b>ni (günlük ya da saatlik) ve <b>Ücret</b>i girin. Yol parası alıyorsa{" "}
+            <b>Günlük yol parası</b>nı yazın, almıyorsa boş bırakın.
+          </li>
+          <li>
+            <B>Personeli ekle</B>.
+          </li>
+        </ol>
+        <p className="not">
+          Ücret ve yol parası işe başlama tarihinden geçerli olur. Evrak gelince kişinin kartından durumu <b>Çalışıyor</b> yapın.
+        </p>
+      </>
+    ),
+  },
+  {
+    baslik: "Ücret değişti (zam, deneme süresi, saatliden günlüğe)",
+    alt: "Personel → kişinin adı → Ücret geçmişi",
+    icerik: (
+      <>
+        <ol>
+          <li>Listede kişinin adına tıklayın.</li>
+          <li>
+            <b>Ücret geçmişi</b> bölümünde yeni ücretin <b>geçerli olduğu tarihi</b>, tipini ve tutarını yazın; açıklamaya
+            &quot;Zam&quot; gibi bir not düşün. <B>Yeni ücreti ekle</B>.
+          </li>
+        </ol>
+        <p className="not">
+          Eski ücreti düzeltmeyin, yenisini ekleyin: o tarihten önceki günler eski ücretle, sonrakiler yeni ücretle hesaplanır. Deneme
+          süresinde yarım ücret de böyle girilir: başlangıç tarihiyle yarım ücret, tam ücrete geçtiği tarihle tam ücret.
+        </p>
+      </>
+    ),
+  },
+  {
+    baslik: "Yol parası, sigorta parası",
+    alt: "Personel → kişinin adı → Ek ödemeler",
+    icerik: (
+      <>
+        <ol>
+          <li>
+            Kişinin kartında <b>Ek ödemeler</b> bölümünde ödemenin adını seçin ya da yazın (Yol parası, Sigorta parası…).
+          </li>
+          <li>
+            <b>Nasıl</b>: <b>Geldiği her gün</b> (puantajda çalıştığı her gün için bir kez eklenir; fazla mesaili gün de bir sayılır)
+            ya da <b>Ayda bir</b>.
+          </li>
+          <li>
+            Tutarı ve başlangıç tarihini girip <B>Ek ödemeyi ekle</B>.
+          </li>
+        </ol>
+        <p className="not">Ödeme kalkarsa silmeyin; satırdaki tarih kutusuna bitiş tarihini girip <b>Bitir</b>&apos;e basın.</p>
+      </>
+    ),
+  },
+  {
+    baslik: "Puantaj girişi",
+    alt: "Personel ve Puantaj → Puantaj gir",
+    icerik: (
+      <>
+        <ol>
+          <li>
+            <B>Puantaj gir</B>&apos;e basın, üstten kişiyi seçin. Ayı ‹ › düğmeleriyle değiştirirsiniz.
+          </li>
+          <li>
+            Her güne <b>çalıştığı gün sayısını</b> yazın: tam gün 1, yarım gün 0,5, fazla mesaili gün 2. Saatlik ücretlide gün yerine{" "}
+            <b>saat</b> yazılır.
+          </li>
+          <li>
+            Gelmediği güne 0 yazıp <b>Gün türü</b>nü seçin: Eksik gün, İzinli, Raporlu, Resmi tatil, Hafta tatili.
+          </li>
+          <li>
+            Kolaylık: <B>Doldur</B> düğmesi boş günlere 1 yazar, pazarları hafta tatili yapar. Sonra yalnız farklı günleri düzeltin.
+          </li>
+          <li>
+            Bir günün tutarı farklıysa <b>Elle tutar</b>a yazın; hesap o günü bu tutarla alır. Nedenini açıklamaya yazın.
+          </li>
+          <li>
+            <B>Kaydet</B>. Kaydedilmemiş günler renkli görünür; sayfadan çıkmadan kaydedin.
+          </li>
+        </ol>
+        <p className="not">
+          Resmi tatil ücretliyse o güne 1, ücretsizse 0 yazın; türü yine &quot;Resmi tatil&quot; seçin. Tutar gün sayısından, tür ise
+          mali müşavir özetindeki sayımdan gelir. Puantajı gün gün de girebilirsiniz, ay sonunda topluca da.
+        </p>
+      </>
+    ),
+  },
+  {
+    baslik: "Ay sonu: avans, kesinti, ödendi",
+    alt: "Personel ve Puantaj → Aylık özet",
+    icerik: (
+      <ol>
+        <li>
+          <B>Aylık özet</B>&apos;te her kişinin geldiği gün, hak edişi, ek ödemeleri ve toplamı görünür.
+        </li>
+        <li>
+          Avans ya da kesinti varsa kişinin satırında <B>Düzelt / ödendi</B>: tutarı eksi olarak yazın (örn. -500) ve açıklamasını
+          girin (örn. Avans). Açıklamasız düzeltme kaydedilmez.
+        </li>
+        <li>
+          Ödeme yapılınca aynı yerden <b>Ödendiği tarih</b>i girin.
+        </li>
+      </ol>
+    ),
+  },
+  {
+    baslik: "Mali müşavire puantaj özeti",
+    alt: "Aylık özet → Mali müşavir puantaj özeti (Excel)",
+    icerik: (
+      <>
+        <p>
+          <B>Mali müşavir puantaj özeti (Excel)</B> her kişinin çalıştığı gün, fazla gün, eksik gün, izin, rapor, resmi tatil ve hafta
+          tatili sayısını verir; ikinci sayfada bu günler tarihleriyle listelenir. Tutar içermez. Mali müşavirin sistemine bunu bakarak
+          girebilir ya da dosyayı gönderebilirsiniz.
+        </p>
+        <p className="not">
+          <b>Hak ediş listesi (Excel)</b> tutarları içerir; kooperatifin kendi ödemesi içindir, yalnız gerekiyorsa paylaşın.
+        </p>
+      </>
+    ),
+  },
+  {
+    baslik: "Personel ayrıldı",
+    alt: "Personel → kişinin adı → Kişi bilgisi",
+    icerik: (
+      <p>
+        Kişinin kartında <b>Durum</b>&apos;u <b>Ayrıldı</b> yapın ve <b>Ayrılış</b> tarihini girin. Kişi silinmez; geçmiş ayları ve
+        puantajı yerinde kalır, ayrıldığı aydan sonra listelerde görünmez.
+      </p>
+    ),
+  },
+];
+
 const KURALLAR = [
   "Her alış, satış, tahsilat ve ödeme programa girilsin — girilmeyen işlem raporda yoktur.",
   "Aynı gün girin. Ertesi güne kalan kayıt unutulur; aynı gün girilen yanlışı da kendiniz iptal edebilirsiniz.",
@@ -420,7 +567,9 @@ const KURALLAR = [
 ];
 
 export default async function YardimPage() {
-  const yonetici = yoneticiMi(await mevcutRol());
+  const rol = await mevcutRol();
+  const yonetici = yoneticiMi(rol);
+  const maasYetkili = maasGorurMu(rol);
   return (
     <div className="yardim">
       <div className="sayfa-bas">
@@ -487,6 +636,34 @@ export default async function YardimPage() {
           </details>
         ))}
       </div>
+
+      {maasYetkili && (
+        <div className="kart" style={{ marginTop: 16 }}>
+          <div className="kart-bas">
+            <h2>Personel, puantaj ve maaş</h2>
+            <span className="soluk" style={{ fontSize: 13 }}>
+              Bu bölümü yalnızca Başkan, Operasyon yöneticisi, ön muhasebe ve bilgi işlem görür
+            </span>
+          </div>
+          <p className="kart-ic soluk" style={{ fontSize: 13.5, paddingBottom: 0, margin: 0 }}>
+            Program kim kaç gün çalıştı, ne hak etti onu tutar; resmi bordro değildir (sigorta, vergi, net maaş mali müşavirdedir).
+            Ücretler kişisel veridir. Kayıt silinmez, her değişiklik kimin yaptığıyla saklanır ve kişinin kartında görünür.
+          </p>
+          {MAAS_BOLUMLERI.map((b, i) => (
+            <details className="hp" key={b.baslik}>
+              <summary>
+                <span className="grup-no">{i + 1}</span>
+                <span>
+                  {b.baslik}
+                  <br />
+                  <small>{b.alt}</small>
+                </span>
+              </summary>
+              <div className="yardim-icerik">{b.icerik}</div>
+            </details>
+          ))}
+        </div>
+      )}
 
       {yonetici && (
         <div className="kart" style={{ marginTop: 16 }}>
