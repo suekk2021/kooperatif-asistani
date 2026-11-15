@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { cariGuncelle, type FormSonucu } from "@/app/actions/cariler";
 import { stokKartiGuncelle } from "@/app/actions/stok";
 import { FormMesaji } from "@/components/FormMesaji";
-import { STOK_BIRIMLERI } from "@/lib/imece";
+import { STOK_BIRIMLERI, sayiGirdi } from "@/lib/imece";
 import type { Cari, Depo, KdvOrani, StokKarti } from "@/types/database";
 
 function AktifKutusu({ aktif, aciklama }: { aktif: boolean; aciklama: string }) {
@@ -138,11 +138,11 @@ export function StokKartiDuzenleFormu({
         </div>
         <div className="alan">
           <label htmlFor="min_stok">Asgari stok (uyarı sınırı)</label>
-          <input id="min_stok" name="min_stok" defaultValue={kart.min_stok ?? ""} inputMode="decimal" />
+          <input id="min_stok" name="min_stok" defaultValue={sayiGirdi(kart.min_stok)} inputMode="decimal" />
         </div>
         <div className="alan">
           <label htmlFor="satis_fiyati">Liste satış fiyatı (KDV hariç)</label>
-          <input id="satis_fiyati" name="satis_fiyati" defaultValue={kart.satis_fiyati ?? ""} inputMode="decimal" />
+          <input id="satis_fiyati" name="satis_fiyati" defaultValue={sayiGirdi(kart.satis_fiyati)} inputMode="decimal" />
         </div>
       </div>
       <div className="alan">

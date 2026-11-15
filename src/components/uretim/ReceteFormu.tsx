@@ -5,13 +5,14 @@ import type { FormSonucu } from "@/app/actions/cariler";
 import { receteKaydet } from "@/app/actions/uretim";
 import { FormMesaji } from "@/components/FormMesaji";
 import type { StokKarti } from "@/types/database";
+import { sayiGirdi, trSayi } from "@/lib/imece";
 
 type KartOzeti = Pick<StokKarti, "id" | "ad" | "kod" | "birim">;
 type Satir = { anahtar: number; ad: string; miktar: string };
 
 function sayiCoz(s: string) {
   const t = s.trim();
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 
 let sayac = 0;
@@ -27,10 +28,10 @@ export function ReceteFormu({
 }) {
   const adla = new Map(malzemeler.map((m) => [m.ad.toLocaleLowerCase("tr-TR").trim(), m]));
   const idle = new Map(malzemeler.map((m) => [m.id, m]));
-  const [cikti, setCikti] = useState(mevcut ? String(mevcut.cikti_miktari) : "100");
+  const [cikti, setCikti] = useState(mevcut ? sayiGirdi(mevcut.cikti_miktari) : "100");
   const [satirlar, setSatirlar] = useState<Satir[]>(() =>
     mevcut?.kalemler.length
-      ? mevcut.kalemler.map((k) => ({ anahtar: ++sayac, ad: idle.get(k.stok_karti_id)?.ad ?? "", miktar: String(k.miktar) }))
+      ? mevcut.kalemler.map((k) => ({ anahtar: ++sayac, ad: idle.get(k.stok_karti_id)?.ad ?? "", miktar: sayiGirdi(k.miktar) }))
       : [{ anahtar: ++sayac, ad: "", miktar: "" }]
   );
   const [sonuc, setSonuc] = useState<FormSonucu>({});

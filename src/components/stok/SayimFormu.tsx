@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { sayimKaydet } from "@/app/actions/sayim";
 import { FormMesaji } from "@/components/FormMesaji";
-import { STOK_TURU_ADI, sayi, tl } from "@/lib/imece";
+import { STOK_TURU_ADI, sayi, tl, trSayi } from "@/lib/imece";
 import type { StokTuru } from "@/types/database";
 
 export type SayimSatiri = { id: string; ad: string; kod: string; tur: StokTuru; birim: string; sistem: number; ortalama: number };
@@ -13,7 +13,7 @@ export type SayimSatiri = { id: string; ad: string; kod: string; tur: StokTuru; 
 function sayiCoz(s: string): number {
   const t = s.trim();
   if (!t) return NaN;
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 
 export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun: string }) {

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { puantajKaydet, type PuantajSatiri } from "@/app/actions/personel";
 import { FormMesaji } from "@/components/FormMesaji";
-import { tl } from "@/lib/imece";
+import { tl, trSayi } from "@/lib/imece";
 import { GUN_TURLERI, GUN_TURU_ADI, ayinGunleri, gecerliUcret, gunAdi, pazarMi } from "@/lib/personel";
 import type { GunTuru, PersonelEkOdemesi, PersonelUcreti, PuantajGunu } from "@/types/database";
 
@@ -15,7 +15,7 @@ const BOS: Hucre = { gun_turu: "calisti", miktar: "", elle: "", aciklama: "" };
 function sayiOku(s: string): number | null {
   const t = s.trim();
   if (!t) return null;
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 
 function sayiYaz(n: number | null | undefined): string {

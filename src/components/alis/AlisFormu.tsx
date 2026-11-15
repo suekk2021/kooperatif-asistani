@@ -5,7 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { alisKaydet, type AlisKalemGirdisi } from "@/app/actions/alis";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { FormMesaji } from "@/components/FormMesaji";
-import { PARA_HESABI_TURU_ADI, tl } from "@/lib/imece";
+import { PARA_HESABI_TURU_ADI, tl, trSayi } from "@/lib/imece";
 import type { Cari, Hesap, KasaBankaHesabi, KdvOrani, StokKarti } from "@/types/database";
 
 type Kalem = {
@@ -24,7 +24,7 @@ type Kalem = {
 function sayiCoz(s: string): number {
   const t = s.trim();
   if (!t) return NaN;
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 const yuvarla = (n: number) => Math.round(n * 100) / 100;
 

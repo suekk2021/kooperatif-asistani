@@ -5,7 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { satisKaydet } from "@/app/actions/satis";
 import { FormMesaji } from "@/components/FormMesaji";
-import { PARA_HESABI_TURU_ADI, sayi, tl } from "@/lib/imece";
+import { PARA_HESABI_TURU_ADI, sayi, tl, trSayi } from "@/lib/imece";
 import type { Cari, KasaBankaHesabi, KdvOrani, StokKarti } from "@/types/database";
 
 export type SatilabilirUrun = Pick<StokKarti, "id" | "ad" | "kod" | "birim" | "kdv_orani" | "tur" | "satis_fiyati"> & {
@@ -18,7 +18,7 @@ type Kalem = { anahtar: number; urunAdi: string; lot: string; miktar: string; fi
 function sayiCoz(s: string): number {
   const t = s.trim();
   if (!t) return NaN;
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 const yuvarla = (n: number) => Math.round(n * 100) / 100;
 

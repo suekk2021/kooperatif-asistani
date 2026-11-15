@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { iadeKaydet } from "@/app/actions/iade";
 import { FormMesaji } from "@/components/FormMesaji";
-import { sayi, tl } from "@/lib/imece";
+import { sayi, tl, trSayi } from "@/lib/imece";
 
 export type IadeEdilebilirKalem = {
   kalem_id: number;
@@ -21,7 +21,7 @@ export type IadeEdilebilirKalem = {
 function sayiCoz(s: string): number {
   const t = s.trim();
   if (!t) return 0;
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 const yuvarla = (n: number) => Math.round(n * 100) / 100;
 

@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { evrakIslem, evrakKaydet } from "@/app/actions/cek-senet";
 import { FormMesaji } from "@/components/FormMesaji";
+import { trSayi } from "@/lib/imece";
 
 type Cari = { id: string; unvan: string; kod: string; tur: "musteri" | "tedarikci" };
 type Hesap = { id: string; ad: string; kod: string };
@@ -12,7 +13,7 @@ type Hesap = { id: string; ad: string; kod: string };
 function sayiCoz(s: string): number {
   const t = s.trim();
   if (!t) return NaN;
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 
 export function YeniEvrakFormu({ cariler, bugun }: { cariler: Cari[]; bugun: string }) {

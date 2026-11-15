@@ -55,12 +55,26 @@ export function metin(formData: FormData, ad: string): string | null {
   return deger || null;
 }
 
-/** "1.250,5" / "12,5" / "12.5" -> sayı; boş veya geçersizse null.
- *  Virgül varsa Türkçe yazım sayılır (nokta binlik ayırıcı); yoksa nokta ondalıktır. */
+/** Kullanıcının yazdığı sayıyı okur: "1.250,5" -> 1250.5, "12,5" / "12.5" -> 12.5, "1.500" -> 1500.
+ *  Virgül yoksa nokta ondalıktır; yalnız "1.500", "12.345.678" gibi tam üçlü gruplarda binlik ayırıcı sayılır
+ *  (Türkiye'de 1500 TL "1.500" yazılır). Bu yüzden veritabanı değeri kutuya sayiGirdi() ile konmalı. */
+export function trSayi(ham: string): number {
+  const t = ham.trim();
+  if (t.includes(",")) return Number(t.replace(/\./g, "").replace(",", "."));
+  if (/^-?[1-9]\d{0,2}(\.\d{3})+$/.test(t)) return Number(t.replace(/\./g, ""));
+  return Number(t);
+}
+
+/** Veritabanı sayısını ("1.500" = 1,5) form kutusu için Türkçe yazar: 1.5 -> "1,5". */
+export function sayiGirdi(deger: number | string | null | undefined): string {
+  if (deger === null || deger === undefined || deger === "") return "";
+  return String(Number(deger)).replace(".", ",");
+}
+
 export function ondalik(formData: FormData, ad: string): number | null {
   const ham = metin(formData, ad);
   if (ham === null) return null;
-  const deger = Number(ham.includes(",") ? ham.replace(/\./g, "").replace(",", ".") : ham);
+  const deger = trSayi(ham);
   return Number.isFinite(deger) ? deger : null;
 }
 

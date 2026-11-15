@@ -4,12 +4,12 @@ import { useActionState, useState, useTransition } from "react";
 import { acilisAyariKaydet, acilisKaydet, type AcilisGirdisi } from "@/app/actions/acilis";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { FormMesaji } from "@/components/FormMesaji";
-import { sayi, tl } from "@/lib/imece";
+import { sayi, tl, trSayi } from "@/lib/imece";
 
 function sayiCoz(s: string): number {
   const t = s.trim();
   if (!t) return NaN;
-  return Number(t.includes(",") ? t.replace(/\./g, "").replace(",", ".") : t);
+  return trSayi(t);
 }
 
 export function AcilisAyarFormu({
