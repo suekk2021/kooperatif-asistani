@@ -87,7 +87,6 @@ export function StokKartiDuzenleFormu({
   hareketVar: boolean;
 }) {
   const [sonuc, action, bekliyor] = useActionState(async (_o: FormSonucu, fd: FormData) => stokKartiGuncelle(kart.id, fd), {});
-  const urunMu = kart.tur === "mamul" || kart.tur === "ticari_mal" || kart.tur === "yari_mamul";
   // React 19 kayıttan sonra formu sıfırlar; <select> ise ilk açılıştaki değere döner.
   // key kaydedilen değere bağlı: kayıt sonrası form yeni değerlerle yeniden kurulur.
   return (
@@ -141,12 +140,10 @@ export function StokKartiDuzenleFormu({
           <label htmlFor="min_stok">Asgari stok (uyarı sınırı)</label>
           <input id="min_stok" name="min_stok" defaultValue={kart.min_stok ?? ""} inputMode="decimal" />
         </div>
-        {urunMu && (
-          <div className="alan">
-            <label htmlFor="satis_fiyati">Liste satış fiyatı (KDV hariç)</label>
-            <input id="satis_fiyati" name="satis_fiyati" defaultValue={kart.satis_fiyati ?? ""} inputMode="decimal" />
-          </div>
-        )}
+        <div className="alan">
+          <label htmlFor="satis_fiyati">Liste satış fiyatı (KDV hariç)</label>
+          <input id="satis_fiyati" name="satis_fiyati" defaultValue={kart.satis_fiyati ?? ""} inputMode="decimal" />
+        </div>
       </div>
       <div className="alan">
         <label htmlFor="notlar">Not</label>
