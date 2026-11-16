@@ -271,9 +271,9 @@ export function ReceteFormu({
             <b className="num">{maliyet.satisFiyati !== null ? tl(maliyet.satisFiyati) : "girilmemiş"}</b>
           </div>
           <div>
-            <span className="soluk">Kâr payı</span>
+            <span className="soluk">Kâr oranı (maliyet üzerine)</span>
             <b className={`num${kar !== null && kar < 0 ? " kirmizi" : fiyatsiz.length ? " amber" : ""}`}>
-              {kar !== null ? `${yuzde(kar, 0)} · ${tl((maliyet.satisFiyati ?? 0) - (birimMaliyet ?? 0))}` : "—"}
+              {kar !== null ? `${yuzde(kar, 1)} · ${tl((maliyet.satisFiyati ?? 0) - (birimMaliyet ?? 0))}` : "—"}
               {kar !== null && fiyatsiz.length > 0 && " (eksik maliyetle, gerçekte daha düşük)"}
             </b>
           </div>

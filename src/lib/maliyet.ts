@@ -57,7 +57,7 @@ export function receteBirimMaliyeti(
   return { birim: bilinen ? toplam / ciktiMiktari : null, eksik: bilinen < kalemler.length };
 }
 
-/** Kâr payı (%): (fiyat − maliyet) / fiyat; parti ekranındaki marj ile aynı tanım. */
+/** Kâr oranı (%), maliyet üzerine: (fiyat − maliyet) / maliyet. Fatih Bey, 16 Kas 2026: 300,78 maliyet, 847,60 fiyat → %181,8. */
 export function karPayi(fiyat: number | null, maliyet: number | null): number | null {
-  return fiyat && maliyet !== null ? ((fiyat - maliyet) / fiyat) * 100 : null;
+  return fiyat && maliyet ? ((fiyat - maliyet) / maliyet) * 100 : null;
 }

@@ -102,7 +102,7 @@ export default async function AylikMaliyetPage({ searchParams }: { searchParams:
                   <th className="sag">Reçete maliyeti (birim)</th>
                   <th className="sag">Fark</th>
                   <th className="sag">Liste fiyatı</th>
-                  <th className="sag">Fiili kâr payı</th>
+                  <th className="sag">Fiili kâr oranı</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,8 +129,8 @@ export default async function AylikMaliyetPage({ searchParams }: { searchParams:
                     <td data-label="Liste fiyatı" className="sag num">
                       {s.fiyat !== null ? tl(s.fiyat) : "girilmemiş"}
                     </td>
-                    <td data-label="Fiili kâr payı" className={`sag num${s.kar !== null && s.kar < 0 ? " kirmizi" : ""}`}>
-                      {yuzde(s.kar, 0)}
+                    <td data-label="Fiili kâr oranı" className={`sag num${s.kar !== null && s.kar < 0 ? " kirmizi" : ""}`}>
+                      {yuzde(s.kar, 1)}
                     </td>
                   </tr>
                 ))}

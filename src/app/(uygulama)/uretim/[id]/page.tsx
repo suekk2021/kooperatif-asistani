@@ -7,6 +7,7 @@ import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { GirdiFormu, GirdiSilDugmesi, PartiBitirFormu } from "@/components/uretim/UretimFormlari";
 import { sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { karPayi } from "@/lib/maliyet";
 import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import { partiSuresiDk, saatTR, sureYazisi, uretimFiresi, yuzde } from "@/lib/uretim";
@@ -53,7 +54,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
   const fire = uretimFiresi(p);
   const saatlik = !acik && dk > 0 && p.uretilen_miktar ? (Number(p.uretilen_miktar) / dk) * 60 : null;
   const fiyat = urun.satis_fiyati !== null ? Number(urun.satis_fiyati) : null;
-  const marj = fiyat && p.birim_maliyet ? ((fiyat - Number(p.birim_maliyet)) / fiyat) * 100 : null;
+  const marj = karPayi(fiyat, p.birim_maliyet ? Number(p.birim_maliyet) : null);
 
   // Malzeme bazında toplam tartım + reçeteye göre olması gereken (kapanınca toplam çıktıya göre).
   const toplamGirdi = new Map<string, number>();
@@ -121,7 +122,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
             <div className="deger num">{tl(p.birim_maliyet)}</div>
             <div className="alt">
               toplam {tl(p.malzeme_maliyeti)}
-              {fiyat ? ` · liste fiyatı ${tl(fiyat)} · marj ${yuzde(marj, 0)}` : " · liste fiyatı girilmemiş"}
+              {fiyat ? ` · liste fiyatı ${tl(fiyat)} · kâr oranı ${yuzde(marj, 1)}` : " · liste fiyatı girilmemiş"}
             </div>
           </div>
           )}
