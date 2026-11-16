@@ -2,6 +2,7 @@ import Link from "next/link";
 import { YeniPartiFormu } from "@/components/uretim/UretimFormlari";
 import { sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import { partiSuresiDk, saatTR, sureYazisi, uretimFiresi, yuzde } from "@/lib/uretim";
 import type { StokKarti, UretimPartisi } from "@/types/database";
@@ -25,6 +26,7 @@ export default async function UretimPage() {
   const acik = partiler.filter((p) => p.durum === "acik");
   const biten = partiler.filter((p) => p.durum !== "acik");
   const yazabilir = duzenlemeYetkisiVarMi(rol);
+  const maliyetGorur = maliyetGorurMu(rol);
 
   return (
     <>
@@ -34,6 +36,11 @@ export default async function UretimPage() {
           <p>Parti kaydı tesiste telefondan girilir: başlat → malzemeleri tart → bitir</p>
         </div>
         <div className="ust-araclar">
+          {maliyetGorur && (
+            <Link href="/uretim/maliyet" className="btn btn-cizgi">
+              Aylık maliyet
+            </Link>
+          )}
           <Link href="/uretim/receteler" className="btn btn-cizgi">
             Reçeteler
           </Link>
@@ -91,7 +98,7 @@ export default async function UretimPage() {
                   <th className="sag">Paketlenen</th>
                   <th className="sag">Fire</th>
                   <th className="sag">Süre</th>
-                  <th className="sag">Birim maliyet</th>
+                  {maliyetGorur && <th className="sag">Birim maliyet</th>}
                 </tr>
               </thead>
               <tbody>
@@ -119,9 +126,11 @@ export default async function UretimPage() {
                       <td data-label="Süre" className="sag num">
                         {p.bitis ? sureYazisi(partiSuresiDk(p)) : ""}
                       </td>
-                      <td data-label="Birim maliyet" className="sag num">
-                        {p.birim_maliyet !== null ? tl(p.birim_maliyet) : ""}
-                      </td>
+                      {maliyetGorur && (
+                        <td data-label="Birim maliyet" className="sag num">
+                          {p.birim_maliyet !== null ? tl(p.birim_maliyet) : ""}
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
@@ -130,10 +139,12 @@ export default async function UretimPage() {
           </div>
         )}
       </div>
+      {maliyetGorur && (
       <p className="not">
         Birim maliyet şimdilik sadece malzeme ve ambalajı içerir. İşçilik, elektrik, soğuk oda gibi genel giderler ay sonunda
         o ayın üretimine dağıtılacak (Raporlar adımı).
       </p>
+      )}
     </>
   );
 }

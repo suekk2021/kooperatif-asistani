@@ -82,6 +82,14 @@ export function maasGorurMu(rol: KullaniciRolu | null | undefined): boolean {
   return rol === "baskan" || rol === "operasyon" || rol === "on_muhasebe" || rol === "bilgi_islem";
 }
 
+/**
+ * Ürün maliyeti ve kâr payını gören roller (Fatih Bey, 16 Kas 2026: yönetim + ön muhasebe; muhasebeci ve depo görmez).
+ * Yalnız ekranda gizlenir; veritabanı okuma kuralı yok (kullanıcı kararı), arka uçtan okunabilir.
+ */
+export function maliyetGorurMu(rol: KullaniciRolu | null | undefined): boolean {
+  return rol === "baskan" || rol === "operasyon" || rol === "bilgi_islem" || rol === "on_muhasebe" || rol === "destek";
+}
+
 export function rolBilgisi(rol: KullaniciRolu | null | undefined) {
   return ROLLER.find((r) => r.deger === rol);
 }

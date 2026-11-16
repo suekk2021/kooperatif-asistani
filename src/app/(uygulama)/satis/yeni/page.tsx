@@ -2,12 +2,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SatisFormu, type SatilabilirUrun } from "@/components/satis/SatisFormu";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import { bugunIstanbul } from "@/lib/tarih";
 import type { Cari, KasaBankaHesabi, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
 
 export default async function YeniSatisPage() {
-  if (!duzenlemeYetkisiVarMi(await mevcutRol())) redirect("/satis");
+  const rol = await mevcutRol();
+  if (!duzenlemeYetkisiVarMi(rol)) redirect("/satis");
+  // Maliyet yetkisi yoksa ortalama maliyet tarayıcıya hiç gönderilmez (önizlemede maliyet satırları çıkmaz; kayıt sunucuda hesaplanır)
+  const maliyetGorur = maliyetGorurMu(rol);
 
   const supabase = await createClient();
   const [{ data: cariVeri }, { data: urunVeri }, { data: durumVeri }, { data: kdvVeri }, { data: hesapVeri }, { data: planVeri }] =
@@ -27,7 +31,7 @@ export default async function YeniSatisPage() {
     ]);
   const durum = new Map(((durumVeri ?? []) as StokDurumu[]).map((d) => [d.stok_karti_id, d]));
   const urunler: SatilabilirUrun[] = ((urunVeri ?? []) as Pick<StokKarti, "id" | "ad" | "kod" | "birim" | "kdv_orani" | "tur" | "satis_fiyati">[]).map(
-    (u) => ({ ...u, stok: Number(durum.get(u.id)?.miktar ?? 0), ortalama: Number(durum.get(u.id)?.ortalama_maliyet ?? 0) })
+    (u) => ({ ...u, stok: Number(durum.get(u.id)?.miktar ?? 0), ortalama: maliyetGorur ? Number(durum.get(u.id)?.ortalama_maliyet ?? 0) : 0 })
   );
   const musteriler = (cariVeri ?? []) as Pick<Cari, "id" | "unvan" | "kod" | "vade_gun">[];
 

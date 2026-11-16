@@ -2,6 +2,7 @@ import Link from "next/link";
 import { YeniStokKartiFormu } from "@/components/stok/YeniStokKartiFormu";
 import { STOK_TURLERI, STOK_TURU_ADI, kodGoster, sayi, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import type { Depo, KdvOrani, StokDurumu, StokGrubu, StokKarti, StokTuru } from "@/types/database";
 
@@ -27,6 +28,7 @@ export default async function StokPage({
   const liste = secili ? tumu.filter((k) => k.tur === secili) : tumu;
   const depoAdi = new Map(((depolar ?? []) as Depo[]).map((d) => [d.id, d.ad]));
   const durum = new Map(((durumVeri ?? []) as StokDurumu[]).map((d) => [d.stok_karti_id, d]));
+  const maliyetGorur = maliyetGorurMu(rol);
   const toplamDeger = liste.reduce((t, k) => t + Number(durum.get(k.id)?.deger ?? 0), 0);
 
   return (
@@ -74,7 +76,7 @@ export default async function StokPage({
         <div className="kart-bas">
           <h2>Stok kartları</h2>
           <span className="soluk num">
-            {liste.length} kart · değer <b>{tl(toplamDeger)}</b>
+            {liste.length} kart{maliyetGorur && <> · değer <b>{tl(toplamDeger)}</b></>}
           </span>
         </div>
         {liste.length === 0 ? (
@@ -91,8 +93,8 @@ export default async function StokPage({
                   <th className="sag">KDV</th>
                   <th className="sag">Asgari</th>
                   <th className="sag">Miktar</th>
-                  <th className="sag">Ort. maliyet</th>
-                  <th className="sag">Değer</th>
+                  {maliyetGorur && <th className="sag">Ort. maliyet</th>}
+                  {maliyetGorur && <th className="sag">Değer</th>}
                 </tr>
               </thead>
               <tbody>
@@ -124,12 +126,16 @@ export default async function StokPage({
                       </b>
                       {azaldi && <div className="kirmizi" style={{ fontSize: 12 }}>asgarinin altında</div>}
                     </td>
-                    <td data-label="Ort. maliyet" className="sag num mobil-gizle">
-                      {miktar > 0 ? tl(d?.ortalama_maliyet) : ""}
-                    </td>
-                    <td data-label="Değer" className="sag num">
-                      {tl(d?.deger)}
-                    </td>
+                    {maliyetGorur && (
+                      <td data-label="Ort. maliyet" className="sag num mobil-gizle">
+                        {miktar > 0 ? tl(d?.ortalama_maliyet) : ""}
+                      </td>
+                    )}
+                    {maliyetGorur && (
+                      <td data-label="Değer" className="sag num">
+                        {tl(d?.deger)}
+                      </td>
+                    )}
                   </tr>
                   );
                 })}

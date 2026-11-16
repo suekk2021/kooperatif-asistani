@@ -5,7 +5,9 @@ import type { FormSonucu } from "@/app/actions/cariler";
 import { receteKaydet } from "@/app/actions/uretim";
 import { FormMesaji } from "@/components/FormMesaji";
 import type { StokKarti } from "@/types/database";
-import { kodGoster, sayiGirdi, trSayi } from "@/lib/imece";
+import { kodGoster, sayiGirdi, tl, trSayi } from "@/lib/imece";
+import { karPayi, type BirimMaliyet } from "@/lib/maliyet";
+import { yuzde } from "@/lib/uretim";
 
 type KartOzeti = Pick<StokKarti, "id" | "ad" | "kod" | "birim">;
 type Satir = { anahtar: number; ad: string; miktar: string };
@@ -123,10 +125,13 @@ export function ReceteFormu({
   urun,
   malzemeler,
   mevcut,
+  maliyet,
 }: {
   urun: KartOzeti;
   malzemeler: KartOzeti[];
   mevcut: { cikti_miktari: number; kalemler: { stok_karti_id: string; miktar: number }[] } | null;
+  /** Yalnız maliyet görme yetkisi olana gelir (malzeme id → bugünkü birim maliyet; null = fiyatı bilinmiyor). */
+  maliyet?: { birim: Record<string, BirimMaliyet | null>; satisFiyati: number | null } | null;
 }) {
   const adla = new Map(malzemeler.map((m) => [kucuk(m.ad), m]));
   const idle = new Map(malzemeler.map((m) => [m.id, m]));
@@ -149,18 +154,40 @@ export function ReceteFormu({
       setSonuc({ hata: `${bulunamayan + 1}. satırdaki malzeme stok kartlarında yok.` });
       return;
     }
-    baslat(async () =>
-      setSonuc(
-        await receteKaydet({
-          urun_karti_id: urun.id,
-          cikti_miktari: trSayi(cikti.trim()),
-          kalemler: satirlar
-            .filter((s) => s.ad)
-            .map((s) => ({ stok_karti_id: adla.get(kucuk(s.ad))!.id, miktar: trSayi(s.miktar.trim()) })),
-        })
-      )
-    );
+    baslat(async () => {
+      const r = await receteKaydet({
+        urun_karti_id: urun.id,
+        cikti_miktari: trSayi(cikti.trim()),
+        kalemler: satirlar
+          .filter((s) => s.ad)
+          .map((s) => ({ stok_karti_id: adla.get(kucuk(s.ad))!.id, miktar: trSayi(s.miktar.trim()) })),
+      });
+      setSonuc(r);
+      if (!r.hata) {
+        const kod = (s: Satir) => adla.get(kucuk(s.ad))?.kod ?? "￿";
+        setSatirlar((ss) => [...ss].sort((a, b) => kod(a).localeCompare(kod(b))));
+      }
+    });
   }
+
+  // Ekrandaki (henüz kaydedilmemiş olabilir) satırlarla canlı hesap
+  const satirTutari = (s: Satir): number | null | undefined => {
+    const k = adla.get(kucuk(s.ad));
+    const m = trSayi(s.miktar.trim());
+    if (!maliyet || !k || !Number.isFinite(m)) return undefined;
+    const bm = maliyet.birim[k.id];
+    return bm ? bm.fiyat * m : null;
+  };
+  const kartFiyatli = (s: Satir) => {
+    const k = adla.get(kucuk(s.ad));
+    return Boolean(maliyet && k && maliyet.birim[k.id]?.kaynak === "kart");
+  };
+  const ciktiSayi = trSayi(cikti.trim());
+  const tutarlar = satirlar.map(satirTutari);
+  const fiyatsiz = satirlar.filter((s, i) => tutarlar[i] === null).map((s) => s.ad);
+  const toplam = tutarlar.reduce<number>((t, x) => t + (x ?? 0), 0);
+  const birimMaliyet = maliyet && ciktiSayi > 0 && tutarlar.some((x) => x != null) ? toplam / ciktiSayi : null;
+  const kar = maliyet ? karPayi(maliyet.satisFiyati, birimMaliyet) : null;
 
   const miktarId = (sira: number) => `recete-${urun.id}-miktar-${sira}`;
 
@@ -176,7 +203,7 @@ export function ReceteFormu({
           tartımlarına göre doldurun; sonra sapma buna göre ölçülür.
         </p>
       </div>
-      <div className="rc-tablo">
+      <div className={`rc-tablo${maliyet ? " rc-maliyetli" : ""}`}>
         <div className="rc-satir rc-bas">
           <span className="rc-solkolon">
             <span className="rc-sira">#</span>
@@ -185,6 +212,7 @@ export function ReceteFormu({
           <span>Malzeme</span>
           <span style={{ textAlign: "right" }}>Miktar</span>
           <span>Birim</span>
+          {maliyet && <span className="rc-tutar">Tutar</span>}
           <span />
         </div>
         {satirlar.map((s, i) => {
@@ -210,6 +238,15 @@ export function ReceteFormu({
                 onChange={(e) => guncelle(s.anahtar, { miktar: e.target.value })}
               />
               <span className="rc-birim">{kart?.birim ?? ""}</span>
+              {maliyet && (
+                <span
+                  className="rc-tutar num"
+                  title={tutarlar[i] === null ? "Alış kaydı da kart fiyatı da yok" : kartFiyatli(s) ? "Alış kaydı yok; stok kartındaki fiyattan" : undefined}
+                >
+                  {tutarlar[i] === null ? "fiyat yok" : tutarlar[i] !== undefined ? tl(tutarlar[i]) : ""}
+                  {tutarlar[i] != null && kartFiyatli(s) && <span className="amber"> *</span>}
+                </span>
+              )}
               <button
                 type="button"
                 className="rc-sil"
@@ -223,6 +260,31 @@ export function ReceteFormu({
           );
         })}
       </div>
+      {maliyet && (
+        <div className="rc-maliyet">
+          <div>
+            <span className="soluk">1 {urun.birim} reçete maliyeti</span>
+            <b className="num">{birimMaliyet !== null ? tl(birimMaliyet) : "—"}</b>
+          </div>
+          <div>
+            <span className="soluk">Liste satış fiyatı (KDV hariç)</span>
+            <b className="num">{maliyet.satisFiyati !== null ? tl(maliyet.satisFiyati) : "girilmemiş"}</b>
+          </div>
+          <div>
+            <span className="soluk">Kâr payı</span>
+            <b className={`num${kar !== null && kar < 0 ? " kirmizi" : fiyatsiz.length ? " amber" : ""}`}>
+              {kar !== null ? `${yuzde(kar, 0)} · ${tl((maliyet.satisFiyati ?? 0) - (birimMaliyet ?? 0))}` : "—"}
+              {kar !== null && fiyatsiz.length > 0 && " (eksik maliyetle, gerçekte daha düşük)"}
+            </b>
+          </div>
+          <p className="soluk">
+            Yalnız malzeme ve ambalaj; işçilik ve genel gider hariç. Malzeme fiyatı bugünkü ortalama maliyetten, stok yoksa son
+            alıştan alınır.
+            {satirlar.some(kartFiyatli) && " * Alış kaydı olmayan malzemede stok kartındaki fiyat kullanıldı."}
+            {fiyatsiz.length > 0 && <span className="amber"> Fiyatı bilinmeyen: {fiyatsiz.join(", ")} — maliyet eksik.</span>}
+          </p>
+        </div>
+      )}
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         <button type="button" className="btn btn-cizgi" onClick={() => setSatirlar((ss) => [...ss, { anahtar: ++sayac, ad: "", miktar: "" }])}>
           + Malzeme

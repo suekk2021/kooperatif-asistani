@@ -7,6 +7,7 @@ import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { GirdiFormu, GirdiSilDugmesi, PartiBitirFormu } from "@/components/uretim/UretimFormlari";
 import { sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import { partiSuresiDk, saatTR, sureYazisi, uretimFiresi, yuzde } from "@/lib/uretim";
 import type { PartiGirdisi, Recete, ReceteKalemi, StokKarti, UretimPartisi, YevmiyeSatiri } from "@/types/database";
@@ -45,6 +46,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
 
   const acik = p.durum === "acik";
   const yazabilir = duzenlemeYetkisiVarMi(rol);
+  const maliyetGorur = maliyetGorurMu(rol);
   const iptalOlur = iptalEdebilir(await oturum(), p);
   const dk = partiSuresiDk(p);
   const toplamCikti = Number(p.uretilen_miktar ?? 0) + Number(p.bozuk_miktar ?? 0);
@@ -113,6 +115,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
             <div className="deger num">{saatlik ? sayi(Math.round(saatlik)) : "—"}</div>
             <div className="alt">{urun.birim} / saat · {sureYazisi(dk)}</div>
           </div>
+          {maliyetGorur && (
           <div className="kart kart-ic metrik">
             <div className="etiket">Birim maliyet (malzeme)</div>
             <div className="deger num">{tl(p.birim_maliyet)}</div>
@@ -121,6 +124,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
               {fiyat ? ` · liste fiyatı ${tl(fiyat)} · marj ${yuzde(marj, 0)}` : " · liste fiyatı girilmemiş"}
             </div>
           </div>
+          )}
         </div>
       )}
 
@@ -177,7 +181,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
                     <th className="sag">Verilen</th>
                     <th className="sag">{acik ? `Reçete (${sayi(recete?.cikti_miktari)} ${urun.birim})` : "Reçeteye göre"}</th>
                     {!acik && <th className="sag">Fark</th>}
-                    {!acik && <th className="sag">Maliyet</th>}
+                    {!acik && maliyetGorur && <th className="sag">Maliyet</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -205,7 +209,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
                             {fark !== null ? `${fark > 0 ? "+" : ""}${yuzde(fark)}` : ""}
                           </td>
                         )}
-                        {!acik && (
+                        {!acik && maliyetGorur && (
                           <td data-label="Maliyet" className="sag num">
                             {tl(maliyet)}
                             {tahmini && <span className="amber"> *</span>}
@@ -218,7 +222,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
               </table>
             </div>
           )}
-          {!acik && girdiler.some((g) => g.maliyet_tahmini) && (
+          {!acik && maliyetGorur && girdiler.some((g) => g.maliyet_tahmini) && (
             <p className="soluk" style={{ margin: 0, padding: "10px 20px 14px", fontSize: 13 }}>
               * Tartım anında stokta yeterli malzeme görünmüyordu; maliyet son alış fiyatından alındı. Alış faturası eksik
               girilmiş olabilir.
@@ -260,10 +264,10 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      {satirlar.length > 0 && (
+      {maliyetGorur && satirlar.length > 0 && (
         <MuhasebeKarsiligi satirlar={satirlar.filter((s) => s.fis_id === p.fis_id)} hesapAdlari={hesapAdlari} />
       )}
-      {p.iptal_fis_id && (
+      {maliyetGorur && p.iptal_fis_id && (
         <MuhasebeKarsiligi baslik="İptal (ters kayıt)" etiket="iptal" satirlar={satirlar.filter((s) => s.fis_id === p.iptal_fis_id)} hesapAdlari={hesapAdlari} />
       )}
 

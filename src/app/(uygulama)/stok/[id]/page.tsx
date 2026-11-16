@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { StokKartiDuzenleFormu } from "@/components/KartDuzenleFormlari";
 import { STOK_TURU_ADI, kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import type { Depo, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
 
@@ -59,6 +60,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
 
   const fiyat = kart.satis_fiyati !== null ? Number(kart.satis_fiyati) : null;
   const ortalama = Number(durum?.ortalama_maliyet ?? 0);
+  const maliyetGorur = maliyetGorurMu(rol);
 
   return (
     <>
@@ -86,21 +88,25 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
           </div>
           <div className="alt">{kart.min_stok !== null ? `asgari ${sayi(kart.min_stok)} ${kart.birim}` : "asgari sınır yok"}</div>
         </div>
-        <div className="kart kart-ic metrik">
-          <div className="etiket">Değer</div>
-          <div className="deger num">{tl(durum?.deger)}</div>
-          <div className="alt">ortalama maliyetle</div>
-        </div>
-        <div className="kart kart-ic metrik">
-          <div className="etiket">Ortalama maliyet</div>
-          <div className="deger num">{miktar > 0 ? tl(ortalama) : "—"}</div>
-          <div className="alt">birim başına</div>
-        </div>
+        {maliyetGorur && (
+          <>
+            <div className="kart kart-ic metrik">
+              <div className="etiket">Değer</div>
+              <div className="deger num">{tl(durum?.deger)}</div>
+              <div className="alt">ortalama maliyetle</div>
+            </div>
+            <div className="kart kart-ic metrik">
+              <div className="etiket">Ortalama maliyet</div>
+              <div className="deger num">{miktar > 0 ? tl(ortalama) : "—"}</div>
+              <div className="alt">birim başına</div>
+            </div>
+          </>
+        )}
         <div className="kart kart-ic metrik">
           <div className="etiket">Liste fiyatı</div>
           <div className="deger num">{fiyat !== null ? tl(fiyat) : "—"}</div>
           <div className="alt">
-            {fiyat && ortalama > 0 ? `malzeme marjı %${Math.round(((fiyat - ortalama) / fiyat) * 100)}` : "KDV hariç"}
+            {maliyetGorur && fiyat && ortalama > 0 ? `malzeme marjı %${Math.round(((fiyat - ortalama) / fiyat) * 100)}` : "KDV hariç"}
           </div>
         </div>
       </div>
@@ -136,7 +142,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
                   <th>Lot / SKT</th>
                   <th className="sag">Giriş</th>
                   <th className="sag">Çıkış</th>
-                  <th className="sag">Birim maliyet</th>
+                  {maliyetGorur && <th className="sag">Birim maliyet</th>}
                   <th className="sag">Kalan</th>
                 </tr>
               </thead>
@@ -162,9 +168,11 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
                       <td data-label="Çıkış" className="sag num">
                         {!giris ? sayi(-Number(h.miktar)) : ""}
                       </td>
-                      <td data-label="Birim maliyet" className="sag num">
-                        {tl(h.birim_maliyet)}
-                      </td>
+                      {maliyetGorur && (
+                        <td data-label="Birim maliyet" className="sag num">
+                          {tl(h.birim_maliyet)}
+                        </td>
+                      )}
                       <td data-label="Kalan" className="sag num ana-deger">
                         <b className={kalan < 0 ? "kirmizi" : undefined}>{sayi(kalan)}</b>
                       </td>

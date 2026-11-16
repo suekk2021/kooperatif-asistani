@@ -49,7 +49,10 @@
 ### 7. Reçete maliyeti görünsün (16 Kas 2026, Fatih Bey)
 - İstek: reçete maliyetlerini görebileceği bir alan.
 - Veri var: `stok_durumu.ortalama_maliyet` (stoktaki ortalama); stok yoksa son alış fiyatı (`guncel_birim_maliyet` SQL fonksiyonu üretimde bunu kullanıyor). Reçete maliyeti = Σ miktar × birim maliyet; ürün birimi başına = toplam / "kaç kg için".
-- Sorulacak: kim görsün (maliyet hassas bilgi), sadece görüntü mü yoksa satış fiyatıyla kâr payı da mı.
+- **Fatih Bey cevabı (16 Kas):** yönetim + ön muhasebe görsün; kâr payı da görünsün; kg başına; reçete maliyeti ile fiili maliyet ayrı, fiili aylık tabloda. Sıra koda göre olsun. Kullanıcı kararı: gizleme yalnız ekranda (veritabanı kuralı yok), muhasebeci görmez.
+- **Yapıldı (16 Kas, yerelde):** `maliyetGorurMu` (roller.ts: başkan, operasyon, bilgi işlem, ön muhasebe, destek), `src/lib/maliyet.ts`. Reçete: tutar sütunu + kg başı maliyet / liste fiyatı / kâr payı kutusu, başlıkta kg başı maliyet, satırlar koda göre. Fiyat sırası: stok ortalaması → son alış → stok kartındaki fiyat (yalnız reçete tahmini, * ile işaretli). Yeni `/uretim/maliyet` aylık fiili maliyet tablosu. Maliyet gizlendi: üretim listesi/parti detayı (+muhasebe fişi), stok listesi/kartı, satış listesi/detayı (+satış fişi), yeni satış (ortalama tarayıcıya gitmiyor), panel brüt kâr. Raporlar (Satış ve kârlılık, mizan) muhasebe için açık bırakıldı.
+- **Denenmedi:** parti/satış detayı (canlıda henüz hiç parti/satış yok); aylık tablonun dolu hali (bu ay tamamlanan parti yok).
+- **Veri durumu:** stokta hiç alış/açılış yok; reçete maliyeti şimdilik yalnız kart fiyatı girilen malzemelerle (Kıyma, tabak, koli) eksik hesaplanıyor.
 
 ## Bitenler
 (henüz yok)

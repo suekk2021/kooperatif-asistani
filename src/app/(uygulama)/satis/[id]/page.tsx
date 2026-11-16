@@ -7,6 +7,7 @@ import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import type { Cari, KasaBankaHesabi, ParaHareketi, SatisFaturasi, SatisKalemi, StokKarti, YevmiyeSatiri } from "@/types/database";
 
@@ -40,7 +41,8 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
   const satirlar = (satirVeri ?? []) as YevmiyeSatiri[];
   const odemeHesabi = odemeHesapVeri as KasaBankaHesabi | null;
   const iptal = f.durum === "iptal";
-  const tahmini = kalemler.some((k) => k.maliyet_tahmini);
+  const maliyetGorur = maliyetGorurMu(rol);
+  const tahmini = maliyetGorur && kalemler.some((k) => k.maliyet_tahmini);
   const no = f.belge_no ?? `SAT-${f.satis_no}`;
 
   return (
@@ -84,7 +86,7 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
                 <th className="sag">Birim fiyat</th>
                 <th className="sag">KDV</th>
                 <th className="sag">Tutar</th>
-                <th className="sag">Maliyet</th>
+                {maliyetGorur && <th className="sag">Maliyet</th>}
               </tr>
             </thead>
             <tbody>
@@ -109,10 +111,12 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
                     <td data-label="Tutar" className="sag num ana-deger">
                       {tl(k.tutar)}
                     </td>
-                    <td data-label="Maliyet" className="sag num">
-                      {tl(k.maliyet_tutari)}
-                      {k.maliyet_tahmini && <span className="amber"> *</span>}
-                    </td>
+                    {maliyetGorur && (
+                      <td data-label="Maliyet" className="sag num">
+                        {tl(k.maliyet_tutari)}
+                        {k.maliyet_tahmini && <span className="amber"> *</span>}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -142,9 +146,11 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
               Ara toplam {tl(f.ara_toplam)} · KDV {tl(f.kdv_toplam)}
             </span>
             <span className="buyuk num">{tl(f.genel_toplam)}</span>
-            <span className="num soluk" style={{ fontSize: 13 }}>
-              Maliyet {tl(f.maliyet_toplam)} · brüt kâr {tl(Number(f.ara_toplam) - Number(f.maliyet_toplam))}
-            </span>
+            {maliyetGorur && (
+              <span className="num soluk" style={{ fontSize: 13 }}>
+                Maliyet {tl(f.maliyet_toplam)} · brüt kâr {tl(Number(f.ara_toplam) - Number(f.maliyet_toplam))}
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -155,11 +161,12 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
         </p>
       )}
 
-      <MuhasebeKarsiligi satirlar={satirlar.filter((s) => s.fis_id === f.fis_id)} hesapAdlari={hesapAdlari} />
+      {/* Satış fişinde maliyet satırları (620/15x) var; maliyet yetkisi olmayana gösterilmez */}
+      {maliyetGorur && <MuhasebeKarsiligi satirlar={satirlar.filter((s) => s.fis_id === f.fis_id)} hesapAdlari={hesapAdlari} />}
       {tahsilatlar.map((t) => (
         <MuhasebeKarsiligi key={t.id} baslik="Tahsilat kaydı" satirlar={satirlar.filter((s) => s.fis_id === t.fis_id)} hesapAdlari={hesapAdlari} />
       ))}
-      {f.iptal_fis_id && (
+      {maliyetGorur && f.iptal_fis_id && (
         <MuhasebeKarsiligi
           baslik="İptal (ters kayıt)"
           etiket="iptal"

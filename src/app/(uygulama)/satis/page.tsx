@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import type { Cari, KasaBankaHesabi, SatisFaturasi } from "@/types/database";
 
@@ -40,7 +41,7 @@ export default async function SatisPage() {
           <h2>Satışlar</h2>
           <span className="soluk num">
             {kayitli.length} satış · ciro {tl(ciro)} (KDV hariç)
-            {maliyet > 0 && ` · maliyet ${tl(maliyet)}`}
+            {maliyetGorurMu(rol) && maliyet > 0 && ` · maliyet ${tl(maliyet)}`}
           </span>
         </div>
         {faturalar.length === 0 ? (

@@ -493,10 +493,19 @@ details.form-ac[open]>summary{display:none}
 .rc-liste li.secili{background:var(--mavi-acik)}
 .rc-liste li .rc-kod{flex:0 0 auto}
 .rc-liste .rc-yok{color:var(--soluk);cursor:default}
+.rc-maliyetli .rc-satir{grid-template-columns:28px 92px minmax(0,1fr) 110px 48px 110px 40px}
+.rc-tutar{text-align:right;font-size:13px;color:var(--soluk);white-space:nowrap}
+.rc-maliyet{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:baseline;padding:12px 14px;border:1px solid var(--cizgi);border-radius:10px;background:var(--zemin)}
+.rc-maliyet>div{display:flex;flex-direction:column;gap:2px}
+.rc-maliyet>div span{font-size:12px;font-weight:700}
+.rc-maliyet>div b{font-size:17px}
+.rc-maliyet p{flex:1 1 100%;margin:0;font-size:12.5px}
 [data-theme="dark"] .rc-satir input,[data-theme="dark"] .rc-sil{background:var(--kart);border-color:var(--cizgi)}
 @media (max-width:640px){
   .rc-satir{grid-template-columns:52px minmax(0,1fr) 64px 34px 32px;gap:6px}
   .rc-bas .rc-kodbas{display:none}
+  .rc-maliyetli .rc-satir{grid-template-columns:52px minmax(0,1fr) 64px 34px 32px}
+  .rc-tutar{display:none}
   .rc-solkolon{display:flex;flex-direction:column;line-height:1.2}
   .rc-solkolon .rc-sira{text-align:left;font-size:11px}
   .rc-solkolon .rc-kod{font-size:10.5px}

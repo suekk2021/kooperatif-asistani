@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { bugunIstanbul } from "@/lib/tarih";
 import { mevcutRol } from "@/lib/rol";
+import { maliyetGorurMu } from "@/lib/roller";
 import { tl, sayi, tarihTR } from "@/lib/imece";
 import { yuzde } from "@/lib/uretim";
 import { yonetimOzeti } from "@/lib/yonetim-ozeti";
@@ -31,6 +32,7 @@ export default async function PanelPage() {
   const bugun = bugunIstanbul();
   const rol = await mevcutRol();
   const parayiGorur = rol !== "depo";
+  const maliyetGorur = maliyetGorurMu(rol);
 
   const say = (sorgu: PromiseLike<{ count: number | null }>) => sorgu.then((r) => r.count ?? 0);
   const [profil, musteri, tedarikci, stokKarti, hatirlaticilar, paraHesabi, acilisFisi, ozet] = await Promise.all([
@@ -177,12 +179,16 @@ export default async function PanelPage() {
             <div className="etiket">Bu ay net satış (KDV hariç)</div>
             <div className="deger num">{tl(buAySatis.ciro)}</div>
             <div className="alt">
-              Brüt kâr {tl(buAySatis.kar)}
-              {marj !== null && ` (${yuzde(marj, 0)})`}
-              {buAySatis.tahminiMaliyetVar && " · tahmini maliyetli"}
+              {maliyetGorur && (
+                <>
+                  Brüt kâr {tl(buAySatis.kar)}
+                  {marj !== null && ` (${yuzde(marj, 0)})`}
+                  {buAySatis.tahminiMaliyetVar && " · tahmini maliyetli"}
+                </>
+              )}
               {degisim(buAySatis.ciro, gecenAySatis.ciro) && (
                 <>
-                  <br />
+                  {maliyetGorur && <br />}
                   {degisim(buAySatis.ciro, gecenAySatis.ciro)}
                 </>
               )}
