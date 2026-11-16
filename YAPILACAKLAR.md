@@ -52,6 +52,8 @@
 - **Fatih Bey cevabı (16 Kas):** yönetim + ön muhasebe görsün; kâr payı da görünsün; kg başına; reçete maliyeti ile fiili maliyet ayrı, fiili aylık tabloda. Sıra koda göre olsun. Kullanıcı kararı: gizleme yalnız ekranda (veritabanı kuralı yok), muhasebeci görmez.
 - **Yapıldı (16 Kas, yerelde):** `maliyetGorurMu` (roller.ts: başkan, operasyon, bilgi işlem, ön muhasebe, destek), `src/lib/maliyet.ts`. Reçete: tutar sütunu + kg başı maliyet / liste fiyatı / kâr payı kutusu, başlıkta kg başı maliyet, satırlar koda göre. Fiyat sırası: stok ortalaması → son alış → stok kartındaki fiyat (yalnız reçete tahmini, * ile işaretli). Yeni `/uretim/maliyet` aylık fiili maliyet tablosu. Maliyet gizlendi: üretim listesi/parti detayı (+muhasebe fişi), stok listesi/kartı, satış listesi/detayı (+satış fişi), yeni satış (ortalama tarayıcıya gitmiyor), panel brüt kâr. Raporlar (Satış ve kârlılık, mizan) muhasebe için açık bırakıldı.
 - **Denenmedi:** parti/satış detayı (canlıda henüz hiç parti/satış yok); aylık tablonun dolu hali (bu ay tamamlanan parti yok).
+- **Canlıda (27aa0f3, 16 Kas 15:23).** Fatih Bey eksik fiyatları kartlara girdi, uyarı kalktı. Kart fiyatının alış mı satış mı olduğu sorulmayacak (kullanıcı kararı: kafası karışmasın); kendisi bir şey isterse düzeltilir.
+- **Kâr oranı maliyet üzerine (9ea6013, canlıda, 16 Kas):** (fiyat−maliyet)/maliyet, Fatih Bey isteği. Fatih Bey'e not gönderilecek; 847,60 KDV hariç mi cevabı bekleniyor; satış raporu marjını da isterse değiştir.
 - **Veri durumu:** stokta hiç alış/açılış yok; reçete maliyeti şimdilik yalnız kart fiyatı girilen malzemelerle (Kıyma, tabak, koli) eksik hesaplanıyor.
 
 ## Bitenler

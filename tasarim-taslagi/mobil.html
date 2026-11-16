@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>İMECE mobil taslak</title>
+<style>
+:root{--lacivert:#132b4f;--mavi:#1d63b8;--mavi-acik:#e8f0fb;--turkuaz:#13897f;--turkuaz-acik:#e3f4f2;--mercan:#c8473d;--mercan-acik:#fbeceb;--amber:#a86a00;--amber-acik:#fdf3e1;--zemin:#f2f4f8;--kart:#fff;--cizgi:#e4e7ef;--metin:#141c2b;--soluk:#5a6478}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#d9dee8;color:var(--metin);min-height:100vh;display:flex;gap:40px;justify-content:center;align-items:flex-start;padding:30px 16px;flex-wrap:wrap}
+.aciklama{max-width:360px;font-size:14.5px;line-height:1.55}
+.aciklama h1{font-size:22px;margin-bottom:10px}
+.aciklama h2{font-size:15px;margin:18px 0 6px}
+.aciklama ul{padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.aciklama .rol{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.aciklama .rol button{border:1px solid #b9c2d3;background:#fff;border-radius:9px;padding:7px 11px;font-weight:700;cursor:pointer}
+.aciklama .rol button.aktif{background:var(--lacivert);color:#fff;border-color:var(--lacivert)}
+.telefon{width:390px;height:800px;max-width:100%;background:#0f1a2c;border-radius:46px;padding:12px;box-shadow:0 30px 70px rgba(19,43,79,.35);flex:0 0 auto}
+.ekran{position:relative;height:100%;background:var(--zemin);border-radius:36px;overflow:hidden;display:flex;flex-direction:column}
+.durum{height:34px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-size:13px;font-weight:700;background:var(--lacivert);color:#fff;flex:0 0 auto}
+.ust{background:var(--lacivert);color:#fff;padding:6px 18px 16px;flex:0 0 auto}
+.ust-satir{display:flex;align-items:center;gap:10px}
+.ust img{width:34px;height:34px;border-radius:50%;background:#fff;padding:1px}
+.ust h1{font-size:20px;flex:1}
+.ust small{display:block;font-size:12.5px;color:#b9c7de;font-weight:600}
+.geri{width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:20px;cursor:pointer}
+.ikon-btn{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:17px;cursor:pointer}
+.govde{flex:1;overflow-y:auto;padding:14px 14px 110px}
+.sayfa{display:none}.sayfa.aktif{display:block}
+.kart{background:var(--kart);border-radius:18px;padding:14px 16px;box-shadow:0 1px 2px rgba(19,43,79,.05),0 4px 14px rgba(19,43,79,.05);margin-bottom:12px}
+.metrikler{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.metrik{background:var(--kart);border-radius:18px;padding:13px 14px;box-shadow:0 1px 2px rgba(19,43,79,.05)}
+.metrik span{font-size:12px;color:var(--soluk);font-weight:700}
+.metrik b{display:block;font-size:20px;margin-top:4px;letter-spacing:-.3px}
+.metrik small{font-size:11.5px;font-weight:700}
+.baslik{font-size:13px;font-weight:800;color:var(--soluk);text-transform:uppercase;letter-spacing:.5px;margin:16px 4px 8px}
+.satir{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #eef0f5}
+.satir:last-child{border-bottom:0}
+.satir .yuvar{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:18px;flex:0 0 40px}
+.satir div{flex:1;min-width:0}
+.satir b{display:block;font-size:15px}
+.satir span{font-size:12.5px;color:var(--soluk)}
+.satir .tutar{font-weight:800;font-size:15px;text-align:right;white-space:nowrap}
+.etk{font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px}
+.e-amber{background:var(--amber-acik);color:var(--amber)}.e-yesil{background:var(--turkuaz-acik);color:var(--turkuaz)}.e-kirmizi{background:var(--mercan-acik);color:var(--mercan)}
+.hizli{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.hizli button{background:var(--kart);border:0;border-radius:16px;padding:12px 4px;font-weight:700;font-size:11.5px;color:var(--metin);display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;box-shadow:0 1px 2px rgba(19,43,79,.05)}
+.hizli i{font-style:normal;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px}
+.ara{display:flex;gap:8px;margin-bottom:12px}
+.ara input{flex:1;border:0;border-radius:14px;padding:12px 14px;font-size:15px;box-shadow:0 1px 2px rgba(19,43,79,.06)}
+.cipler{display:flex;gap:6px;overflow-x:auto;margin-bottom:12px}
+.cipler button{border:0;border-radius:999px;padding:8px 14px;font-weight:700;background:var(--kart);white-space:nowrap;cursor:pointer}
+.cipler button.aktif{background:var(--lacivert);color:#fff}
+.alan{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.alan label{font-size:12.5px;font-weight:800;color:var(--soluk)}
+.alan input,.alan select{border:1px solid #d7dce6;border-radius:12px;padding:13px 14px;font-size:16px;background:#fff;width:100%}
+.iki{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.secim{display:flex;gap:6px;flex-wrap:wrap}
+.secim button{border:1px solid var(--cizgi);background:#fff;border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px;cursor:pointer}
+.secim button.aktif{border-color:var(--mavi);background:var(--mavi-acik);color:var(--mavi)}
+.yapiskan{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--cizgi);padding:12px 16px 26px;display:flex;align-items:center;gap:12px;z-index:5}
+.yapiskan .top{flex:1}
+.yapiskan .top span{font-size:12px;color:var(--soluk);font-weight:700}
+.yapiskan .top b{display:block;font-size:20px}
+.btn-ana{border:0;background:var(--mavi);color:#fff;font-weight:800;font-size:16px;border-radius:14px;padding:14px 26px;cursor:pointer}
+.btn-cizgi{border:1px dashed #b9c2d3;background:transparent;border-radius:14px;padding:12px;width:100%;font-weight:700;font-size:14px;color:var(--mavi);cursor:pointer}
+/* alt çubuk */
+.tabbar{position:absolute;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--cizgi);display:flex;padding:6px 6px 22px;z-index:10}
+.tabbar button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--soluk);cursor:pointer;padding:6px 0}
+.tabbar button i{font-style:normal;font-size:21px;line-height:1}
+.tabbar button.aktif{color:var(--mavi)}
+.tabbar .arti{position:relative}
+.tabbar .arti span{margin-top:-26px;width:60px;height:60px;border-radius:50%;background:var(--mavi);color:#fff;font-size:32px;display:grid;place-items:center;border:5px solid var(--zemin);box-shadow:0 8px 20px rgba(29,99,184,.35)}
+/* alttan açılan panel */
+.perde{position:absolute;inset:0;background:rgba(8,14,26,.45);z-index:20;display:none}
+.perde.acik{display:block}
+.alt-panel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:26px 26px 0 0;padding:10px 16px 30px;z-index:21;transform:translateY(105%);transition:transform .22s}
+.alt-panel.acik{transform:none}
+.tutamak{width:40px;height:5px;border-radius:9px;background:#d5dae4;margin:0 auto 12px}
+.alt-panel h3{font-size:17px;margin-bottom:12px}
+.izgara{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.izgara button{border:0;background:var(--zemin);border-radius:18px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;gap:7px;font-weight:700;font-size:12.5px;color:var(--metin);cursor:pointer}
+.izgara i{font-style:normal;width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:22px}
+.menu-grup{font-size:12px;font-weight:800;color:var(--soluk);text-transform:uppercase;letter-spacing:.5px;margin:14px 2px 8px}
+.kullanici{display:flex;align-items:center;gap:12px;padding:12px;background:var(--zemin);border-radius:16px;margin-top:14px}
+.kullanici .av{width:40px;height:40px;border-radius:50%;background:var(--turkuaz);color:#fff;display:grid;place-items:center;font-weight:800}
+.kullanici div{flex:1}
+.kullanici span{font-size:12.5px;color:var(--soluk)}
+.kullanici button{border:1px solid var(--cizgi);background:#fff;border-radius:10px;padding:8px 11px;font-weight:700;cursor:pointer}
+.c-mavi{background:var(--mavi-acik);color:var(--mavi)}.c-yesil{background:var(--turkuaz-acik);color:var(--turkuaz)}.c-amber{background:var(--amber-acik);color:var(--amber)}.c-kirmizi{background:var(--mercan-acik);color:var(--mercan)}.c-lacivert{background:#e7ebf3;color:var(--lacivert)}
+.dev{min-height:62px;font-size:18px;width:100%;border-radius:16px}
+.parti-adim{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eef0f5;font-size:15px}
+.kur{background:var(--lacivert);color:#fff;border-radius:18px;padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:center;font-size:13.5px}
+.kur b{display:block;font-size:15px}
+.kur button{border:0;background:#fff;color:var(--lacivert);border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="aciklama">
+  <h1>İMECE — telefon görünümü (taslak)</h1>
+  <p>Telefondan açınca program bir <b>mobil uygulama</b> gibi davranacak. Bilgisayardaki görünüm değişmiyor.</p>
+  <h2>Ne değişiyor?</h2>
+  <ul>
+    <li><b>Alt çubuk:</b> en çok kullanılan 4 bölüm + ortada büyük <b>＋</b>. Soldan açılan menü kalkıyor.</li>
+    <li><b>＋ düğmesi:</b> "ne yapacaksın?" — satış, tahsilat, alış, ödeme, üretim, sayım tek dokunuşla.</li>
+    <li><b>Menü:</b> alttan açılan panel; tüm bölümler kutucuk olarak, altta hesabın ve çıkış.</li>
+    <li><b>Listeler kart:</b> tablolar yerine parmakla rahat dokunulan satırlar, üstte arama ve filtre.</li>
+    <li><b>Formlarda</b> büyük alanlar, sayı klavyesi, toplam ve <b>Kaydet</b> hep altta sabit.</li>
+    <li><b>Ana ekrana ekle:</b> telefona simgesiyle kurulur, tarayıcı çubuğu olmadan tam ekran açılır.</li>
+    <li>Alt çubuk <b>role göre</b> değişir: depo çalışanı Üretim ve Stok'u görür, para ekranlarını görmez.</li>
+  </ul>
+  <h2>Rol seç (alt çubuğu gör)</h2>
+  <div class="rol">
+    <button class="aktif" onclick="rolSec('on',this)">Ön muhasebe</button>
+    <button onclick="rolSec('depo',this)">Depo / üretim</button>
+    <button onclick="rolSec('muh',this)">Muhasebeci</button>
+  </div>
+  <p style="margin-top:14px;color:var(--soluk);font-size:13px">Telefonun içine tıklayarak gezebilirsin: alt çubuk, ＋, Menü, satış listesinde bir satır, "Yeni satış".</p>
+</div>
+
+<div class="telefon"><div class="ekran" id="ekran">
+  <div class="durum"><span>09:41</span><span>●●● 📶 🔋</span></div>
+
+  <div class="ust">
+    <div class="ust-satir">
+      <button class="geri" id="geri" style="display:none" onclick="git(onceki)">‹</button>
+      <img src="logo.png" alt="" id="ust-logo">
+      <h1 id="ust-baslik">Günaydın, Nagihan<small>Salı, 11 Kasım</small></h1>
+      <button class="ikon-btn" title="Hatırlatıcılar">🔔</button>
+    </div>
+  </div>
+
+  <div class="govde">
+    <!-- ANA SAYFA -->
+    <div class="sayfa aktif" id="s-panel">
+      <div class="kur"><div style="flex:1"><b>Kuruluş: 3/5 adım</b>Açılış bakiyeleri bekleniyor</div><button>Devam</button></div>
+      <div class="hizli" id="hizli-on">
+        <button onclick="git('s-yeni-satis')"><i class="c-mavi">🧾</i>Satış</button>
+        <button><i class="c-yesil">⬇</i>Tahsilat</button>
+        <button><i class="c-amber">📦</i>Alış</button>
+        <button><i class="c-kirmizi">⬆</i>Ödeme</button>
+      </div>
+      <div class="metrikler para">
+        <div class="metrik"><span>Nakit (kasa+banka)</span><b>48.250 ₺</b><small class="yesil" style="color:var(--turkuaz)">POS dahil</small></div>
+        <div class="metrik"><span>Alacak</span><b>31.900 ₺</b><small style="color:var(--mercan)">6.400 ₺ gecikmiş</small></div>
+        <div class="metrik"><span>Bu ay net satış</span><b>92.300 ₺</b><small style="color:var(--turkuaz)">▲ %12</small></div>
+        <div class="metrik"><span>Bu ay fire</span><b>%3,4</b><small style="color:var(--soluk)">14 parti</small></div>
+      </div>
+      <div class="baslik">Dikkat edilecekler</div>
+      <div class="kart">
+        <div class="satir"><div class="yuvar c-kirmizi">⏰</div><div><b>Yılmaz Market</b><span>Vadesi 12 gün geçti</span></div><div class="tutar">6.400 ₺</div></div>
+        <div class="satir"><div class="yuvar c-amber">🥟</div><div><b>Mantı · lot 1108</b><span>SKT 5 gün sonra · 18 paket</span></div></div>
+        <div class="satir"><div class="yuvar c-lacivert">⚙</div><div><b>Su böreği partisi açık</b><span>Dünden kaldı</span></div></div>
+      </div>
+    </div>
+
+    <!-- SATIŞ LİSTESİ -->
+    <div class="sayfa" id="s-satis">
+      <div class="ara"><input placeholder="🔍  Müşteri ya da fatura ara"></div>
+      <div class="cipler"><button class="aktif">Bu ay</button><button>Veresiye</button><button>Peşin</button><button>İptal</button></div>
+      <div class="baslik">Bugün</div>
+      <div class="kart">
+        <div class="satir" onclick="git('s-satis-detay')" style="cursor:pointer"><div class="yuvar c-mavi">🧾</div><div><b>Yılmaz Market</b><span>SAT-24 · 3 kalem</span></div><div class="tutar">4.820 ₺<br><span class="etk e-amber">veresiye</span></div></div>
+        <div class="satir"><div class="yuvar c-mavi">🧾</div><div><b>Perakende</b><span>SAT-23 · 1 kalem</span></div><div class="tutar">640 ₺<br><span class="etk e-yesil">kasa</span></div></div>
+      </div>
+      <div class="baslik">Dün</div>
+      <div class="kart">
+        <div class="satir"><div class="yuvar c-mavi">🧾</div><div><b>Belediye Kreş</b><span>SAT-22 · 5 kalem</span></div><div class="tutar">11.300 ₺<br><span class="etk e-amber">veresiye</span></div></div>
+        <div class="satir"><div class="yuvar c-kirmizi">🧾</div><div><b>Ece Pastanesi</b><span>SAT-21 · iptal edildi</span></div><div class="tutar" style="text-decoration:line-through;color:var(--soluk)">900 ₺</div></div>
+      </div>
+    </div>
+
+    <!-- SATIŞ DETAY -->
+    <div class="sayfa" id="s-satis-detay">
+      <div class="kart">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span class="etk e-amber">veresiye · vade 10 Ara</span><span style="font-size:13px;color:var(--soluk)">11 Kas</span></div>
+        <div style="font-size:30px;font-weight:800;margin:10px 0 2px">4.820 ₺</div>
+        <span style="font-size:13px;color:var(--soluk)">Ara toplam 4.463 ₺ · KDV 357 ₺</span>
+      </div>
+      <div class="baslik">Kalemler</div>
+      <div class="kart">
+        <div class="satir"><div><b>Su böreği</b><span>20 paket × 120 ₺</span></div><div class="tutar">2.400 ₺</div></div>
+        <div class="satir"><div><b>Mantı</b><span>15 paket × 95 ₺ · %5 isk.</span></div><div class="tutar">1.354 ₺</div></div>
+        <div class="satir"><div><b>İçli köfte</b><span>6 paket × 118 ₺</span></div><div class="tutar">708 ₺</div></div>
+      </div>
+      <div class="secim" style="margin-top:4px"><button>↩ İade al</button><button>⬇ Tahsilat gir</button><button style="color:var(--mercan)">İptal et</button></div>
+      <p style="font-size:12.5px;color:var(--soluk);margin-top:12px">Kaydeden: Nagihan Doğan · 11 Kas 10:42</p>
+    </div>
+
+    <!-- YENİ SATIŞ -->
+    <div class="sayfa" id="s-yeni-satis">
+      <div class="alan"><label>Müşteri</label><select><option>Yılmaz Market</option></select></div>
+      <div class="kart">
+        <div class="alan"><label>1. ürün</label><input value="Su böreği"></div>
+        <div class="iki"><div class="alan"><label>Miktar (paket)</label><input inputmode="decimal" value="20"></div><div class="alan"><label>Birim fiyat</label><input inputmode="decimal" value="120"></div></div>
+        <span style="font-size:12.5px;color:var(--soluk)">Stokta 64 paket · KDV %1 · tutar 2.400 ₺</span>
+      </div>
+      <button class="btn-cizgi">+ Ürün ekle</button>
+      <div class="alan" style="margin-top:14px"><label>Ödeme</label>
+        <div class="secim"><button class="aktif">Veresiye</button><button>Kasa</button><button>Ziraat POS</button><button>Banka</button></div></div>
+      <details style="margin-top:6px"><summary style="font-weight:700;color:var(--mavi);padding:8px 0">Daha fazla: tarih, vade, fatura no, iskonto, not</summary>
+        <div class="iki" style="margin-top:8px"><div class="alan"><label>Tarih</label><input type="date" value="2026-11-11"></div><div class="alan"><label>Vade</label><input type="date"></div></div>
+      </details>
+    </div>
+
+    <!-- KASA -->
+    <div class="sayfa" id="s-kasa">
+      <div class="metrikler">
+        <div class="metrik"><span>Merkez kasa</span><b>6.150 ₺</b></div>
+        <div class="metrik"><span>Ziraat vadesiz</span><b>39.800 ₺</b></div>
+        <div class="metrik"><span>Ziraat POS</span><b>2.300 ₺</b><small style="color:var(--soluk)">bankaya geçecek</small></div>
+        <div class="metrik"><span>Şirket kartı</span><b style="color:var(--mercan)">−3.100 ₺</b></div>
+      </div>
+      <div class="secim" style="margin-bottom:12px"><button>⬇ Tahsilat</button><button>⬆ Ödeme</button><button>⇄ Virman</button></div>
+      <div class="baslik">Son hareketler</div>
+      <div class="kart">
+        <div class="satir"><div class="yuvar c-yesil">⬇</div><div><b>Belediye Kreş</b><span>Tahsilat · Ziraat vadesiz</span></div><div class="tutar" style="color:var(--turkuaz)">+8.000 ₺</div></div>
+        <div class="satir"><div class="yuvar c-kirmizi">⬆</div><div><b>Akın Un</b><span>Ödeme · Merkez kasa</span></div><div class="tutar" style="color:var(--mercan)">−2.750 ₺</div></div>
+        <div class="satir"><div class="yuvar c-lacivert">⇄</div><div><b>POS → banka</b><span>Virman · komisyon 46 ₺</span></div><div class="tutar">2.254 ₺</div></div>
+      </div>
+    </div>
+
+    <!-- ÜRETİM (depo) -->
+    <div class="sayfa" id="s-uretim">
+      <div class="kart">
+        <div style="display:flex;justify-content:space-between"><b style="font-size:17px">Su böreği · P-31</b><span class="etk e-amber">açık</span></div>
+        <span style="font-size:13px;color:var(--soluk)">Başladı 08:15 · Sorumlu Ayşe</span>
+        <div class="parti-adim"><span>Un</span><b>12,5 kg</b></div>
+        <div class="parti-adim"><span>Peynir</span><b>6 kg</b></div>
+        <div class="parti-adim" style="border:0"><span>Yağ</span><b>2 lt</b></div>
+      </div>
+      <div class="alan"><label>Malzeme</label><input placeholder="Un, peynir, kutu…"></div>
+      <div class="alan"><label>Tartılan (kg)</label><input inputmode="decimal" placeholder="0"></div>
+      <button class="btn-ana dev">+ Ekle</button>
+      <button class="btn-ana dev" style="background:var(--turkuaz);margin-top:10px">■ Partiyi bitir</button>
+    </div>
+  </div>
+
+  <!-- yeni satışta sabit alt -->
+  <div class="yapiskan" id="yapiskan" style="display:none">
+    <div class="top"><span>Toplam (KDV dahil)</span><b>2.424 ₺</b></div>
+    <button class="btn-ana" onclick="git('s-satis-detay')">Kaydet</button>
+  </div>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <div class="perde" id="perde" onclick="kapat()"></div>
+  <div class="alt-panel" id="p-arti">
+    <div class="tutamak"></div>
+    <h3>Ne kaydedeceksin?</h3>
+    <div class="izgara" id="arti-izgara"></div>
+  </div>
+  <div class="alt-panel" id="p-menu" style="max-height:82%;overflow-y:auto">
+    <div class="tutamak"></div>
+    <div class="menu-grup">Operasyon</div>
+    <div class="izgara">
+      <button><i class="c-amber">📦</i>Alış</button><button onclick="kapat();git('s-uretim')"><i class="c-lacivert">⚙</i>Üretim</button><button><i class="c-yesil">🏷</i>Stok</button>
+    </div>
+    <div class="menu-grup">Finans ve muhasebe</div>
+    <div class="izgara">
+      <button><i class="c-mavi">👥</i>Cariler</button><button><i class="c-mavi">📄</i>Çek / Senet</button><button><i class="c-yesil">📊</i>Raporlar</button>
+      <button><i class="c-lacivert">🗂</i>Hesap Planı</button><button><i class="c-lacivert">🕘</i>İşlem Geçmişi</button>
+    </div>
+    <div class="menu-grup">Genel</div>
+    <div class="izgara">
+      <button><i class="c-amber">🔔</i>Hatırlatıcılar</button><button><i class="c-amber">📝</i>Notlar</button><button><i class="c-yesil">❓</i>Kılavuz</button>
+    </div>
+    <div class="kullanici"><div class="av">ND</div><div><b>Nagihan Doğan</b><br><span>Ön muhasebe</span></div><button>🌙</button><button>Çıkış</button></div>
+  </div>
+</div></div>
+
+<script>
+const ROLLER={
+  on:{tab:[['s-panel','🏠','Ana sayfa'],['s-satis','🧾','Satış'],['+'],['s-kasa','💰','Kasa'],['menu','☰','Menü']],
+      arti:[['🧾','Satış','c-mavi','s-yeni-satis'],['⬇','Tahsilat','c-yesil'],['📦','Alış','c-amber'],['⬆','Ödeme','c-kirmizi'],['⚙','Üretim','c-lacivert','s-uretim'],['🔢','Sayım','c-lacivert'],['⇄','Virman','c-mavi'],['↩','İade','c-amber']]},
+  depo:{tab:[['s-panel','🏠','Ana sayfa'],['s-uretim','⚙','Üretim'],['+'],['stok','🏷','Stok'],['menu','☰','Menü']],
+      arti:[['⚙','Üretim başlat','c-lacivert','s-uretim'],['📦','Mal girişi','c-amber'],['🔢','Sayım','c-lacivert']]},
+  muh:{tab:[['s-panel','🏠','Ana sayfa'],['rapor','📊','Raporlar'],['s-satis','🧾','Satış'],['s-kasa','💰','Kasa'],['menu','☰','Menü']],arti:[]}
+};
+const BASLIK={'s-panel':null,'s-satis':'Satış','s-satis-detay':'SAT-24 · Yılmaz Market','s-yeni-satis':'Yeni satış','s-kasa':'Kasa ve Banka','s-uretim':'Üretim'};
+let rol='on',aktif='s-panel',onceki='s-panel';
+function git(id){
+  if(!document.getElementById(id))return;
+  if(id!==aktif)onceki=['s-satis-detay','s-yeni-satis'].includes(aktif)?'s-satis':aktif;
+  aktif=id;
+  document.querySelectorAll('.sayfa').forEach(s=>s.classList.toggle('aktif',s.id===id));
+  const b=BASLIK[id], alt=['s-satis-detay','s-yeni-satis'].includes(id);
+  document.getElementById('ust-baslik').innerHTML=b?b:'Günaydın, '+(rol==='depo'?'Ayşe':rol==='muh'?'Tolga Bey':'Nagihan')+'<small>Salı, 11 Kasım</small>';
+  document.getElementById('geri').style.display=alt?'':'none';
+  document.getElementById('ust-logo').style.display=alt?'none':'';
+  document.getElementById('tabbar').style.display=id==='s-yeni-satis'?'none':'';
+  document.getElementById('yapiskan').style.display=id==='s-yeni-satis'?'':'none';
+  document.querySelectorAll('.para').forEach(e=>e.style.display=rol==='depo'?'none':'');
+  document.getElementById('hizli-on').style.display=rol==='on'?'':'none';
+  ciz();
+}
+function ciz(){
+  const t=document.getElementById('tabbar');t.innerHTML='';
+  ROLLER[rol].tab.forEach(x=>{
+    const b=document.createElement('button');
+    if(x[0]==='+'){b.className='arti';b.innerHTML='<span>＋</span>';b.onclick=()=>ac('p-arti');}
+    else{b.innerHTML='<i>'+x[1]+'</i>'+x[2];if(x[0]===aktif||(aktif.startsWith(x[0])&&x[0]!=='s-'))b.classList.add('aktif');
+      b.onclick=()=>x[0]==='menu'?ac('p-menu'):git(x[0]);}
+    t.appendChild(b);
+  });
+  const g=document.getElementById('arti-izgara');g.innerHTML='';
+  ROLLER[rol].arti.forEach(a=>{const b=document.createElement('button');b.innerHTML='<i class="'+a[2]+'">'+a[0]+'</i>'+a[1];b.onclick=()=>{kapat();if(a[3])git(a[3]);};g.appendChild(b);});
+}
+function ac(id){document.getElementById('perde').classList.add('acik');document.getElementById(id).classList.add('acik');}
+function kapat(){document.getElementById('perde').classList.remove('acik');document.querySelectorAll('.alt-panel').forEach(p=>p.classList.remove('acik'));}
+function rolSec(r,el){rol=r;document.querySelectorAll('.rol button').forEach(b=>b.classList.toggle('aktif',b===el));git('s-panel');}
+git('s-panel');
+</script>
+</body>
+</html>
