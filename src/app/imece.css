@@ -475,6 +475,39 @@ details.form-ac[open]>summary{display:none}
 .yk-alt{width:60%;margin-bottom:8px}
 @keyframes yk-nabiz{from{opacity:.45}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.yk-cizgi,.mc-panel,.mc-perde{animation:none}}
+/* Reçete malzeme tablosu */
+.rc-tablo{display:flex;flex-direction:column;gap:6px}
+.rc-satir{display:grid;grid-template-columns:28px 92px minmax(0,1fr) 110px 48px 40px;gap:8px;align-items:center}
+.rc-bas{font-size:11.5px;font-weight:800;color:var(--soluk);text-transform:uppercase;letter-spacing:.4px;padding-bottom:2px;border-bottom:1px solid var(--cizgi)}
+.rc-solkolon{display:contents}
+.rc-sira{color:var(--soluk);font-weight:700;font-size:13px;text-align:right}
+.rc-kod{font-family:var(--font-kod),Consolas,monospace;font-size:12.5px;font-weight:700;color:var(--mavi)}
+.rc-birim{color:var(--soluk);font-size:13px}
+.rc-satir input{border:1px solid #d7dce6;border-radius:8px;padding:6px 10px;background:#fff;min-height:36px;width:100%;min-width:0}
+.rc-satir .rc-miktar{text-align:right}
+.rc-sil{width:36px;height:36px;border:1px solid var(--cizgi);border-radius:8px;background:#fff;color:var(--soluk);font-size:18px;line-height:1;cursor:pointer}
+.rc-sil:hover{color:var(--mercan);border-color:var(--mercan)}
+.rc-secici{position:relative;min-width:0}
+.rc-liste{position:absolute;z-index:30;top:calc(100% + 4px);left:0;right:0;min-width:240px;max-height:280px;overflow-y:auto;margin:0;padding:4px;list-style:none;background:var(--kart);border:1px solid var(--cizgi);border-radius:10px;box-shadow:var(--golge)}
+.rc-liste li{display:flex;gap:10px;align-items:baseline;padding:8px 10px;border-radius:7px;cursor:pointer}
+.rc-liste li.secili{background:var(--mavi-acik)}
+.rc-liste li .rc-kod{flex:0 0 auto}
+.rc-liste .rc-yok{color:var(--soluk);cursor:default}
+[data-theme="dark"] .rc-satir input,[data-theme="dark"] .rc-sil{background:var(--kart);border-color:var(--cizgi)}
+@media (max-width:640px){
+  .rc-satir{grid-template-columns:52px minmax(0,1fr) 64px 34px 32px;gap:6px}
+  .rc-bas .rc-kodbas{display:none}
+  .rc-solkolon{display:flex;flex-direction:column;line-height:1.2}
+  .rc-solkolon .rc-sira{text-align:left;font-size:11px}
+  .rc-solkolon .rc-kod{font-size:10.5px}
+  .rc-sil{width:32px;height:36px}
+  .rc-satir input{padding:6px 8px}
+  .rc-liste{min-width:0;right:-110px}
+  .rc-secici:not(:focus-within) .rc-ad-goster{display:block;border:1px solid #d7dce6;border-radius:8px;padding:6px 8px;min-height:36px;font-size:15px;line-height:1.3;overflow-wrap:anywhere;pointer-events:none}
+  .rc-secici:not(:focus-within) .rc-ad-goster+input{position:absolute;inset:0;height:100%;color:transparent;background:transparent;border-color:transparent}
+  [data-theme="dark"] .rc-secici .rc-ad-goster{border-color:var(--cizgi);background:var(--kart)}
+}
+.rc-ad-goster{display:none}
 }
 /* Küçük yazı düğmeleri (Düzenle / Sil) telefonda parmakla basılacak büyüklükte olsun */
 @media (max-width:1000px){.dokun{min-height:40px;min-width:44px;padding:0 6px;font-size:13.5px!important}}

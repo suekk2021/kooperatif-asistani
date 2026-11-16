@@ -36,5 +36,20 @@
 - **⛔ Kullanıcı kuralı (13 Kas): çalışanlar şu an veri giriyor; bana sormadan hiçbir veri silinmez.** Aşağıdaki dönem sonu temizliği de önce listelenip onaylanmadan yapılmaz.
 - Bitiş 25 Kas → **30 Kas 2026** (`src/lib/test-donemi.ts`, şerit buradan okur). Dönem sonunda: test kartları/kayıtları sil + sayaçları sıfırla + açılış ayarını sıfırla + şeridi `null` yap; **stok grupları ve hesap planındaki grup hesapları silinmez** (grup tanımı gerçek yapı); kartları tutma kararı o gün sorulur.
 
+### 6. Reçete ekranı görünüm düzeni (16 Kas 2026, Fatih Bey WhatsApp)
+- Dosya: `src/components/uretim/ReceteFormu.tsx`. Fatih Bey reçeteyi PC'den girdi, kaydetti; "sorun yok, sadece görsel".
+- **a)** Her satırdaki "1. malzeme" / "Miktar (kg)" başlıkları kalksın; en üstte tek başlık satırı: Sıra | Kod | Malzeme | Miktar | Birim | Sil (Fatih Bey'in örnek tablosu gibi, küçük alanda çok satır).
+- **b)** Kod malzemenin başında, noktasız (15010002). Şu an etikette noktalı (`kart.kod`, `kodGoster` kullanılmamış).
+- **c)** Birim miktarın sağında yazsın.
+- **d)** Açılır listede kod + ad birlikte görünsün (şu an `datalist` yalnız ad).
+- **e)** Mobilde ▼ ile liste açılmıyor, yazınca geliyor. Fatih Bey: "kaldırılabilir de, kalabilir de". Mobilde de satırlar tek satır olmalı (şu an ad/miktar alt alta, uzun kaydırma).
+- **Korunacak:** harf yazınca listenin süzülmesi ("U'ya basar basmaz gelmesi çok hoş").
+- **Fatih Bey onayladı, yapıldı (16 Kas, yerelde, canlıya alınmadı):** tablo düzeni + kendi arama listesi (kod+ad, kodla da arar, ok/Enter, seçince miktara geçer, kutuya girince tüm liste). Telefonda ad kutuya sığmazsa alt satıra kayar. tsc + eslint temiz; masaüstü + 390px telefon görünümü ego'da denendi (kaydetmeden). Kullanıcı onayıyla canlıya alındı (16 Kas).
+
+### 7. Reçete maliyeti görünsün (16 Kas 2026, Fatih Bey)
+- İstek: reçete maliyetlerini görebileceği bir alan.
+- Veri var: `stok_durumu.ortalama_maliyet` (stoktaki ortalama); stok yoksa son alış fiyatı (`guncel_birim_maliyet` SQL fonksiyonu üretimde bunu kullanıyor). Reçete maliyeti = Σ miktar × birim maliyet; ürün birimi başına = toplam / "kaç kg için".
+- Sorulacak: kim görsün (maliyet hassas bilgi), sadece görüntü mü yoksa satış fiyatıyla kâr payı da mı.
+
 ## Bitenler
 (henüz yok)
