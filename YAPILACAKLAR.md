@@ -5,6 +5,8 @@
 
 ## Açık
 
+> **24 Kas 2026 kapanış (kullanıcı):** aşağıdakiler bekleyen iş değil, hepsi "karşı taraftan istek gelirse yapılır". Fatih Bey'in ertelediği KDV / marj / 151-153 konuları listeden düştü; yeni istek gelince buraya eklenir.
+
 ### 1. Notlar yalnız ilgili kişilere görünsün (12 Kas 2026, kullanıcı)
 - **Sorun (kodda doğrulandı):** `src/app/(uygulama)/notlar/page.tsx` notları kimseye göre süzmüyor; veritabanı okuma kuralı da giriş yapan herkese açık (`20261111280000_not_medya.sql` yorumu: "notları zaten giriş yapan herkes görüyor"). Yani Fatih Bey'e yazılan not Nagihan Hanım'a da görünüyor.
 - **İstenen:** bir not yalnız gönderene ve alıcılarına görünsün. "Herkes" seçilmiş notu herkes görür.
