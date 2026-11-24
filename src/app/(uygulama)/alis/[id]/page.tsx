@@ -5,7 +5,7 @@ import { KayitIzi } from "@/components/KayitIzi";
 import { FaturaIadeleri } from "@/components/iade/FaturaIadeleri";
 import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
-import { sayi, tarihTR, tl } from "@/lib/imece";
+import { kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { createClient } from "@/lib/supabase/server";
 import type { AlisFaturasi, AlisKalemi, Cari, KasaBankaHesabi, ParaHareketi, StokKarti, YevmiyeSatiri } from "@/types/database";
@@ -52,7 +52,7 @@ export default async function AlisDetayPage({ params }: { params: Promise<{ id: 
             Alış · {f.belge_no} {iptal && <span className="etk e-kirmizi">iptal</span>}
           </h1>
           <p>
-            {cari.unvan} <span className="kod">{cari.kod}</span> · {tarihTR(f.tarih)}
+            {cari.unvan} <span className="kod">{kodGoster(cari.kod)}</span> · {tarihTR(f.tarih)}
             {f.vade_tarihi && ` · vade ${tarihTR(f.vade_tarihi)}`}
           </p>
         </div>
@@ -97,7 +97,7 @@ export default async function AlisDetayPage({ params }: { params: Promise<{ id: 
                       {!s && k.aciklama && <span className="soluk"> · {hesapAdlari.get(k.hesap_kodu ?? "")}</span>}
                     </td>
                     <td data-label="Kod" className="mobil-gizle">
-                      <span className="kod">{s?.kod ?? k.hesap_kodu}</span>
+                      <span className="kod">{kodGoster(s?.kod ?? k.hesap_kodu)}</span>
                     </td>
                     <td data-label="Miktar" className="sag num">
                       {sayi(k.miktar)} {s?.birim ?? ""}
@@ -123,7 +123,7 @@ export default async function AlisDetayPage({ params }: { params: Promise<{ id: 
             <span className="soluk">Ödeme: </span>
             {odemeHesabi ? (
               <span className="etk e-yesil">
-                Peşin · {odemeHesabi.ad} ({odemeHesabi.kod})
+                Peşin · {odemeHesabi.ad} ({kodGoster(odemeHesabi.kod)})
               </span>
             ) : (
               <span className="etk e-amber">Veresiye</span>

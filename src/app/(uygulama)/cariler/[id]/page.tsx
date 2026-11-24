@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CariDuzenleFormu } from "@/components/KartDuzenleFormlari";
-import { CARI_TURU_ADI, tarihTR, tl } from "@/lib/imece";
+import { CARI_TURU_ADI, kodGoster, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { createClient } from "@/lib/supabase/server";
 import type { Cari, YevmiyeSatiri } from "@/types/database";
@@ -81,7 +81,7 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
         <div>
           <h1>{cari.unvan}</h1>
           <p>
-            {CARI_TURU_ADI[cari.tur].tekil} <span className="kod">{cari.kod}</span>
+            {CARI_TURU_ADI[cari.tur].tekil} <span className="kod">{kodGoster(cari.kod)}</span>
             {cari.telefon && ` · ${cari.telefon}`}
             {cari.vergi_no && ` · VKN ${cari.vergi_no}`}
             {cari.vade_gun > 0 && ` · vade ${cari.vade_gun} gün`}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { YeniEvrakFormu } from "@/components/cek-senet/EvrakFormlari";
 import { createClient } from "@/lib/supabase/server";
 import { bugunIstanbul } from "@/lib/tarih";
-import { tarihTR, tl } from "@/lib/imece";
+import { kodGoster, tarihTR, tl } from "@/lib/imece";
 import { EVRAK_DURUM, VADE_UYARI_GUN, evrakAdi } from "@/lib/cek-senet";
 import { islemIzni, oturum } from "@/lib/yetki";
 
@@ -111,7 +111,7 @@ export default async function CekSenetPage({ searchParams }: { searchParams: Pro
                         {(e.seri_no || e.banka) && <span className="soluk"> · {[e.seri_no, e.banka].filter(Boolean).join(" · ")}</span>}
                       </td>
                       <td data-label="Cari">
-                        {cari?.unvan} <span className="kod">{cari?.kod}</span>
+                        {cari?.unvan} <span className="kod">{kodGoster(cari?.kod)}</span>
                       </td>
                       <td data-label="Tutar" className="sag num ana-deger">
                         {tl(e.tutar)}

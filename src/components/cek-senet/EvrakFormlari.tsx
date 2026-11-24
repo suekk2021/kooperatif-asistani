@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { evrakIslem, evrakKaydet } from "@/app/actions/cek-senet";
 import { FormMesaji } from "@/components/FormMesaji";
-import { trSayi } from "@/lib/imece";
+import { kodGoster, trSayi } from "@/lib/imece";
 
 type Cari = { id: string; unvan: string; kod: string; tur: "musteri" | "tedarikci" };
 type Hesap = { id: string; ad: string; kod: string };
@@ -87,7 +87,7 @@ export function YeniEvrakFormu({ cariler, bugun }: { cariler: Cari[]; bugun: str
             <option value="">Seçin</option>
             {uygunCariler.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.unvan} ({c.kod})
+                {c.unvan} ({kodGoster(c.kod)})
               </option>
             ))}
           </select>
@@ -195,7 +195,7 @@ export function EvrakIslemFormu({
                 <option value="">Seçin</option>
                 {hesaplar.map((h) => (
                   <option key={h.id} value={h.id}>
-                    {h.ad} ({h.kod})
+                    {h.ad} ({kodGoster(h.kod)})
                   </option>
                 ))}
               </select>
@@ -208,7 +208,7 @@ export function EvrakIslemFormu({
                 <option value="">Seçin</option>
                 {tedarikciler.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.unvan} ({c.kod})
+                    {c.unvan} ({kodGoster(c.kod)})
                   </option>
                 ))}
               </select>

@@ -6,7 +6,7 @@ import { KayitIzi } from "@/components/KayitIzi";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { createClient } from "@/lib/supabase/server";
 import { bugunIstanbul } from "@/lib/tarih";
-import { tarihTR, tl } from "@/lib/imece";
+import { kodGoster, tarihTR, tl } from "@/lib/imece";
 import { EVRAK_DURUM, EVRAK_ISLEM_ADI, evrakAdi } from "@/lib/cek-senet";
 import { iptalEdebilir, islemIzni, oturum, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import type { YevmiyeSatiri } from "@/types/database";
@@ -52,7 +52,7 @@ export default async function EvrakDetayPage({ params }: { params: Promise<{ id:
           </h1>
           <p>
             {e.yon === "alinan" ? "Müşteriden alındı" : "Tedarikçiye verildi"} · <Link href={`/cariler/${cari?.id}`}>{cari?.unvan}</Link>{" "}
-            <span className="kod">{cari?.kod}</span>
+            <span className="kod">{kodGoster(cari?.kod)}</span>
           </p>
         </div>
         <div className="ust-araclar">

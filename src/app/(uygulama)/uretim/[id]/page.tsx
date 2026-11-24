@@ -5,7 +5,7 @@ import { KayitIzi } from "@/components/KayitIzi";
 import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
 import { GirdiFormu, GirdiSilDugmesi, PartiBitirFormu } from "@/components/uretim/UretimFormlari";
-import { sayi, tarihTR, tl } from "@/lib/imece";
+import { kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { karPayi } from "@/lib/maliyet";
 import { maliyetGorurMu } from "@/lib/roller";
@@ -197,7 +197,7 @@ export default async function PartiPage({ params }: { params: Promise<{ id: stri
                     return (
                       <tr key={kid}>
                         <td>
-                          <b>{k?.ad}</b> <span className="kod">{k?.kod}</span>
+                          <b>{k?.ad}</b> <span className="kod">{kodGoster(k?.kod)}</span>
                         </td>
                         <td data-label="Verilen" className="sag num">
                           {sayi(verilen)} {k?.birim}

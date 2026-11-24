@@ -5,7 +5,7 @@ import { useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { iadeKaydet } from "@/app/actions/iade";
 import { FormMesaji } from "@/components/FormMesaji";
-import { sayi, tl, trSayi } from "@/lib/imece";
+import { kodGoster, sayi, tl, trSayi } from "@/lib/imece";
 
 export type IadeEdilebilirKalem = {
   kalem_id: number;
@@ -99,7 +99,7 @@ export function IadeFormu({
             <div className="form-satir" style={{ alignItems: "flex-end" }}>
               <div className="alan" style={{ flex: "2 1 220px" }}>
                 <label>
-                  {k.ad} <span className="kod">{k.kod}</span>
+                  {k.ad} <span className="kod">{kodGoster(k.kod)}</span>
                 </label>
                 <span className="soluk" style={{ fontSize: 13 }}>
                   {tur === "satis" ? "Satılan" : "Alınan"} {sayi(k.satilan)} {k.birim} · iade edilebilir <b>{sayi(k.kalan)}</b> · birim {tl(k.net_birim)} (iskonto sonrası)

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { YeniCariFormu } from "@/components/cari/YeniCariFormu";
-import { CARI_TURU_ADI, tl } from "@/lib/imece";
+import { CARI_TURU_ADI, kodGoster, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { createClient } from "@/lib/supabase/server";
 import type { Cari, CariTuru, HesapBakiyesi } from "@/types/database";
@@ -92,7 +92,7 @@ export default async function CarilerPage({
                         </Link>
                       </td>
                       <td data-label="Kod" className="mobil-gizle">
-                        <span className="kod">{c.kod}</span>
+                        <span className="kod">{kodGoster(c.kod)}</span>
                       </td>
                       <td data-label="Telefon">{c.telefon}</td>
                       <td data-label="Vergi no" className="mobil-gizle">{c.vergi_no}</td>

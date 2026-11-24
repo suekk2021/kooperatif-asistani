@@ -1,4 +1,4 @@
-import { tl } from "@/lib/imece";
+import { kodGoster, tl } from "@/lib/imece";
 import { createClient } from "@/lib/supabase/server";
 import type { Hesap, HesapBakiyesi } from "@/types/database";
 
@@ -61,7 +61,7 @@ export default async function HesapPlaniPage() {
                       return (
                         <tr key={h.kod} style={h.aktif ? undefined : { opacity: 0.5 }}>
                           <td style={{ paddingLeft: 14 + seviye * 18 }}>
-                            <span className="kod">{h.kod}</span>
+                            <span className="kod">{kodGoster(h.kod)}</span>
                           </td>
                           <td data-label="Hesap">
                             {seviye === 0 ? <b>{h.ad}</b> : h.ad}

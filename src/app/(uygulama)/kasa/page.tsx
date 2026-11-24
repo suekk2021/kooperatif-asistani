@@ -3,7 +3,7 @@ import { IptalFormu } from "@/components/IptalFormu";
 import { oturum, iptalEdebilir } from "@/lib/yetki";
 import { ParaIslemleri } from "@/components/kasa/ParaIslemleri";
 import { FisOzeti } from "@/components/MuhasebeKarsiligi";
-import { PARA_HAREKETI_TURU_ADI, PARA_HESABI_TURU_ADI, tarihTR, tl } from "@/lib/imece";
+import { kodGoster, PARA_HAREKETI_TURU_ADI, PARA_HESABI_TURU_ADI, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { createClient } from "@/lib/supabase/server";
 import { bugunIstanbul } from "@/lib/tarih";
@@ -104,7 +104,7 @@ export default async function KasaPage({ searchParams }: { searchParams: Promise
           return (
             <div key={h.id} className="kart kart-ic metrik">
               <div className="etiket">
-                {h.ad} <span className="kod">{h.kod}</span>
+                {h.ad} <span className="kod">{kodGoster(h.kod)}</span>
               </div>
               <div className={`deger num${(kart && gosterilen > 0) || (!kart && gosterilen < 0) ? " kirmizi" : ""}`}>
                 {tl(gosterilen)}

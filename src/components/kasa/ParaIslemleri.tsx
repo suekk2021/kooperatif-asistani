@@ -4,7 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { paraHareketiKaydet, paraHesabiAc } from "@/app/actions/kasa";
 import { FormMesaji } from "@/components/FormMesaji";
-import { PARA_HESABI_TURU_ADI } from "@/lib/imece";
+import { kodGoster, PARA_HESABI_TURU_ADI } from "@/lib/imece";
 import type { Cari, KasaBankaHesabi, ParaHesabiTuru } from "@/types/database";
 
 type Sekme = "tahsilat" | "odeme" | "virman" | "hesap";
@@ -47,7 +47,7 @@ export function ParaIslemleri({
   const bankalar = hesaplar.filter((h) => h.tur === "banka");
   const secenek = (h: KasaBankaHesabi) => (
     <option key={h.id} value={h.id}>
-      {h.ad} ({h.kod})
+      {h.ad} ({kodGoster(h.kod)})
     </option>
   );
   const cariListesi = (tercih: "musteri" | "tedarikci") =>

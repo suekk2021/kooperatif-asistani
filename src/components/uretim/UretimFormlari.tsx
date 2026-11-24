@@ -1,5 +1,6 @@
 "use client";
 
+import { kodGoster } from "@/lib/imece";
 import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
@@ -64,7 +65,7 @@ export function GirdiFormu({ partiId, malzemeler }: { partiId: string; malzemele
       <input type="hidden" name="stok_karti_id" value={kart?.id ?? ""} />
       <div className="form-satir" style={{ alignItems: "flex-end" }}>
         <div className="alan" style={{ flex: "2 1 200px" }}>
-          <label htmlFor="malzeme">Malzeme {kart && <span className="kod">{kart.kod}</span>}</label>
+          <label htmlFor="malzeme">Malzeme {kart && <span className="kod">{kodGoster(kart.kod)}</span>}</label>
           <input
             id="malzeme"
             list="parti-malzemeleri"

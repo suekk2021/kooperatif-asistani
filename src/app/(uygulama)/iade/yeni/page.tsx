@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { IadeFormu, type IadeEdilebilirKalem } from "@/components/iade/IadeFormu";
 import { createClient } from "@/lib/supabase/server";
 import { bugunIstanbul } from "@/lib/tarih";
-import { tarihTR } from "@/lib/imece";
+import { kodGoster, tarihTR } from "@/lib/imece";
 import { islemIzni, oturum } from "@/lib/yetki";
 
 export default async function IadeYeniPage({ searchParams }: { searchParams: Promise<{ satis?: string; alis?: string }> }) {
@@ -71,7 +71,7 @@ export default async function IadeYeniPage({ searchParams }: { searchParams: Pro
         <div>
           <h1>{tur === "satis" ? "Müşteriden iade al" : "Tedarikçiye iade et"}</h1>
           <p>
-            {tur === "satis" ? "Satış" : "Alış faturası"} <Link href={geri}>{no}</Link> · {cari?.unvan} <span className="kod">{cari?.kod}</span> ·{" "}
+            {tur === "satis" ? "Satış" : "Alış faturası"} <Link href={geri}>{no}</Link> · {cari?.unvan} <span className="kod">{kodGoster(cari?.kod)}</span> ·{" "}
             {tarihTR(fatura.tarih)}
           </p>
         </div>

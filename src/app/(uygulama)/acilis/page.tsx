@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AcilisAyarFormu, AcilisTablosu, type AcilisSatiri } from "@/components/acilis/AcilisFormlari";
 import { IptalFormu } from "@/components/IptalFormu";
-import { PARA_HESABI_TURU_ADI, STOK_TURU_ADI, tarihTR, tl } from "@/lib/imece";
+import { kodGoster, PARA_HESABI_TURU_ADI, STOK_TURU_ADI, tarihTR, tl } from "@/lib/imece";
 import { mevcutRol } from "@/lib/rol";
 import { iptalEdebilir, islemIzni, oturum } from "@/lib/yetki";
 import { createClient } from "@/lib/supabase/server";
@@ -101,7 +101,7 @@ export default async function AcilisPage({ searchParams }: { searchParams: Promi
       <div className={ayarli ? "kart kart-ic" : "not"} style={{ marginTop: 0, marginBottom: 16 }}>
         {ayarli ? (
           <p style={{ margin: "0 0 10px" }}>
-            Açılış tarihi <b>{tarihTR(ayar!.tarih)}</b> · karşı hesap <span className="kod">{ayar!.karsi_hesap}</span> {karsiAd}
+            Açılış tarihi <b>{tarihTR(ayar!.tarih)}</b> · karşı hesap <span className="kod">{kodGoster(ayar!.karsi_hesap)}</span> {karsiAd}
             <span className="soluk"> — girilen her açılış kaydı bu tarihe yazılır; borç-alacak farkı bu hesaba gider.</span>
           </p>
         ) : (

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { IptalFormu } from "@/components/IptalFormu";
 import { KayitIzi } from "@/components/KayitIzi";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
-import { sayi, tarihTR, tl } from "@/lib/imece";
+import { kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { createClient } from "@/lib/supabase/server";
 import { iptalEdebilir, islemIzni, oturum, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import type { Iade, IadeKalemi, ParaHareketi, YevmiyeSatiri } from "@/types/database";
@@ -51,7 +51,7 @@ export default async function IadeDetayPage({ params }: { params: Promise<{ id: 
             {satisIadesi ? "Satış iadesi" : "Alış iadesi"} · İADE-{iade.iade_no} {iptal && <span className="etk e-kirmizi">iptal</span>}
           </h1>
           <p>
-            <Link href={`/cariler/${cari?.id}`}>{cari?.unvan}</Link> <span className="kod">{cari?.kod}</span> · {tarihTR(iade.tarih)} ·{" "}
+            <Link href={`/cariler/${cari?.id}`}>{cari?.unvan}</Link> <span className="kod">{kodGoster(cari?.kod)}</span> · {tarihTR(iade.tarih)} ·{" "}
             {satisIadesi ? "Satış" : "Alış faturası"} <Link href={`/${iade.tur}/${faturaId}`}>{faturaNo}</Link>
             {iade.belge_no && ` · belge ${iade.belge_no}`}
           </p>
@@ -88,7 +88,7 @@ export default async function IadeDetayPage({ params }: { params: Promise<{ id: 
                 return (
                   <tr key={k.id}>
                     <td className="liste-baslik">
-                      <b>{u?.ad}</b> <span className="kod">{u?.kod}</span>
+                      <b>{u?.ad}</b> <span className="kod">{kodGoster(u?.kod)}</span>
                     </td>
                     <td data-label="Miktar" className="sag num">
                       {sayi(k.miktar)} {u?.birim}

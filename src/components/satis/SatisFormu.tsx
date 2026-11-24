@@ -5,7 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { satisKaydet } from "@/app/actions/satis";
 import { FormMesaji } from "@/components/FormMesaji";
-import { PARA_HESABI_TURU_ADI, sayi, tl, trSayi } from "@/lib/imece";
+import { kodGoster, PARA_HESABI_TURU_ADI, sayi, tl, trSayi } from "@/lib/imece";
 import type { Cari, KasaBankaHesabi, KdvOrani, StokKarti } from "@/types/database";
 
 export type SatilabilirUrun = Pick<StokKarti, "id" | "ad" | "kod" | "birim" | "kdv_orani" | "tur" | "satis_fiyati"> & {
@@ -172,7 +172,7 @@ export function SatisFormu({
               <option value="">Seçin</option>
               {musteriler.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.unvan} ({m.kod})
+                  {m.unvan} ({kodGoster(m.kod)})
                 </option>
               ))}
             </select>
@@ -202,7 +202,7 @@ export function SatisFormu({
               <div className="form-satir">
                 <div className="alan" style={{ flex: "2 1 240px" }}>
                   <label>
-                    {i + 1}. ürün {h.urun && <span className="kod">{h.urun.kod}</span>}
+                    {i + 1}. ürün {h.urun && <span className="kod">{kodGoster(h.urun.kod)}</span>}
                   </label>
                   <input
                     list="satis-urunleri"
@@ -385,7 +385,7 @@ export function SatisFormu({
                 {onizleme.map((s) => (
                   <tr key={`${s.kod}-${s.borc ? "b" : "a"}`}>
                     <td>
-                      <span className="kod">{s.kod}</span>
+                      <span className="kod">{kodGoster(s.kod)}</span>
                     </td>
                     <td data-label="Hesap">{hesapAdlari[s.kod] ?? urunler.find((u) => u.kod === s.kod)?.ad ?? cari?.unvan}</td>
                     <td data-label="Borç" className="sag num">
@@ -402,8 +402,8 @@ export function SatisFormu({
         )}
         {odeme && (
           <p className="soluk" style={{ margin: 0, padding: "0 20px 14px", fontSize: 13 }}>
-            Tahsilat ayrıca kaydedilir: <span className="kod">{tahsilatHesaplari.find((h) => h.id === odeme)?.kod}</span> B ·{" "}
-            <span className="kod">{cari?.kod ?? "120…"}</span> A
+            Tahsilat ayrıca kaydedilir: <span className="kod">{kodGoster(tahsilatHesaplari.find((h) => h.id === odeme)?.kod)}</span> B ·{" "}
+            <span className="kod">{kodGoster(cari?.kod ?? "120…")}</span> A
           </p>
         )}
       </div>

@@ -1,4 +1,4 @@
-import { tl } from "@/lib/imece";
+import { kodGoster, tl } from "@/lib/imece";
 import type { YevmiyeSatiri } from "@/types/database";
 
 /** Tablo hücresi için kısa gösterim: "102.01 B · 120.01.002 A" */
@@ -7,7 +7,7 @@ export function FisOzeti({ satirlar }: { satirlar: YevmiyeSatiri[] }) {
     <span style={{ display: "inline-flex", flexWrap: "wrap", gap: "4px 8px", justifyContent: "flex-end" }}>
       {satirlar.map((s) => (
         <span key={s.id} style={{ whiteSpace: "nowrap" }}>
-          <span className="kod">{s.hesap_kodu}</span> {Number(s.borc) > 0 ? "B" : "A"}
+          <span className="kod">{kodGoster(s.hesap_kodu)}</span> {Number(s.borc) > 0 ? "B" : "A"}
         </span>
       ))}
     </span>
@@ -50,7 +50,7 @@ export function MuhasebeKarsiligi({
             {satirlar.map((s) => (
               <tr key={s.id}>
                 <td>
-                  <span className="kod">{s.hesap_kodu}</span>
+                  <span className="kod">{kodGoster(s.hesap_kodu)}</span>
                 </td>
                 <td data-label="Hesap">{s.aciklama ?? hesapAdlari.get(s.hesap_kodu) ?? ""}</td>
                 <td data-label="Borç" className="sag num">

@@ -4,7 +4,7 @@ import { useActionState, useState, useTransition } from "react";
 import { acilisAyariKaydet, acilisKaydet, type AcilisGirdisi } from "@/app/actions/acilis";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { FormMesaji } from "@/components/FormMesaji";
-import { sayi, tl, trSayi } from "@/lib/imece";
+import { kodGoster, sayi, tl, trSayi } from "@/lib/imece";
 
 function sayiCoz(s: string): number {
   const t = s.trim();
@@ -36,7 +36,7 @@ export function AcilisAyarFormu({
           </option>
           {hesaplar.map((h) => (
             <option key={h.kod} value={h.kod}>
-              {h.kod} · {h.ad}
+              {kodGoster(h.kod)} · {h.ad}
             </option>
           ))}
         </select>
@@ -121,7 +121,7 @@ export function AcilisTablosu({ tur, satirlar, kilitli }: { tur: "para" | "cari"
             {satirlar.map((s) => (
               <tr key={s.id}>
                 <td>
-                  <b>{s.ad}</b> <span className="kod">{s.kod}</span>
+                  <b>{s.ad}</b> <span className="kod">{kodGoster(s.kod)}</span>
                   {s.alt && <span className="soluk" style={{ fontSize: 12.5 }}> · {s.alt}</span>}
                 </td>
                 <td data-label="Daha önce girilen" className={`sag num${s.onceki ? "" : " soluk"}`}>

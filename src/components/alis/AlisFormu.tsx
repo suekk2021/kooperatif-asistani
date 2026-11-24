@@ -5,7 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { alisKaydet, type AlisKalemGirdisi } from "@/app/actions/alis";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { FormMesaji } from "@/components/FormMesaji";
-import { PARA_HESABI_TURU_ADI, tl, trSayi } from "@/lib/imece";
+import { kodGoster, PARA_HESABI_TURU_ADI, tl, trSayi } from "@/lib/imece";
 import type { Cari, Hesap, KasaBankaHesabi, KdvOrani, StokKarti } from "@/types/database";
 
 type Kalem = {
@@ -178,7 +178,7 @@ export function AlisFormu({
               <option value="">Seçin</option>
               {tedarikciler.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.unvan} ({t.kod})
+                  {t.unvan} ({kodGoster(t.kod)})
                 </option>
               ))}
             </select>
@@ -232,7 +232,7 @@ export function AlisFormu({
                 {h.k.tip === "stok" ? (
                   <div className="alan" style={{ flex: "2 1 240px" }}>
                     <label>
-                      Malzeme {h.kart && <span className="kod">{h.kart.kod}</span>}
+                      Malzeme {h.kart && <span className="kod">{kodGoster(h.kart.kod)}</span>}
                     </label>
                     <input
                       list="alis-stok-kartlari"
@@ -251,7 +251,7 @@ export function AlisFormu({
                         <option value="">Seçin</option>
                         {giderHesaplari.map((g) => (
                           <option key={g.kod} value={g.kod}>
-                            {g.kod} · {g.ad}
+                            {kodGoster(g.kod)} · {g.ad}
                           </option>
                         ))}
                       </select>
@@ -408,7 +408,7 @@ export function AlisFormu({
                 {onizleme.map((s) => (
                   <tr key={s.kod}>
                     <td>
-                      <span className="kod">{s.kod}</span>
+                      <span className="kod">{kodGoster(s.kod)}</span>
                     </td>
                     <td data-label="Hesap">{hesapAdlari[s.kod] ?? stokKartlari.find((k) => k.kod === s.kod)?.ad ?? cari?.unvan}</td>
                     <td data-label="Borç" className="sag num">
@@ -425,8 +425,8 @@ export function AlisFormu({
         )}
         {odeme && (
           <p className="soluk" style={{ margin: 0, padding: "0 20px 14px", fontSize: 13 }}>
-            Peşin ödeme ayrıca kaydedilir: <span className="kod">{cari?.kod ?? "320…"}</span> B ·{" "}
-            <span className="kod">{odemeHesaplari.find((h) => h.id === odeme)?.kod}</span> A
+            Peşin ödeme ayrıca kaydedilir: <span className="kod">{kodGoster(cari?.kod ?? "320…")}</span> B ·{" "}
+            <span className="kod">{kodGoster(odemeHesaplari.find((h) => h.id === odeme)?.kod)}</span> A
           </p>
         )}
       </div>
