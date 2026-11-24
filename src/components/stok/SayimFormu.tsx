@@ -5,10 +5,11 @@ import { useState, useTransition } from "react";
 import type { FormSonucu } from "@/app/actions/cariler";
 import { sayimKaydet } from "@/app/actions/sayim";
 import { FormMesaji } from "@/components/FormMesaji";
-import { STOK_TURU_ADI, sayi, tl, trSayi } from "@/lib/imece";
-import type { StokTuru } from "@/types/database";
+import { STOK_TURU_ADI, kodGoster, sayi, tl, trSayi } from "@/lib/imece";
+import type { Depo, StokTuru } from "@/types/database";
 
-export type SayimSatiri = { id: string; ad: string; kod: string; tur: StokTuru; birim: string; sistem: number; ortalama: number };
+/** sistem: depo id → o depodaki miktar */
+export type SayimSatiri = { id: string; ad: string; kod: string; tur: StokTuru; birim: string; sistem: Record<number, number>; ortalama: number };
 
 function sayiCoz(s: string): number {
   const t = s.trim();
@@ -16,8 +17,10 @@ function sayiCoz(s: string): number {
   return trSayi(t);
 }
 
-export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun: string }) {
+export function SayimFormu({ satirlar, depolar, bugun }: { satirlar: SayimSatiri[]; depolar: Depo[]; bugun: string }) {
   const router = useRouter();
+  const [depo, setDepo] = useState(depolar.find((d) => d.gorev === "hammadde")?.id ?? depolar[0]?.id ?? 0);
+  const sistem = (s: SayimSatiri) => s.sistem[depo] ?? 0;
   const [filtre, setFiltre] = useState<StokTuru | "hepsi">("hepsi");
   const [sayilan, setSayilan] = useState<Record<string, string>>({});
   const [sayan, setSayan] = useState("");
@@ -28,7 +31,7 @@ export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun
   const turler = [...new Set(satirlar.map((s) => s.tur))];
   const gorunen = filtre === "hepsi" ? satirlar : satirlar.filter((s) => s.tur === filtre);
   const girilen = satirlar.filter((s) => Number.isFinite(sayiCoz(sayilan[s.id] ?? "")));
-  const toplamFark = girilen.reduce((t, s) => t + (sayiCoz(sayilan[s.id]) - s.sistem) * s.ortalama, 0);
+  const toplamFark = girilen.reduce((t, s) => t + (sayiCoz(sayilan[s.id]) - sistem(s)) * s.ortalama, 0);
 
   function kaydet() {
     if (!girilen.length) return setSonuc({ hata: "Hiçbir karta sayılan miktar girilmedi. Sayılmayan kartları boş bırakın." });
@@ -37,6 +40,7 @@ export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun
     baslat(async () => {
       const s = await sayimKaydet({
         tarih: bugun,
+        depo_id: depo,
         sayan: sayan || undefined,
         aciklama: aciklama || undefined,
         kalemler: girilen.map((g) => ({ stok_karti_id: g.id, sayilan: sayiCoz(sayilan[g.id]) })),
@@ -51,12 +55,22 @@ export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun
       <div className="kart-ic" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div className="form-satir">
           <div className="alan">
+            <label htmlFor="depo">Sayılan depo</label>
+            <select id="depo" value={depo} onChange={(e) => setDepo(Number(e.target.value))}>
+              {depolar.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.ad}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="alan">
             <label htmlFor="sayan">Sayan kişi</label>
             <input id="sayan" value={sayan} onChange={(e) => setSayan(e.target.value)} placeholder="Nagihan" />
           </div>
           <div className="alan" style={{ flex: "2 1 260px" }}>
             <label htmlFor="aciklama">Not</label>
-            <input id="aciklama" value={aciklama} onChange={(e) => setAciklama(e.target.value)} placeholder="Ay sonu sayımı, soğuk depo…" />
+            <input id="aciklama" value={aciklama} onChange={(e) => setAciklama(e.target.value)} placeholder="Ay sonu sayımı…" />
           </div>
         </div>
         <div className="secim">
@@ -75,7 +89,7 @@ export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun
           <thead>
             <tr>
               <th>Kart</th>
-              <th className="sag">Sistemde</th>
+              <th className="sag">Sistemde ({depolar.find((d) => d.id === depo)?.ad})</th>
               <th className="sag">Sayılan</th>
               <th className="sag">Fark</th>
             </tr>
@@ -84,14 +98,14 @@ export function SayimFormu({ satirlar, bugun }: { satirlar: SayimSatiri[]; bugun
             {gorunen.map((s) => {
               const deger = sayiCoz(sayilan[s.id] ?? "");
               const girildi = Number.isFinite(deger);
-              const fark = girildi ? deger - s.sistem : 0;
+              const fark = girildi ? deger - sistem(s) : 0;
               return (
                 <tr key={s.id}>
                   <td>
-                    <b>{s.ad}</b> <span className="kod">{s.kod}</span>
+                    <b>{s.ad}</b> <span className="kod">{kodGoster(s.kod)}</span>
                   </td>
                   <td data-label="Sistemde" className="sag num">
-                    {sayi(s.sistem)} {s.birim}
+                    {sayi(sistem(s))} {s.birim}
                   </td>
                   <td data-label="Sayılan" className="sag">
                     <div className="alan" style={{ alignItems: "flex-end" }}>

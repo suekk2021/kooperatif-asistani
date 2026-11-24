@@ -65,6 +65,7 @@ export function mobilDuzen(rol: KullaniciRolu | null, yazar: boolean): { sekmele
       hizli: [
         { yol: "/uretim", ad: "Üretim başlat", ikon: "uretim", renk: "lacivert" },
         { yol: "/alis/yeni", ad: "Mal girişi", ikon: "alis", renk: "amber" },
+        { yol: "/stok/transfer", ad: "Depo transferi", ikon: "virman", renk: "mavi" },
         { yol: "/stok/sayim", ad: "Sayım", ikon: "sayim", renk: "lacivert" },
       ],
     };
@@ -78,6 +79,7 @@ export function mobilDuzen(rol: KullaniciRolu | null, yazar: boolean): { sekmele
         { yol: "/alis/yeni", ad: "Alış", ikon: "alis", renk: "amber" },
         { yol: "/kasa?islem=odeme", ad: "Ödeme", ikon: "odeme", renk: "mercan" },
         { yol: "/uretim", ad: "Üretim", ikon: "uretim", renk: "lacivert" },
+        { yol: "/stok/transfer", ad: "Depo transferi", ikon: "virman", renk: "lacivert" },
         { yol: "/stok/sayim", ad: "Sayım", ikon: "sayim", renk: "lacivert" },
         { yol: "/kasa?islem=virman", ad: "Virman", ikon: "virman", renk: "mavi" },
         { yol: "/cek-senet", ad: "Çek / Senet", ikon: "aktarim", renk: "amber" },

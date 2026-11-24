@@ -5,13 +5,12 @@ import type { FormSonucu } from "@/app/actions/cariler";
 import { stokKartiEkle } from "@/app/actions/stok";
 import { FormMesaji } from "@/components/FormMesaji";
 import { STOK_BIRIMLERI, STOK_TURU_ADI } from "@/lib/imece";
-import type { Depo, KdvOrani, StokGrubu } from "@/types/database";
+import type { KdvOrani, StokGrubu } from "@/types/database";
 
 type Girdi = Record<string, string>;
 
 type Ortak = {
   gruplar: StokGrubu[];
-  depolar: Depo[];
   kdvOranlari: KdvOrani[];
   mevcutAdlar: string[];
 };
@@ -22,7 +21,6 @@ type Ortak = {
 // yazdıkları (düzeltip tekrar kaydedebilsin).
 function KartAlanlari({
   gruplar,
-  depolar,
   kdvOranlari,
   mevcutAdlar,
   bekliyor,
@@ -96,17 +94,6 @@ function KartAlanlari({
       </div>
     </div>
     <div className="form-satir" style={{ marginTop: 12 }}>
-      <div className="alan">
-        <label htmlFor="depo_id">Depo</label>
-        <select id="depo_id" name="depo_id" defaultValue={girdi.depo_id ?? ""}>
-          <option value="">—</option>
-          {depolar.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.ad}
-            </option>
-          ))}
-        </select>
-      </div>
       <div className="alan" style={{ flexBasis: 120, flexGrow: 0 }}>
         <label htmlFor="kdv_orani">KDV</label>
         <select id="kdv_orani" name="kdv_orani" defaultValue={girdi.kdv_orani ?? "1"}>

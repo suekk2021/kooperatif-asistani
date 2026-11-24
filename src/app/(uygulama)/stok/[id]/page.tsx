@@ -5,6 +5,7 @@ import { STOK_TURU_ADI, kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
+import { gorevliDepolar } from "@/lib/depo";
 import type { Depo, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
 
 type Hareket = {
@@ -19,6 +20,7 @@ type Hareket = {
   skt: string | null;
   aciklama: string | null;
   iptal_edilen_hareket: number | null;
+  depo_id: number;
 };
 
 const KAYNAK: Record<string, { ad: string; yol?: string; renk: string }> = {
@@ -29,6 +31,7 @@ const KAYNAK: Record<string, { ad: string; yol?: string; renk: string }> = {
   sayim: { ad: "Sayım farkı", yol: "/stok/sayim/", renk: "e-kirmizi" },
   acilis: { ad: "Açılış", renk: "e-gri" },
   iade: { ad: "İade", yol: "/iade/", renk: "e-mavi" },
+  transfer: { ad: "Transfer", yol: "/stok/transfer/", renk: "e-gri" },
   iptal: { ad: "İptal", renk: "e-kirmizi" },
 };
 
@@ -42,7 +45,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
   const [{ data: hareketVeri }, { data: durumVeri }, { data: depoVeri }, { data: kdvVeri }, rol] = await Promise.all([
     supabase.from("stok_hareketleri").select("*").eq("stok_karti_id", id).order("tarih").order("id"),
     supabase.from("stok_durumu").select("*").eq("stok_karti_id", id).maybeSingle(),
-    supabase.from("depolar").select("*").eq("aktif", true).order("id"),
+    supabase.from("depolar").select("*"),
     supabase.from("kdv_oranlari").select("*").eq("aktif", true).order("oran"),
     mevcutRol(),
   ]);
@@ -50,6 +53,11 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
   const durum = durumVeri as StokDurumu | null;
   const miktar = Number(durum?.miktar ?? 0);
   const asilTur = new Map(hareketler.map((h) => [h.id, h.kaynak_tur]));
+  const depolar = gorevliDepolar((depoVeri ?? []) as Depo[]);
+  const depoAdi = new Map(((depoVeri ?? []) as Depo[]).map((d) => [d.id, d.ad.replace(/ depo$/, "")]));
+  const depoMiktari = depolar
+    .map((d) => ({ d, m: hareketler.filter((h) => h.depo_id === d.id).reduce((t, h) => t + Number(h.miktar), 0) }))
+    .filter((x) => hareketler.some((h) => h.depo_id === x.d.id));
 
   const gosterim = hareketler.reduce<{ h: Hareket; kalan: number }[]>((liste, h) => {
     const onceki = liste.length ? liste[liste.length - 1].kalan : 0;
@@ -86,7 +94,17 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
           <div className={`deger num${miktar < 0 ? " kirmizi" : ""}`}>
             {sayi(miktar)} <small style={{ fontSize: 15 }}>{kart.birim}</small>
           </div>
-          <div className="alt">{kart.min_stok !== null ? `asgari ${sayi(kart.min_stok)} ${kart.birim}` : "asgari sınır yok"}</div>
+          <div className="alt">
+            {depoMiktari.length > 0 &&
+              depoMiktari.map((x, i) => (
+                <span key={x.d.id} className={x.m < -0.0005 ? "kirmizi" : undefined}>
+                  {i > 0 && " · "}
+                  {x.d.ad.replace(/ depo$/, "")} {sayi(x.m)}
+                </span>
+              ))}
+            {depoMiktari.length > 0 && <br />}
+            {kart.min_stok !== null ? `asgari ${sayi(kart.min_stok)} ${kart.birim}` : "asgari sınır yok"}
+          </div>
         </div>
         {maliyetGorur && (
           <>
@@ -118,7 +136,6 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
           </summary>
           <StokKartiDuzenleFormu
             kart={kart}
-            depolar={(depoVeri ?? []) as Depo[]}
             kdvOranlari={(kdvVeri ?? []) as KdvOrani[]}
             hareketVar={hareketler.length > 0}
           />
@@ -139,6 +156,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
                 <tr>
                   <th>Tarih</th>
                   <th>İşlem</th>
+                  <th>Depo</th>
                   <th>Lot / SKT</th>
                   <th className="sag">Giriş</th>
                   <th className="sag">Çıkış</th>
@@ -158,6 +176,7 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
                       <td data-label="İşlem" className="liste-baslik">
                         <span className={`etk ${k.renk}`}>{k.ad}</span> {yol && <Link href={yol}>belge ›</Link>}
                       </td>
+                      <td data-label="Depo">{depoAdi.get(h.depo_id)}</td>
                       <td data-label="Lot / SKT">
                         {h.lot_no}
                         {h.skt && ` · ${tarihTR(h.skt)}`}

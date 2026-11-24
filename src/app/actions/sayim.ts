@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hataMesaji } from "@/lib/imece";
 import type { FormSonucu } from "./cariler";
 
-export type SayimGirdisi = { tarih?: string; sayan?: string; aciklama?: string; kalemler: { stok_karti_id: string; sayilan: number }[] };
+export type SayimGirdisi = { tarih?: string; depo_id?: number; sayan?: string; aciklama?: string; kalemler: { stok_karti_id: string; sayilan: number }[] };
 
 function yenile() {
   revalidatePath("/stok", "layout");

@@ -4,7 +4,7 @@ import { IptalFormu } from "@/components/IptalFormu";
 import { KayitIzi } from "@/components/KayitIzi";
 import { oturum, iptalEdebilir, IPTAL_YETKI_NOTU } from "@/lib/yetki";
 import { MuhasebeKarsiligi } from "@/components/MuhasebeKarsiligi";
-import { sayi, tarihTR, tl } from "@/lib/imece";
+import { kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { createClient } from "@/lib/supabase/server";
 import type { StokKarti, YevmiyeSatiri } from "@/types/database";
@@ -16,6 +16,7 @@ type Sayim = {
   sayan: string | null;
   aciklama: string | null;
   durum: string;
+  depo_id: number | null;
   iptal_nedeni: string | null;
   fis_id: string | null;
   iptal_fis_id: string | null;
@@ -50,6 +51,7 @@ export default async function SayimDetayPage({ params }: { params: Promise<{ id:
   const kalemler = ((kalemVeri ?? []) as Kalem[]).sort((a, b) => Number(a.fark_tutari) - Number(b.fark_tutari));
   const { data: kartVeri } = await supabase.from("stok_kartlari").select("id, ad, kod, birim").in("id", kalemler.map((k) => k.stok_karti_id));
   const kart = new Map(((kartVeri ?? []) as Pick<StokKarti, "id" | "ad" | "kod" | "birim">[]).map((k) => [k.id, k]));
+  const { data: depoVeri } = s.depo_id ? await supabase.from("depolar").select("ad").eq("id", s.depo_id).maybeSingle() : { data: null };
   const hesapAdlari = new Map(((hesapVeri ?? []) as { kod: string; ad: string }[]).map((h) => [h.kod, h.ad]));
   const satirlar = (satirVeri ?? []) as YevmiyeSatiri[];
   const eksik = kalemler.filter((k) => Number(k.fark_tutari) < 0).reduce((t, k) => t - Number(k.fark_tutari), 0);
@@ -66,6 +68,7 @@ export default async function SayimDetayPage({ params }: { params: Promise<{ id:
           </h1>
           <p>
             {tarihTR(s.tarih)}
+            {depoVeri && ` · ${depoVeri.ad}`}
             {s.sayan && ` · sayan ${s.sayan}`}
             {s.aciklama && ` · ${s.aciklama}`}
           </p>
@@ -125,7 +128,7 @@ export default async function SayimDetayPage({ params }: { params: Promise<{ id:
                       <Link href={`/stok/${k.stok_karti_id}`} style={{ fontWeight: 700, color: "inherit" }}>
                         {c?.ad}
                       </Link>{" "}
-                      <span className="kod">{c?.kod}</span>
+                      <span className="kod">{kodGoster(c?.kod)}</span>
                     </td>
                     <td data-label="Sistemde" className="sag num">
                       {sayi(k.sistem_miktari)} {c?.birim}

@@ -18,7 +18,6 @@ export async function stokKartiEkle(formData: FormData): Promise<FormSonucu> {
     return { hata: "Kodun son kısmı 1-3 haneli rakam olmalı (örn. 3 ya da 003); harf ve nokta olamaz." };
   }
 
-  const depoId = ondalik(formData, "depo_id");
   const kdv = ondalik(formData, "kdv_orani");
   const minStok = ondalik(formData, "min_stok");
 
@@ -42,7 +41,6 @@ export async function stokKartiEkle(formData: FormData): Promise<FormSonucu> {
       ...(kod ? { kod } : {}),
       ad,
       birim,
-      depo_id: depoId,
       kdv_orani: kdv ?? 1,
       min_stok: minStok !== null && minStok >= 0 ? minStok : null,
       satis_fiyati: ondalik(formData, "satis_fiyati"),
@@ -89,7 +87,6 @@ export async function stokKartiGuncelle(id: string, formData: FormData): Promise
     .update({
       ad,
       birim,
-      depo_id: ondalik(formData, "depo_id"),
       kdv_orani: ondalik(formData, "kdv_orani") ?? 1,
       min_stok: minStok !== null && minStok >= 0 ? minStok : null,
       satis_fiyati: ondalik(formData, "satis_fiyati"),

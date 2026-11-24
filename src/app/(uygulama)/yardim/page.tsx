@@ -110,6 +110,35 @@ const BOLUMLER: Bolum[] = [
     ),
   },
   {
+    baslik: "Üretime malzeme verdim",
+    alt: "Hammadde deposundan Üretim deposuna transfer",
+    icerik: (
+      <>
+        <p>
+          Üç depo var: alınan her şey <b>Hammadde depo</b>ya girer; üretimde reçete malzemeleri yalnız <b>Üretim depo</b>dan
+          düşer; biten ürün <b>Mamül depo</b>ya girer ve satış oradan çıkar. Bu yüzden üretime verilen malzeme önce transferle
+          Üretim deposuna geçirilir.
+        </p>
+        <ol>
+          <li>
+            <B>Stok</B> → <B>Depo transferi</B>. <T yol="＋ → Depo transferi" />
+          </li>
+          <li>
+            <b>Çıkış deposu</b> Hammadde, <b>Giriş deposu</b> Üretim (hazır seçili gelir). Malzemeyi listeden seçin, miktarı yazın;{" "}
+            <B>+ Malzeme</B> ile satır ekleyin.
+          </li>
+          <li>
+            <B>Transferi kaydet</B>. Malın değeri değişmez, yalnız yeri değişir.
+          </li>
+        </ol>
+        <p className="soluk">
+          Çıkış deposunda yeterli mal yoksa da kaydedilir, o depo eksiye düşer ve listede kırmızı görünür; bu genelde eksik
+          girilmiş bir alışı ya da sayımı gösterir.
+        </p>
+      </>
+    ),
+  },
+  {
     baslik: "Üretim yaptık",
     alt: "Bir parti (ör. su böreği) hazırlandı — telefondan da girilebilir",
     icerik: (
@@ -125,7 +154,10 @@ const BOLUMLER: Bolum[] = [
           İş bitince: <b>Paketlenen</b> miktar, varsa <b>Bozuk / atılan</b> miktar ve nedeni, <b>Son kullanma tarihi</b> →{" "}
           <B>■ Partiyi bitir</B>.
         </li>
-        <li>Parti bitirilmeden ürün stoğa girmez. Gün sonunda açık parti bırakmayın.</li>
+        <li>
+          Parti bitirilmeden ürün stoğa girmez. Gün sonunda açık parti bırakmayın. Malzemeler Üretim deposundan düşer, ürün
+          Mamül deposuna girer.
+        </li>
       </ol>
     ),
   },
@@ -177,7 +209,8 @@ const BOLUMLER: Bolum[] = [
           <B>Stok</B> → <B>Sayım yap</B>. <T yol="＋ → Sayım" />
         </li>
         <li>
-          Rafta gerçekten olan miktarı <b>Sayılan</b> sütununa yazın (<b>Sistemde</b> sütunu programın beklediği miktardır).
+          <b>Sayılan depo</b>yu seçin (her depo ayrı sayılır). Rafta gerçekten olan miktarı <b>Sayılan</b> sütununa yazın (
+          <b>Sistemde</b> sütunu programın o depoda beklediği miktardır).
         </li>
         <li>
           <B>Sayımı kaydet</B>. Fark, fire/kaçak raporunda görünür.

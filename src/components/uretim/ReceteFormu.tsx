@@ -16,7 +16,7 @@ const kucuk = (s: string) => s.toLocaleLowerCase("tr-TR").trim();
 
 let sayac = 0;
 
-function MalzemeSecici({
+export function MalzemeSecici({
   deger,
   malzemeler,
   degisti,

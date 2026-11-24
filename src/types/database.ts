@@ -104,7 +104,10 @@ export type StokKarti = {
   updated_at: string;
 };
 
-export type Depo = { id: number; ad: string; aciklama: string | null; aktif: boolean };
+export type DepoGorevi = "hammadde" | "uretim" | "mamul";
+/** gorev boş olanlar eski etiket depolarıdır (Kuru/Soğuk); stok yalnız görevli depolarda tutulur. */
+export type Depo = { id: number; ad: string; aciklama: string | null; aktif: boolean; gorev: DepoGorevi | null };
+export type StokDepoDurumu = { stok_karti_id: string; depo_id: number; miktar: number; deger: number };
 export type KdvOrani = { oran: number; indirilecek_kod: string | null; hesaplanan_kod: string | null; aktif: boolean };
 
 export type Hatirlatici = {

@@ -5,7 +5,7 @@ import { cariGuncelle, type FormSonucu } from "@/app/actions/cariler";
 import { stokKartiGuncelle } from "@/app/actions/stok";
 import { FormMesaji } from "@/components/FormMesaji";
 import { STOK_BIRIMLERI, sayiGirdi } from "@/lib/imece";
-import type { Cari, Depo, KdvOrani, StokKarti } from "@/types/database";
+import type { Cari, KdvOrani, StokKarti } from "@/types/database";
 
 function AktifKutusu({ aktif, aciklama }: { aktif: boolean; aciklama: string }) {
   return (
@@ -77,12 +77,10 @@ export function CariDuzenleFormu({ cari }: { cari: Cari }) {
 
 export function StokKartiDuzenleFormu({
   kart,
-  depolar,
   kdvOranlari,
   hareketVar,
 }: {
   kart: StokKarti;
-  depolar: Depo[];
   kdvOranlari: KdvOrani[];
   hareketVar: boolean;
 }) {
@@ -91,7 +89,7 @@ export function StokKartiDuzenleFormu({
   // key kaydedilen değere bağlı: kayıt sonrası form yeni değerlerle yeniden kurulur.
   return (
     <form
-      key={`${kart.birim}|${kart.depo_id ?? ""}|${Number(kart.kdv_orani)}`}
+      key={`${kart.birim}|${Number(kart.kdv_orani)}`}
       action={action}
       className="kart-ic"
       style={{ display: "flex", flexDirection: "column", gap: 12 }}
@@ -112,17 +110,6 @@ export function StokKartiDuzenleFormu({
           </select>
           {/* disabled select formda gönderilmez; hareketi olan kartta mevcut birim aynen gider */}
           {hareketVar && <input type="hidden" name="birim" value={kart.birim} />}
-        </div>
-        <div className="alan">
-          <label htmlFor="depo_id">Depo</label>
-          <select id="depo_id" name="depo_id" defaultValue={kart.depo_id ? String(kart.depo_id) : ""}>
-            <option value="">—</option>
-            {depolar.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.ad}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
       <div className="form-satir">

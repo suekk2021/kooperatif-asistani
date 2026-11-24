@@ -9,6 +9,7 @@ export const KAYIT_TURLERI: Record<string, { ad: string; yol?: (id: string) => s
   para_hareketleri: { ad: "Kasa/banka hareketi", yol: () => "/kasa" },
   uretim_partileri: { ad: "Üretim partisi", yol: (id) => `/uretim/${id}` },
   sayimlar: { ad: "Sayım", yol: (id) => `/stok/sayim/${id}` },
+  depo_transferleri: { ad: "Depolar arası transfer", yol: (id) => `/stok/transfer/${id}` },
   cariler: { ad: "Cari kart", yol: (id) => `/cariler/${id}` },
   stok_kartlari: { ad: "Stok kartı", yol: (id) => `/stok/${id}` },
   stok_gruplari: { ad: "Stok grubu", yol: () => "/stok/gruplar" },
