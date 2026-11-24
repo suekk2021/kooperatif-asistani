@@ -56,5 +56,13 @@
 - **Kâr oranı maliyet üzerine (9ea6013, canlıda, 16 Kas):** (fiyat−maliyet)/maliyet, Fatih Bey isteği. Fatih Bey'e not gönderildi; yönetim İstanbul'dan dönünce netleşecek: 847,60 KDV hariç mi, satış raporu marjını da isterse değiştir.
 - **Veri durumu:** stokta hiç alış/açılış yok; reçete maliyeti şimdilik yalnız kart fiyatı girilen malzemelerle (Kıyma, tabak, koli) eksik hesaplanıyor.
 
+### 8. Üç depo + depolar arası transfer (24 Kas 2026, Fatih Bey yazılı)
+- Mamül / Hammadde / Üretim; reçete tüketimi yalnız Üretim'den (eksiye düşebilir); üretim çıktısı ve ticari mal alışı Mamül'e; transfer: depo sorumlusu, muhasebe, Fatih Bey.
+- **Yapıldı (24 Kas, yerelde):** ayrıntı MUHASEBE-PLANI.md en üstü. **Canlıda (24 Kas, e971f3b).** Gerçek kayıtla denenmedi.
+- Fikir (istenmedi): transfer ekranında "reçeteden doldur" (X kg ürün için gereken malzemeyi otomatik yaz).
+
+### 9. Kodlar her yerde noktasız (24 Kas 2026, Fatih Bey)
+- **Yapıldı (24 Kas, yerelde):** yalnız ekran gösterimi; veri ve Mikro/Excel aktarımı noktalı kalır. **Canlıda (24 Kas, b43da14).**
+
 ## Bitenler
 (henüz yok)
