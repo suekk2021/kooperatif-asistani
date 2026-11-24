@@ -34,7 +34,8 @@
 
 ### 5. Test dönemi uzatıldı (13 Kas 2026, kullanıcı)
 - **⛔ Kullanıcı kuralı (13 Kas): çalışanlar şu an veri giriyor; bana sormadan hiçbir veri silinmez.** Aşağıdaki dönem sonu temizliği de önce listelenip onaylanmadan yapılmaz.
-- Bitiş 25 Kas → **30 Kas 2026** (`src/lib/test-donemi.ts`, şerit buradan okur). Dönem sonunda: test kartları/kayıtları sil + sayaçları sıfırla + açılış ayarını sıfırla + şeridi `null` yap; **stok grupları ve hesap planındaki grup hesapları silinmez** (grup tanımı gerçek yapı); kartları tutma kararı o gün sorulur.
+- **24 Kas karar (kullanıcı): bitiş 26 Aralık 2026'ya uzatıldı; girilen kayıtlar GERÇEK veri sayılıyor (gerçek hammadde, belki maaş) — hiçbir şey silinmez, aşağıdaki temizlik planı GEÇERSİZ.** Dönem sonunda neyin kalacağına Fatih Bey / Nagihan Hanım söyler, kullanıcı kararıyla değerlendirilir. Şerit metni: 'Girdiğiniz kayıtlar düzeltilebilir; silinmesi gereken bir şey olursa birlikte değerlendirilir.' Karar Fatih Bey'le ortak (yıl sonu). Aşağıdaki eski plan yalnız tarihçe:
+- (eski) Bitiş 25 Kas → **30 Kas 2026** (`src/lib/test-donemi.ts`, şerit buradan okur). Dönem sonunda: test kartları/kayıtları sil + sayaçları sıfırla + açılış ayarını sıfırla + şeridi `null` yap; **stok grupları ve hesap planındaki grup hesapları silinmez** (grup tanımı gerçek yapı); kartları tutma kararı o gün sorulur.
 
 ### 6. Reçete ekranı görünüm düzeni (16 Kas 2026, Fatih Bey WhatsApp)
 - Dosya: `src/components/uretim/ReceteFormu.tsx`. Fatih Bey reçeteyi PC'den girdi, kaydetti; "sorun yok, sadece görsel".

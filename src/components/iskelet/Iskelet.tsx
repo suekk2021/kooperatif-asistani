@@ -135,8 +135,8 @@ export function Iskelet({
         </header>
         {TEST_DONEMI_BITIS && (
           <div className="test-seridi" role="note">
-            <b>TEST DÖNEMİ</b> · {tarihTR(TEST_DONEMI_BITIS)} tarihine kadar. Bu sürede girilen tüm kayıtlar denemedir ve dönem sonunda
-            silinecektir.
+            <b>TEST DÖNEMİ</b> · {tarihTR(TEST_DONEMI_BITIS)} tarihine kadar. Girdiğiniz kayıtlar düzeltilebilir; silinmesi gereken bir şey olursa
+            birlikte değerlendirilir.
           </div>
         )}
         <main className="icerik">{children}</main>
