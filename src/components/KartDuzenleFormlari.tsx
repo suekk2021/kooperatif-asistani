@@ -20,8 +20,14 @@ function AktifKutusu({ aktif, aciklama }: { aktif: boolean; aciklama: string }) 
 
 export function CariDuzenleFormu({ cari }: { cari: Cari }) {
   const [sonuc, action, bekliyor] = useActionState(async (_o: FormSonucu, fd: FormData) => cariGuncelle(cari.id, fd), {});
+  // React 19 kayıttan sonra formu ilk açılıştaki değerlere sıfırlar; key kaydedilen değerlere bağlı,
+  // böylece kayıt sonrası form yeni değerlerle yeniden kurulur (stok kartındaki ile aynı sebep).
+  const formAnahtari = [
+    cari.unvan, cari.telefon, cari.vade_gun, cari.vergi_no, cari.vergi_dairesi,
+    cari.eposta, cari.adres, cari.iban, cari.notlar, cari.aktif,
+  ].join("|");
   return (
-    <form action={action} className="kart-ic" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <form key={formAnahtari} action={action} className="kart-ic" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div className="form-satir">
         <div className="alan" style={{ flexBasis: 300 }}>
           <label htmlFor="unvan">Ünvan / ad *</label>
