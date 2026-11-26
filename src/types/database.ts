@@ -391,7 +391,7 @@ export type IadeKalemi = {
 
 // Personel + puantaj (migration 20261114100000). Yalnız maas_gorur() rolleri okur.
 export type PersonelDurumu = "giris_bekliyor" | "calisiyor" | "ayrildi";
-export type UcretTipi = "gunluk" | "saatlik";
+export type UcretTipi = "gunluk" | "saatlik" | "aylik";
 export type GunTuru = "calisti" | "eksik" | "izinli" | "raporlu" | "resmi_tatil" | "hafta_tatili";
 
 export type Personel = {

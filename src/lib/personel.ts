@@ -9,7 +9,7 @@ export const DURUM_ADI: Record<PersonelDurumu, string> = {
   ayrildi: "Ayrıldı",
 };
 
-export const UCRET_TIPI_ADI: Record<UcretTipi, string> = { gunluk: "Günlük", saatlik: "Saatlik" };
+export const UCRET_TIPI_ADI: Record<UcretTipi, string> = { gunluk: "Günlük", saatlik: "Saatlik", aylik: "Aylık" };
 
 export const GUN_TURU_ADI: Record<GunTuru, string> = {
   calisti: "Çalıştı",

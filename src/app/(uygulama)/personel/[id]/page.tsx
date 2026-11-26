@@ -113,7 +113,7 @@ export default async function PersonelKartiPage({ params }: { params: Promise<{ 
             </table>
           </div>
         )}
-        <UcretEkleFormu personelId={id} sonTip={guncel?.ucret_tipi ?? "gunluk"} />
+        <UcretEkleFormu personelId={id} sonTip={guncel?.ucret_tipi ?? "aylik"} />
       </div>
 
       <div className="kart" style={{ marginBottom: 16 }}>

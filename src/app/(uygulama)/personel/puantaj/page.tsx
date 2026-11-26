@@ -45,6 +45,8 @@ export default async function PuantajPage({ searchParams }: { searchParams: Prom
         ucretler={(uv ?? []) as PersonelUcreti[]}
         ekler={(ev ?? []) as PersonelEkOdemesi[]}
         gunler={(gv ?? []) as PuantajGunu[]}
+        iseBaslama={secili.ise_baslama}
+        ayrilis={secili.durum === "ayrildi" ? secili.ayrilis : null}
       />
     );
   }
@@ -55,8 +57,9 @@ export default async function PuantajPage({ searchParams }: { searchParams: Prom
         <div>
           <h1>Puantaj · {ayAdi(ay)}</h1>
           <p>
-            Her güne çalıştığı gün sayısını (günlük ücretli) ya da saati (saatlik ücretli) yazın. Fazla mesaili güne 2, yarım güne 0,5.
-            Resmi tatil ücretli ise o güne 1, ücretsiz ise 0 yazın ve türünü seçin.
+            Aylık ücretlide her güne çalıştığı saati yazın (tam gün 8, yarım gün 4, 1 saat izinli 7). Eksik gün ve raporlu günde 0
+            yazıp türünü seçin; resmi tatil, hafta tatili ve izinli günde kesinti olmaz. Günlük ücretlide gün sayısı (tam gün 1,
+            yarım gün 0,5), saatlik ücretlide saat yazılır.
           </p>
         </div>
         <div className="ust-araclar">

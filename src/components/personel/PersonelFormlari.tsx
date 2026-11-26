@@ -55,14 +55,15 @@ export function YeniPersonelFormu() {
         <div className="form-satir">
           <div className="alan">
             <label htmlFor="ucret_tipi">Ücret tipi</label>
-            <select id="ucret_tipi" name="ucret_tipi" defaultValue={girdi.ucret_tipi ?? "gunluk"}>
+            <select id="ucret_tipi" name="ucret_tipi" defaultValue={girdi.ucret_tipi ?? "aylik"}>
+              <option value="aylik">Aylık</option>
               <option value="gunluk">Günlük</option>
               <option value="saatlik">Saatlik</option>
             </select>
           </div>
           <div className="alan">
             <label htmlFor="ucret">Ücret (₺)</label>
-            <input id="ucret" name="ucret" inputMode="decimal" placeholder="833,33" autoComplete="off" defaultValue={girdi.ucret ?? ""} />
+            <input id="ucret" name="ucret" inputMode="decimal" placeholder="28075,50" autoComplete="off" defaultValue={girdi.ucret ?? ""} />
           </div>
           <div className="alan">
             <label htmlFor="yol">Günlük yol parası (₺)</label>
@@ -147,6 +148,7 @@ export function UcretEkleFormu({ personelId, sonTip }: { personelId: string; son
         <div className="alan">
           <label htmlFor="u_tip">Tip *</label>
           <select id="u_tip" name="ucret_tipi" defaultValue={girdi.ucret_tipi ?? sonTip}>
+            <option value="aylik">Aylık</option>
             <option value="gunluk">Günlük</option>
             <option value="saatlik">Saatlik</option>
           </select>

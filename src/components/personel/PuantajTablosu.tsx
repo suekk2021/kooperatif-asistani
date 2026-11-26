@@ -37,14 +37,22 @@ export function PuantajTablosu({
   ucretler,
   ekler,
   gunler,
+  iseBaslama,
+  ayrilis,
 }: {
   personelId: string;
   ay: string;
   ucretler: PersonelUcreti[];
   ekler: PersonelEkOdemesi[];
   gunler: PuantajGunu[];
+  iseBaslama: string | null;
+  ayrilis: string | null; // yalnız durumu "ayrıldı" olan kişide dolu gelir
 }) {
   const tarihler = useMemo(() => ayinGunleri(ay), [ay]);
+  const ayBas = tarihler[0];
+  const aySon = tarihler[tarihler.length - 1];
+  // Aylık ücretlide "gün" sütunu çalıştığı saattir (tam gün 8); hesap veritabanındaki maas_ay_ozeti ile aynı kural.
+  const aylik = gecerliUcret(ucretler, aySon)?.ucret_tipi === "aylik";
   const ilk = useMemo(() => {
     const m: Record<string, Hucre> = {};
     for (const g of gunler) {
@@ -54,7 +62,7 @@ export function PuantajTablosu({
   }, [gunler]);
   const [kayitli, setKayitli] = useState(ilk);
   const [hucreler, setHucreler] = useState(ilk);
-  const [doldurMiktar, setDoldurMiktar] = useState("1");
+  const [doldurMiktar, setDoldurMiktar] = useState(aylik ? "8" : "1");
   const [sonuc, setSonuc] = useState<FormSonucu>({});
   const [bekliyor, basla] = useTransition();
 
@@ -116,6 +124,8 @@ export function PuantajTablosu({
   let gelinen = 0;
   let ucretsiz = 0;
   const satirTutari: Record<string, number | null> = {};
+  let kesilenGun = 0;
+  const aylikTutar = aylik ? Number(gecerliUcret(ucretler, aySon)?.tutar ?? 0) : 0;
   for (const t of tarihler) {
     const h = hucre(t);
     const m = sayiOku(h.miktar) ?? 0;
@@ -128,12 +138,25 @@ export function PuantajTablosu({
     toplamMiktar += m;
     if (m > 0) gelinen++;
     if (m > 0 && !u && e === null) ucretsiz++;
+    if (aylik) {
+      // Boş gün (satır yok) kesinti üretmez; veritabanıyla aynı.
+      const dolu = h.miktar.trim() !== "" || h.gun_turu !== "calisti";
+      const kesilen = dolu && ["calisti", "eksik", "raporlu"].includes(h.gun_turu) ? Math.max(8 - m, 0) : 0;
+      kesilenGun += kesilen / 8;
+      satirTutari[t] = kesilen > 0 ? -Math.round((aylikTutar / 30) * (kesilen / 8) * 100) / 100 : null;
+      continue;
+    }
     const tutar = e ?? Math.round(m * (u?.tutar ?? 0) * 100) / 100;
     satirTutari[t] = m > 0 || e !== null ? tutar : null;
     hakEdis += tutar;
   }
-  const ayBas = tarihler[0];
-  const aySon = tarihler[tarihler.length - 1];
+  if (aylik) {
+    const bas = iseBaslama && iseBaslama > ayBas ? iseBaslama : ayBas;
+    const bit = ayrilis && ayrilis < aySon ? ayrilis : aySon;
+    const tamAy = bas === ayBas && bit === aySon;
+    const gunSayisi = tamAy ? 30 : Math.min(30, Math.max(tarihler.filter((t) => t >= bas && t <= bit).length, 0));
+    hakEdis = Math.round((aylikTutar / 30) * (gunSayisi - kesilenGun) * 100) / 100;
+  }
   let ekToplam = 0;
   for (const e of ekler) {
     if (e.baslangic > aySon || (e.bitis && e.bitis < ayBas)) continue;
@@ -145,7 +168,7 @@ export function PuantajTablosu({
       ekToplam += Number(e.tutar) * gun;
     }
   }
-  const saatlik = gecerliUcret(ucretler, aySon)?.ucret_tipi === "saatlik";
+  const saatlik = gecerliUcret(ucretler, aySon)?.ucret_tipi === "saatlik" || aylik;
 
   return (
     <>
@@ -161,7 +184,7 @@ export function PuantajTablosu({
           aria-label="Boş günlere yazılacak değer"
         />
         <span className="soluk" style={{ fontSize: 13.5 }}>
-          {saatlik ? "saat" : "gün"} yaz, pazarları hafta tatili yap
+          {aylik ? "saat yaz (tam gün 8), pazarları hafta tatili yap" : `${saatlik ? "saat" : "gün"} yaz, pazarları hafta tatili yap`}
         </span>
         <button type="button" className="btn btn-cizgi" onClick={boslariDoldur}>
           Doldur
@@ -183,7 +206,7 @@ export function PuantajTablosu({
               <th>Gün türü</th>
               <th className="sag">{saatlik ? "Saat" : "Gün"}</th>
               <th className="sag">Elle tutar</th>
-              <th className="sag">Tutar</th>
+              <th className="sag">{aylik ? "Kesinti" : "Tutar"}</th>
               <th>Açıklama</th>
             </tr>
           </thead>
@@ -220,6 +243,8 @@ export function PuantajTablosu({
                       onChange={(e) => degistir(t, "elle", e.target.value)}
                       inputMode="decimal"
                       placeholder="—"
+                      disabled={aylik}
+                      title={aylik ? "Aylık ücretlide kullanılmaz; kesinti saatten hesaplanır" : undefined}
                       style={{ width: 90, textAlign: "right" }}
                       aria-label={`${t} elle tutar`}
                     />
@@ -239,7 +264,7 @@ export function PuantajTablosu({
           </tbody>
           <tfoot>
             <tr className="toplam">
-              <td colSpan={2}>Toplam ({gelinen} gün geldi)</td>
+              <td colSpan={2}>Toplam ({gelinen} gün geldi{aylik ? `, ${sayiYaz(Math.round(kesilenGun * 1000) / 1000) || 0} gün kesinti` : ""})</td>
               <td className="sag num">{sayiYaz(Math.round(toplamMiktar * 100) / 100)}</td>
               <td />
               <td className="sag num">{tl(hakEdis)}</td>

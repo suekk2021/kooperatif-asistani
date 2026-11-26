@@ -61,7 +61,7 @@ export async function cariGuncelle(id: string, formData: FormData): Promise<Form
     }
   }
 
-  const { error } = await supabase
+  const { data: guncellenen, error } = await supabase
     .from("cariler")
     .update({
       unvan,
@@ -75,9 +75,12 @@ export async function cariGuncelle(id: string, formData: FormData): Promise<Form
       notlar: metin(formData, "notlar"),
       aktif,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id");
 
   if (error) return { hata: hataMesaji(error, `"${unvan}" adında başka bir ${CARI_TURU_ADI[cari.tur as CariTuru].tekil.toLocaleLowerCase("tr-TR")} var.`) };
+  // Yetki kuralı (RLS) satırı engellerse Supabase hata vermez, 0 satır günceller; "Kaydedildi" demeyelim.
+  if (!guncellenen || guncellenen.length === 0) return { hata: "Kayıt güncellenemedi: bu cariyi değiştirme yetkiniz olmayabilir. Teknik destekle görüşün." };
   revalidatePath("/cariler", "layout");
   revalidatePath("/panel");
   return { basarili: aktif ? "Kaydedildi." : "Kaydedildi; cari pasife alındı (listelerde görünmez)." };

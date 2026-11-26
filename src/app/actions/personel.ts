@@ -26,8 +26,8 @@ export async function personelEkle(formData: FormData): Promise<FormSonucu & { i
   const yol = ondalik(formData, "yol");
   if (!ad) return { hata: "Ad soyad zorunlu." };
   if (!DURUMLAR.includes(durum)) return { hata: "Durum seçilmedi." };
-  if (ucret !== null && (ucret < 0 || (ucretTipi !== "gunluk" && ucretTipi !== "saatlik"))) {
-    return { hata: "Ücret tipi (günlük/saatlik) seçilmeli ve ücret 0'dan küçük olmamalı." };
+  if (ucret !== null && (ucret < 0 || (ucretTipi !== "gunluk" && ucretTipi !== "saatlik" && ucretTipi !== "aylik"))) {
+    return { hata: "Ücret tipi (aylık/günlük/saatlik) seçilmeli ve ücret 0'dan küçük olmamalı." };
   }
   if (ucret !== null && !baslama) return { hata: "Ücret girildiyse işe başlama tarihi de girilmeli (ücret o tarihten geçerli olur)." };
   if (yol !== null && (yol < 0 || !baslama)) return { hata: "Yol parası için işe başlama tarihi girilmeli." };
@@ -81,7 +81,7 @@ export async function ucretEkle(personelId: string, formData: FormData): Promise
   const tip = metin(formData, "ucret_tipi") as UcretTipi | null;
   const tutar = ondalik(formData, "tutar");
   if (!baslangic) return { hata: "Geçerlilik tarihi zorunlu." };
-  if (tip !== "gunluk" && tip !== "saatlik") return { hata: "Ücret tipi seçilmedi." };
+  if (tip !== "gunluk" && tip !== "saatlik" && tip !== "aylik") return { hata: "Ücret tipi seçilmedi." };
   if (tutar === null || tutar < 0) return { hata: "Ücret tutarı girilmeli." };
 
   const supabase = await createClient();

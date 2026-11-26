@@ -458,7 +458,7 @@ const MAAS_BOLUMLERI: Bolum[] = [
             <b>Durum</b>: işe başladıysa <b>Çalışıyor</b>; evrakı henüz teslim edilmediyse <b>Girişi bekliyor</b>.
           </li>
           <li>
-            <b>İşe başlama</b> tarihini, <b>Ücret tipi</b>ni (günlük ya da saatlik) ve <b>Ücret</b>i girin. Yol parası alıyorsa{" "}
+            <b>İşe başlama</b> tarihini, <b>Ücret tipi</b>ni (aylık, günlük ya da saatlik; kooperatifte hepsi <b>Aylık</b>) ve <b>Ücret</b>i girin. Yol parası alıyorsa{" "}
             <b>Günlük yol parası</b>nı yazın, almıyorsa boş bırakın.
           </li>
           <li>
@@ -521,14 +521,17 @@ const MAAS_BOLUMLERI: Bolum[] = [
             <B>Puantaj gir</B>&apos;e basın, üstten kişiyi seçin. Ayı ‹ › düğmeleriyle değiştirirsiniz.
           </li>
           <li>
-            Her güne <b>çalıştığı gün sayısını</b> yazın: tam gün 1, yarım gün 0,5, fazla mesaili gün 2. Saatlik ücretlide gün yerine{" "}
-            <b>saat</b> yazılır.
+            <b>Aylık ücretlide</b> her güne <b>çalıştığı saati</b> yazın: tam gün 8, yarım gün 4, 1 saat izin aldıysa 7. Ay 28, 30 ya da
+            31 gün çekse de ücret sabittir; yalnız kesinti düşülür (ücret ÷ 30 × kesilen gün, 1 gün = 8 saat). Günlük ücretlide gün
+            sayısı (tam gün 1, yarım gün 0,5), saatlik ücretlide saat yazılır.
           </li>
           <li>
-            Gelmediği güne 0 yazıp <b>Gün türü</b>nü seçin: Eksik gün, İzinli, Raporlu, Resmi tatil, Hafta tatili.
+            Gelmediği güne 0 yazıp <b>Gün türü</b>nü seçin: Eksik gün, İzinli, Raporlu, Resmi tatil, Hafta tatili. Aylık ücretlide{" "}
+            <b>Eksik gün</b> ve <b>Raporlu</b> günde kesinti yapılır; <b>İzinli</b>, <b>Resmi tatil</b> ve <b>Hafta tatili</b> günde kesinti
+            yapılmaz. Yıllık izin hakkını program tutmaz, sizin takibinizdedir.
           </li>
           <li>
-            Kolaylık: <B>Doldur</B> düğmesi boş günlere 1 yazar, pazarları hafta tatili yapar. Sonra yalnız farklı günleri düzeltin.
+            Kolaylık: <B>Doldur</B> düğmesi boş günlere 1 (aylık ücretlide 8 saat) yazar, pazarları hafta tatili yapar. Sonra yalnız farklı günleri düzeltin.
           </li>
           <li>
             Bir günün tutarı farklıysa <b>Elle tutar</b>a yazın; hesap o günü bu tutarla alır. Nedenini açıklamaya yazın.

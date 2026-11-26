@@ -99,7 +99,7 @@ export default async function MaasOzetiPage({ searchParams }: { searchParams: Pr
                     </td>
                     <td className="sag num">{s.calisilan_gun}</td>
                     <td className="sag num">
-                      {s.ucret_tipi === "saatlik" ? `${sayi(s.toplam_miktar)} saat` : sayi(s.fazla_gun)}
+                      {s.ucret_tipi === "saatlik" ? `${sayi(s.toplam_miktar)} saat` : s.ucret_tipi === "aylik" ? "—" : sayi(s.fazla_gun)}
                     </td>
                     <td className="sag num">{s.eksik_gun}</td>
                     <td className="sag num">
