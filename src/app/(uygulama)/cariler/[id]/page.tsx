@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { CariDuzenleFormu } from "@/components/KartDuzenleFormlari";
 import { CARI_TURU_ADI, kodGoster, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { fiyatYetkiliMi } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
-import type { Cari, YevmiyeSatiri } from "@/types/database";
+import type { Cari, FiyatListesi, YevmiyeSatiri } from "@/types/database";
 
 type EkstreSatiri = YevmiyeSatiri & {
   yevmiye_fisleri: { fis_no: number; tarih: string; aciklama: string; kaynak_tur: string; kaynak_id: string | null; created_at: string };
@@ -30,10 +31,12 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
   if (!cariVeri) notFound();
   const cari = cariVeri as Cari;
 
-  const [{ data: iadeVeri }, { data: evrakHareketVeri }] = await Promise.all([
+  const [{ data: iadeVeri }, { data: evrakHareketVeri }, { data: listeVeri }] = await Promise.all([
     supabase.from("iadeler").select("id").eq("cari_id", id),
     supabase.from("evrak_hareketleri").select("id, evrak_id").eq("cari_id", id),
+    supabase.from("fiyat_listeleri").select("id, ad, aktif").order("ad"),
   ]);
+  const fiyatListeleri = (listeVeri ?? []) as Pick<FiyatListesi, "id" | "ad" | "aktif">[];
   const iadeIdleri = new Set((iadeVeri ?? []).map((i) => i.id as string));
   const evrakHareketi = new Map((evrakHareketVeri ?? []).map((h) => [h.id as string, h.evrak_id as string]));
   const [{ data: satirVeri }, { data: alisVeri }, { data: satisVeri }, rol] = await Promise.all([
@@ -85,6 +88,18 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
             {cari.telefon && ` · ${cari.telefon}`}
             {cari.vergi_no && ` · VKN ${cari.vergi_no}`}
             {cari.vade_gun > 0 && ` · vade ${cari.vade_gun} gün`}
+            {cari.tur === "musteri" &&
+              (() => {
+                const liste = fiyatListeleri.find((l) => l.id === cari.fiyat_listesi_id && l.aktif);
+                return liste ? (
+                  <>
+                    {" · fiyat listesi "}
+                    <Link href={`/satis/fiyat-listeleri/${liste.id}`}>{liste.ad}</Link>
+                  </>
+                ) : (
+                  <span className="amber"> · fiyat listesi yok, satış yapılamaz</span>
+                );
+              })()}
           </p>
         </div>
         <div className="ust-araclar">
@@ -103,7 +118,7 @@ export default async function CariEkstrePage({ params }: { params: Promise<{ id:
             <span className="btn btn-cizgi">Bilgileri düzenle</span>
             {!cari.aktif && <span className="etk e-gri" style={{ marginLeft: 8 }}>pasif</span>}
           </summary>
-          <CariDuzenleFormu cari={cari} />
+          <CariDuzenleFormu cari={cari} fiyatListeleri={fiyatListeleri} fiyatYetkili={fiyatYetkiliMi(rol)} />
         </details>
       )}
 

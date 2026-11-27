@@ -66,9 +66,35 @@ export type Cari = {
   vade_gun: number;
   notlar: string | null;
   aktif: boolean;
+  /** Yalnız müşteride; satış için zorunlu (20261128100000_fiyat_listesi_birim_donusumu.sql). */
+  fiyat_listesi_id: string | null;
   olusturan: string | null;
   created_at: string;
   updated_at: string;
+};
+
+// ===== Fiyat listesi + birim dönüşümü (20261128100000_fiyat_listesi_birim_donusumu.sql) =====
+
+export type FiyatListesi = {
+  id: string;
+  ad: string;
+  aciklama: string | null;
+  aktif: boolean;
+  olusturan: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Fiyat her zaman ana birimin KDV hariç fiyatıdır. */
+export type FiyatListesiKalemi = { id: string; liste_id: string; stok_karti_id: string; fiyat: number };
+
+/** 1 `birim` = `katsayi` ana birim (ör. Mantı: 1 paket = 0,410 kg). */
+export type BirimDonusumu = {
+  id: string;
+  stok_karti_id: string;
+  birim: StokBirimi;
+  katsayi: number;
+  aktif: boolean;
 };
 
 export type StokTuru = "hammadde" | "ambalaj" | "yari_mamul" | "mamul" | "ticari_mal" | "yardimci";
@@ -290,6 +316,9 @@ export type SatisKalemi = {
   maliyet_tahmini: boolean;
   iskonto_orani: number;
   iskonto_tutari: number;
+  /** Satışta seçilen birim ve miktar (bilgi); hesap hep `miktar` (ana birim) ile. Eski satışlarda boş. */
+  girilen_birim: string | null;
+  girilen_miktar: number | null;
 };
 
 // ===== Adım 4 (supabase/migrations/20261110140000_uretim.sql) =====

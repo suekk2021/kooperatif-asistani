@@ -14,6 +14,9 @@ export const KAYIT_TURLERI: Record<string, { ad: string; yol?: (id: string) => s
   stok_kartlari: { ad: "Stok kartı", yol: (id) => `/stok/${id}` },
   stok_gruplari: { ad: "Stok grubu", yol: () => "/stok/gruplar" },
   kasa_banka_hesaplari: { ad: "Kasa/banka hesabı", yol: () => "/kasa" },
+  fiyat_listeleri: { ad: "Fiyat listesi", yol: (id) => `/satis/fiyat-listeleri/${id}` },
+  fiyat_listesi_kalemleri: { ad: "Liste fiyatı", yol: () => "/satis/fiyat-listeleri" },
+  birim_donusumleri: { ad: "Birim dönüşümü" },
   receteler: { ad: "Reçete", yol: () => "/uretim/receteler" },
   recete_kalemleri: { ad: "Reçete kalemi", yol: () => "/uretim/receteler" },
   hesap_plani: { ad: "Hesap planı", yol: () => "/hesap-plani" },
@@ -32,6 +35,7 @@ const ALAN_ADLARI: Record<string, string> = {
   satis_fiyati: "liste fiyatı", min_stok: "asgari stok", kdv_orani: "KDV", notlar: "notlar", durum: "durum",
   iptal_nedeni: "iptal nedeni", uretilen_miktar: "paketlenen", bozuk_miktar: "bozuk", bozuk_neden: "fire nedeni",
   skt: "son kullanma", lot_no: "lot", sorumlu: "sorumlu", aciklama: "açıklama", tarih: "tarih", karsi_hesap: "karşı hesap",
+  fiyat: "fiyat", katsayi: "ana birim karşılığı", fiyat_listesi_id: "fiyat listesi",
 };
 const GIZLI_ALANLAR = new Set(["updated_at", "created_at", "fis_id", "iptal_fis_id", "malzeme_maliyeti", "birim_maliyet", "bitis"]);
 
@@ -47,6 +51,8 @@ export function kayitEtiketi(tablo: string, j: Json): string {
   if (tablo === "iadeler") return `İADE-${v("iade_no")}`;
   if (tablo === "evraklar") return `${v("tur") === "cek" ? "Çek" : "Senet"} #${v("evrak_no")} · ${Number(v("tutar")).toLocaleString("tr-TR")} ₺`;
   if (tablo === "evrak_hareketleri") return v("islem") ?? "";
+  if (tablo === "fiyat_listesi_kalemleri") return `${Number(v("fiyat")).toLocaleString("tr-TR")} ₺`;
+  if (tablo === "birim_donusumleri") return `1 ${v("birim")} = ${Number(v("katsayi")).toLocaleString("tr-TR")}`;
   if (tablo === "para_hareketleri") return [v("tur"), v("tutar") && `${Number(v("tutar")).toLocaleString("tr-TR")} ₺`, v("aciklama")].filter(Boolean).join(" · ");
   return v("unvan") ?? v("ad") ?? v("kod") ?? v("oran") ?? v("donem") ?? "";
 }

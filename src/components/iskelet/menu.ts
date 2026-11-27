@@ -26,6 +26,7 @@ export const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
       { yol: "/alis", ad: "Alış", ikon: "alis", kimler: [...KAYIT_GIRENLER, "depo", ...IZLEYENLER] },
       { yol: "/uretim", ad: "Üretim", ikon: "uretim", kimler: [...KAYIT_GIRENLER, "depo"] },
       { yol: "/satis", ad: "Satış", ikon: "satis", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
+      { yol: "/satis/fiyat-listeleri", ad: "Fiyat Listeleri", ikon: "rapor", kimler: [...KAYIT_GIRENLER, ...IZLEYENLER] },
       { yol: "/stok", ad: "Stok", ikon: "stok", kimler: [...KAYIT_GIRENLER, "depo", ...IZLEYENLER] },
     ],
   },
@@ -48,6 +49,12 @@ export const MENU: { grup: string; ogeler: MenuOgesi[] }[] = [
     ],
   },
 ];
+
+/** /satis/fiyat-listeleri açıkken yalnız o öğe seçili görünsün, üstündeki /satis değil. */
+export function menudeAktifMi(yol: string, o: MenuOgesi) {
+  if (!yol.startsWith(o.yol)) return false;
+  return !MENU.some((g) => g.ogeler.some((b) => b.yol.length > o.yol.length && b.yol.startsWith(o.yol) && yol.startsWith(b.yol)));
+}
 
 export function gorurMu(o: MenuOgesi, rol: KullaniciRolu | null) {
   return !o.yakinda && (!o.kimler || (rol !== null && o.kimler.includes(rol)));

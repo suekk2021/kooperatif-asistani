@@ -8,7 +8,7 @@ import { IMZA } from "@/lib/imza";
 import { rolAdi } from "@/lib/roller";
 import type { KullaniciRolu } from "@/types/database";
 import { ikonlar } from "./Ikonlar";
-import { MENU, gorurMu, mobilDuzen } from "./menu";
+import { MENU, gorurMu, menudeAktifMi, mobilDuzen } from "./menu";
 
 /** Telefonda: alttaki sekme çubuğu, ortadaki ＋ (hızlı kayıt) ve alttan açılan menü. Bilgisayarda gizli. */
 export function MobilKabuk({
@@ -105,7 +105,7 @@ export function MobilKabuk({
               <div className="mc-grup">{g.grup}</div>
               <div className="mc-izgara">
                 {g.ogeler.map((o) => (
-                  <Link key={o.yol} href={o.yol} onClick={kapat} className={yol.startsWith(o.yol) ? "aktif" : undefined}>
+                  <Link key={o.yol} href={o.yol} onClick={kapat} className={menudeAktifMi(yol, o) ? "aktif" : undefined}>
                     <i>{ikonlar[o.ikon]}</i>
                     {o.ad}
                   </Link>

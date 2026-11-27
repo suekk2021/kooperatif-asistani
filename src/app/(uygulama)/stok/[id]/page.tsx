@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StokKartiDuzenleFormu } from "@/components/KartDuzenleFormlari";
+import { BirimDonusumleri } from "@/components/stok/BirimDonusumleri";
 import { STOK_TURU_ADI, kodGoster, sayi, tarihTR, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import { gorevliDepolar } from "@/lib/depo";
-import type { Depo, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
+import type { BirimDonusumu, Depo, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
 
 type Hareket = {
   id: number;
@@ -42,11 +43,12 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
   if (!kartVeri) notFound();
   const kart = kartVeri as StokKarti;
 
-  const [{ data: hareketVeri }, { data: durumVeri }, { data: depoVeri }, { data: kdvVeri }, rol] = await Promise.all([
+  const [{ data: hareketVeri }, { data: durumVeri }, { data: depoVeri }, { data: kdvVeri }, { data: donusumVeri }, rol] = await Promise.all([
     supabase.from("stok_hareketleri").select("*").eq("stok_karti_id", id).order("tarih").order("id"),
     supabase.from("stok_durumu").select("*").eq("stok_karti_id", id).maybeSingle(),
     supabase.from("depolar").select("*"),
     supabase.from("kdv_oranlari").select("*").eq("aktif", true).order("oran"),
+    supabase.from("birim_donusumleri").select("*").eq("stok_karti_id", id).order("katsayi"),
     mevcutRol(),
   ]);
   const hareketler = (hareketVeri ?? []) as Hareket[];
@@ -141,6 +143,13 @@ export default async function StokKartiPage({ params }: { params: Promise<{ id: 
           />
         </details>
       )}
+
+      <BirimDonusumleri
+        kartId={kart.id}
+        anaBirim={kart.birim}
+        donusumler={(donusumVeri ?? []) as BirimDonusumu[]}
+        yazar={duzenlemeYetkisiVarMi(rol)}
+      />
 
       <div className="kart">
         <div className="kart-bas">

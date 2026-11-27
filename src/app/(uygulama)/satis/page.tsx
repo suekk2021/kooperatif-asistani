@@ -27,13 +27,16 @@ export default async function SatisPage() {
           <h1>Satış</h1>
           <p>Müşteriye ürün çıkışı — stok, alacak, KDV ve maliyet tek kayıtla</p>
         </div>
-        {duzenlemeYetkisiVarMi(rol) && (
-          <div className="ust-araclar">
+        <div className="ust-araclar">
+          <Link href="/satis/fiyat-listeleri" className="btn btn-cizgi">
+            Fiyat listeleri
+          </Link>
+          {duzenlemeYetkisiVarMi(rol) && (
             <Link href="/satis/yeni" className="btn btn-ana">
               + Yeni satış
             </Link>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="kart">

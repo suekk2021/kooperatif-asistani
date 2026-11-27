@@ -10,7 +10,7 @@ import { IMZA } from "@/lib/imza";
 import { TEST_DONEMI_BITIS } from "@/lib/test-donemi";
 import type { KullaniciRolu } from "@/types/database";
 import { ikonlar } from "./Ikonlar";
-import { MENU, gorurMu, type MenuOgesi } from "./menu";
+import { MENU, gorurMu, menudeAktifMi, type MenuOgesi } from "./menu";
 import { MobilKabuk } from "./MobilKabuk";
 
 function basHarfler(ad: string) {
@@ -41,7 +41,7 @@ export function Iskelet({
   const digerleri = yonetici ? MENU.flatMap((g) => g.ogeler).filter((o) => !o.yakinda && !gorurMu(o, benimRol)) : [];
 
   const baglanti = (o: MenuOgesi) => (
-    <Link key={o.yol} href={o.yol} className={yol.startsWith(o.yol) ? "aktif" : undefined}>
+    <Link key={o.yol} href={o.yol} className={menudeAktifMi(yol, o) ? "aktif" : undefined}>
       {ikonlar[o.ikon]}
       {o.ad}
     </Link>

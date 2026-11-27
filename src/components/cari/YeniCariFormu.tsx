@@ -3,10 +3,19 @@
 import { useActionState, useEffect, useRef } from "react";
 import { cariEkle, type FormSonucu } from "@/app/actions/cariler";
 import { FormMesaji } from "@/components/FormMesaji";
+import { FiyatListesiSecimi } from "@/components/cari/FiyatListesiSecimi";
 import { CARI_TURU_ADI } from "@/lib/imece";
-import type { CariTuru } from "@/types/database";
+import type { CariTuru, FiyatListesi } from "@/types/database";
 
-export function YeniCariFormu({ tur }: { tur: CariTuru }) {
+export function YeniCariFormu({
+  tur,
+  fiyatListeleri,
+  fiyatYetkili,
+}: {
+  tur: CariTuru;
+  fiyatListeleri: Pick<FiyatListesi, "id" | "ad" | "aktif">[];
+  fiyatYetkili: boolean;
+}) {
   const formRef = useRef<HTMLFormElement>(null);
   const [sonuc, action, bekliyor] = useActionState(
     async (_onceki: FormSonucu, formData: FormData) => cariEkle(formData),
@@ -70,6 +79,7 @@ export function YeniCariFormu({ tur }: { tur: CariTuru }) {
           </div>
         </div>
         <div className="form-satir" style={{ marginTop: 12 }}>
+          {tur === "musteri" && <FiyatListesiSecimi listeler={fiyatListeleri} secili={null} yetkili={fiyatYetkili} />}
           <div className="alan">
             <label htmlFor="notlar">Not</label>
             <input id="notlar" name="notlar" />

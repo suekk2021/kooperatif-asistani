@@ -4,8 +4,9 @@ import { useActionState } from "react";
 import { cariGuncelle, type FormSonucu } from "@/app/actions/cariler";
 import { stokKartiGuncelle } from "@/app/actions/stok";
 import { FormMesaji } from "@/components/FormMesaji";
+import { FiyatListesiSecimi } from "@/components/cari/FiyatListesiSecimi";
 import { STOK_BIRIMLERI, sayiGirdi } from "@/lib/imece";
-import type { Cari, KdvOrani, StokKarti } from "@/types/database";
+import type { Cari, FiyatListesi, KdvOrani, StokKarti } from "@/types/database";
 
 function AktifKutusu({ aktif, aciklama }: { aktif: boolean; aciklama: string }) {
   return (
@@ -18,13 +19,21 @@ function AktifKutusu({ aktif, aciklama }: { aktif: boolean; aciklama: string }) 
   );
 }
 
-export function CariDuzenleFormu({ cari }: { cari: Cari }) {
+export function CariDuzenleFormu({
+  cari,
+  fiyatListeleri,
+  fiyatYetkili,
+}: {
+  cari: Cari;
+  fiyatListeleri: Pick<FiyatListesi, "id" | "ad" | "aktif">[];
+  fiyatYetkili: boolean;
+}) {
   const [sonuc, action, bekliyor] = useActionState(async (_o: FormSonucu, fd: FormData) => cariGuncelle(cari.id, fd), {});
   // React 19 kayıttan sonra formu ilk açılıştaki değerlere sıfırlar; key kaydedilen değerlere bağlı,
   // böylece kayıt sonrası form yeni değerlerle yeniden kurulur (stok kartındaki ile aynı sebep).
   const formAnahtari = [
     cari.unvan, cari.telefon, cari.vade_gun, cari.vergi_no, cari.vergi_dairesi,
-    cari.eposta, cari.adres, cari.iban, cari.notlar, cari.aktif,
+    cari.eposta, cari.adres, cari.iban, cari.notlar, cari.aktif, cari.fiyat_listesi_id,
   ].join("|");
   return (
     <form key={formAnahtari} action={action} className="kart-ic" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -66,9 +75,12 @@ export function CariDuzenleFormu({ cari }: { cari: Cari }) {
           <input id="iban" name="iban" defaultValue={cari.iban ?? ""} />
         </div>
       </div>
-      <div className="alan">
-        <label htmlFor="notlar">Not</label>
-        <input id="notlar" name="notlar" defaultValue={cari.notlar ?? ""} />
+      <div className="form-satir">
+        {cari.tur === "musteri" && <FiyatListesiSecimi listeler={fiyatListeleri} secili={cari.fiyat_listesi_id} yetkili={fiyatYetkili} />}
+        <div className="alan" style={{ flexBasis: 300 }}>
+          <label htmlFor="notlar">Not</label>
+          <input id="notlar" name="notlar" defaultValue={cari.notlar ?? ""} />
+        </div>
       </div>
       <AktifKutusu aktif={cari.aktif} aciklama="işaret kaldırılırsa cari listelerden ve seçimlerden kalkar; bakiyesi sıfır olmalı" />
       <div>

@@ -2,8 +2,9 @@ import Link from "next/link";
 import { YeniCariFormu } from "@/components/cari/YeniCariFormu";
 import { CARI_TURU_ADI, kodGoster, tl } from "@/lib/imece";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
+import { fiyatYetkiliMi } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
-import type { Cari, CariTuru, HesapBakiyesi } from "@/types/database";
+import type { Cari, CariTuru, FiyatListesi, HesapBakiyesi } from "@/types/database";
 
 export default async function CarilerPage({
   searchParams,
@@ -15,10 +16,13 @@ export default async function CarilerPage({
   const tur: CariTuru = turParam === "tedarikci" ? "tedarikci" : "musteri";
 
   const supabase = await createClient();
-  const [{ data: cariler }, rol] = await Promise.all([
+  const [{ data: cariler }, { data: listeVeri }, rol] = await Promise.all([
     supabase.from("cariler").select("*").eq("aktif", !pasifler).order("kod"),
+    supabase.from("fiyat_listeleri").select("id, ad, aktif").order("ad"),
     mevcutRol(),
   ]);
+  const fiyatListeleri = (listeVeri ?? []) as Pick<FiyatListesi, "id" | "ad" | "aktif">[];
+  const listeAdi = new Map(fiyatListeleri.filter((l) => l.aktif).map((l) => [l.id, l.ad]));
   const tumu = (cariler ?? []) as Cari[];
   const liste = tumu.filter((c) => c.tur === tur);
 
@@ -55,7 +59,9 @@ export default async function CarilerPage({
         </Link>
       </div>
 
-      {duzenlemeYetkisiVarMi(rol) && !pasifler && <YeniCariFormu key={tur} tur={tur} />}
+      {duzenlemeYetkisiVarMi(rol) && !pasifler && (
+        <YeniCariFormu key={tur} tur={tur} fiyatListeleri={fiyatListeleri} fiyatYetkili={fiyatYetkiliMi(rol)} />
+      )}
 
       <div className="kart">
         <div className="kart-bas">
@@ -77,6 +83,7 @@ export default async function CarilerPage({
                   <th>Kod</th>
                   <th>Telefon</th>
                   <th>Vergi no</th>
+                  {tur === "musteri" && <th>Fiyat listesi</th>}
                   <th className="sag">Vade</th>
                   <th className="sag">{tur === "musteri" ? "Alacağımız" : "Borcumuz"}</th>
                 </tr>
@@ -96,6 +103,15 @@ export default async function CarilerPage({
                       </td>
                       <td data-label="Telefon">{c.telefon}</td>
                       <td data-label="Vergi no" className="mobil-gizle">{c.vergi_no}</td>
+                      {tur === "musteri" && (
+                        <td data-label="Fiyat listesi">
+                          {c.fiyat_listesi_id && listeAdi.has(c.fiyat_listesi_id) ? (
+                            listeAdi.get(c.fiyat_listesi_id)
+                          ) : (
+                            <span className="etk e-amber">yok — satış yapılamaz</span>
+                          )}
+                        </td>
+                      )}
                       <td data-label="Vade" className="sag num">
                         {c.vade_gun ? `${c.vade_gun} gün` : "Peşin"}
                       </td>

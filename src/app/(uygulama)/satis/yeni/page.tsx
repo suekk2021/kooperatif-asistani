@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { SatisFormu, type SatilabilirUrun } from "@/components/satis/SatisFormu";
+import { SatisFormu, type SatilabilirUrun, type SatisMusterisi } from "@/components/satis/SatisFormu";
 import { duzenlemeYetkisiVarMi, mevcutRol } from "@/lib/rol";
 import { maliyetGorurMu } from "@/lib/roller";
 import { createClient } from "@/lib/supabase/server";
 import { bugunIstanbul } from "@/lib/tarih";
-import type { Cari, KasaBankaHesabi, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
+import type { BirimDonusumu, FiyatListesi, FiyatListesiKalemi, KasaBankaHesabi, KdvOrani, StokDurumu, StokKarti } from "@/types/database";
 
 export default async function YeniSatisPage() {
   const rol = await mevcutRol();
@@ -14,26 +14,52 @@ export default async function YeniSatisPage() {
   const maliyetGorur = maliyetGorurMu(rol);
 
   const supabase = await createClient();
-  const [{ data: cariVeri }, { data: urunVeri }, { data: durumVeri }, { data: kdvVeri }, { data: hesapVeri }, { data: planVeri }] =
-    await Promise.all([
-      supabase.from("cariler").select("id, unvan, kod, vade_gun").eq("tur", "musteri").eq("aktif", true).order("unvan"),
-      supabase
-        .from("stok_kartlari")
-        .select("id, ad, kod, birim, kdv_orani, tur, satis_fiyati")
-        .in("tur", ["mamul", "ticari_mal"])
-        .eq("aktif", true)
-        .is("birlestirildigi_kart", null)
-        .order("ad"),
-      supabase.from("stok_durumu").select("*"),
-      supabase.from("kdv_oranlari").select("*").eq("aktif", true).order("oran"),
-      supabase.from("kasa_banka_hesaplari").select("*").eq("aktif", true).neq("tur", "kredi_karti").order("kod"),
-      supabase.from("hesap_plani").select("kod, ad"),
-    ]);
+  const [
+    { data: cariVeri },
+    { data: urunVeri },
+    { data: durumVeri },
+    { data: kdvVeri },
+    { data: hesapVeri },
+    { data: planVeri },
+    { data: listeVeri },
+    { data: fiyatVeri },
+    { data: donusumVeri },
+  ] = await Promise.all([
+    supabase.from("cariler").select("id, unvan, kod, vade_gun, fiyat_listesi_id").eq("tur", "musteri").eq("aktif", true).order("unvan"),
+    supabase
+      .from("stok_kartlari")
+      .select("id, ad, kod, birim, kdv_orani, tur")
+      .in("tur", ["mamul", "ticari_mal"])
+      .eq("aktif", true)
+      .is("birlestirildigi_kart", null)
+      .order("ad"),
+    supabase.from("stok_durumu").select("*"),
+    supabase.from("kdv_oranlari").select("*").eq("aktif", true).order("oran"),
+    supabase.from("kasa_banka_hesaplari").select("*").eq("aktif", true).neq("tur", "kredi_karti").order("kod"),
+    supabase.from("hesap_plani").select("kod, ad"),
+    supabase.from("fiyat_listeleri").select("id, ad").eq("aktif", true).order("ad"),
+    supabase.from("fiyat_listesi_kalemleri").select("liste_id, stok_karti_id, fiyat"),
+    supabase.from("birim_donusumleri").select("stok_karti_id, birim, katsayi").eq("aktif", true).order("katsayi"),
+  ]);
   const durum = new Map(((durumVeri ?? []) as StokDurumu[]).map((d) => [d.stok_karti_id, d]));
-  const urunler: SatilabilirUrun[] = ((urunVeri ?? []) as Pick<StokKarti, "id" | "ad" | "kod" | "birim" | "kdv_orani" | "tur" | "satis_fiyati">[]).map(
-    (u) => ({ ...u, stok: Number(durum.get(u.id)?.miktar ?? 0), ortalama: maliyetGorur ? Number(durum.get(u.id)?.ortalama_maliyet ?? 0) : 0 })
-  );
-  const musteriler = (cariVeri ?? []) as Pick<Cari, "id" | "unvan" | "kod" | "vade_gun">[];
+  const donusumler = new Map<string, { birim: string; katsayi: number }[]>();
+  for (const d of (donusumVeri ?? []) as Pick<BirimDonusumu, "stok_karti_id" | "birim" | "katsayi">[]) {
+    donusumler.set(d.stok_karti_id, [...(donusumler.get(d.stok_karti_id) ?? []), { birim: d.birim, katsayi: Number(d.katsayi) }]);
+  }
+  const urunler: SatilabilirUrun[] = ((urunVeri ?? []) as Pick<StokKarti, "id" | "ad" | "kod" | "birim" | "kdv_orani" | "tur">[]).map((u) => ({
+    ...u,
+    stok: Number(durum.get(u.id)?.miktar ?? 0),
+    ortalama: maliyetGorur ? Number(durum.get(u.id)?.ortalama_maliyet ?? 0) : 0,
+    donusumler: donusumler.get(u.id) ?? [],
+  }));
+  const musteriler = (cariVeri ?? []) as SatisMusterisi[];
+  const fiyatListeleri = (listeVeri ?? []) as Pick<FiyatListesi, "id" | "ad">[];
+  const fiyatlar: Record<string, Record<string, number>> = {};
+  for (const k of (fiyatVeri ?? []) as Pick<FiyatListesiKalemi, "liste_id" | "stok_karti_id" | "fiyat">[]) {
+    (fiyatlar[k.liste_id] ??= {})[k.stok_karti_id] = Number(k.fiyat);
+  }
+  const aktifListe = new Set(fiyatListeleri.map((l) => l.id));
+  const listesiz = musteriler.filter((m) => !m.fiyat_listesi_id || !aktifListe.has(m.fiyat_listesi_id)).length;
 
   const eksik = [
     musteriler.length === 0 && { ad: "müşteri kartı", yol: "/cariler?tur=musteri" },
@@ -68,14 +94,24 @@ export default async function YeniSatisPage() {
           </p>
         </div>
       ) : (
+        <>
+        {listesiz > 0 && (
+          <div className="kart kart-ic" style={{ marginBottom: 16, borderLeft: "4px solid var(--amber)" }}>
+            <b className="amber">{listesiz} müşterinin fiyat listesi yok</b> — onlara satış yapılamaz.{" "}
+            <Link href="/satis/fiyat-listeleri">Fiyat listeleri</Link> · <Link href="/cariler?tur=musteri">Müşteriler</Link>
+          </div>
+        )}
         <SatisFormu
           musteriler={musteriler}
           urunler={urunler}
+          fiyatListeleri={fiyatListeleri}
+          fiyatlar={fiyatlar}
           kdvOranlari={(kdvVeri ?? []) as KdvOrani[]}
           tahsilatHesaplari={(hesapVeri ?? []) as KasaBankaHesabi[]}
           hesapAdlari={Object.fromEntries(((planVeri ?? []) as { kod: string; ad: string }[]).map((h) => [h.kod, h.ad]))}
           bugun={bugunIstanbul()}
         />
+        </>
       )}
     </>
   );

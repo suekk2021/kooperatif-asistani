@@ -6,14 +6,19 @@ import type { FormSonucu } from "@/app/actions/cariler";
 import { satisKaydet } from "@/app/actions/satis";
 import { FormMesaji } from "@/components/FormMesaji";
 import { kodGoster, PARA_HESABI_TURU_ADI, sayi, tl, trSayi } from "@/lib/imece";
-import type { Cari, KasaBankaHesabi, KdvOrani, StokKarti } from "@/types/database";
+import type { Cari, FiyatListesi, KasaBankaHesabi, KdvOrani, StokKarti } from "@/types/database";
 
-export type SatilabilirUrun = Pick<StokKarti, "id" | "ad" | "kod" | "birim" | "kdv_orani" | "tur" | "satis_fiyati"> & {
+export type SatilabilirUrun = Pick<StokKarti, "id" | "ad" | "kod" | "birim" | "kdv_orani" | "tur"> & {
   stok: number;
   ortalama: number;
+  /** Aktif birim dönüşümleri: 1 birim = katsayi ana birim. */
+  donusumler: { birim: string; katsayi: number }[];
 };
 
-type Kalem = { anahtar: number; urunAdi: string; lot: string; miktar: string; fiyat: string; kdv: number; isk: string };
+export type SatisMusterisi = Pick<Cari, "id" | "unvan" | "kod" | "vade_gun" | "fiyat_listesi_id">;
+
+/** birim boşsa ana birim. Fiyat ve KDV burada tutulmaz: fiyat müşterinin listesinden, KDV stok kartından gelir. */
+type Kalem = { anahtar: number; urunAdi: string; lot: string; miktar: string; birim: string; isk: string };
 
 function sayiCoz(s: string): number {
   const t = s.trim();
@@ -21,9 +26,11 @@ function sayiCoz(s: string): number {
   return trSayi(t);
 }
 const yuvarla = (n: number) => Math.round(n * 100) / 100;
+// Veritabanındaki satis_kaydet ile aynı: ana birim miktarı 3 haneye yuvarlanır.
+const yuvarla3 = (n: number) => Math.round(n * 1000) / 1000;
 
 let sayac = 0;
-const bosKalem = (): Kalem => ({ anahtar: ++sayac, urunAdi: "", lot: "", miktar: "", fiyat: "", kdv: 1, isk: "" });
+const bosKalem = (): Kalem => ({ anahtar: ++sayac, urunAdi: "", lot: "", miktar: "", birim: "", isk: "" });
 /** Boş = 0; geçersiz ya da 0–99,99 dışı = NaN. */
 function iskontoCoz(s: string): number {
   if (!s.trim()) return 0;
@@ -34,13 +41,19 @@ function iskontoCoz(s: string): number {
 export function SatisFormu({
   musteriler,
   urunler,
+  fiyatListeleri,
+  fiyatlar,
   kdvOranlari,
   tahsilatHesaplari,
   hesapAdlari,
   bugun,
 }: {
-  musteriler: Pick<Cari, "id" | "unvan" | "kod" | "vade_gun">[];
+  musteriler: SatisMusterisi[];
   urunler: SatilabilirUrun[];
+  /** Yalnız aktif listeler. */
+  fiyatListeleri: Pick<FiyatListesi, "id" | "ad">[];
+  /** liste id → stok kartı id → ana birim fiyatı (KDV hariç) */
+  fiyatlar: Record<string, Record<string, number>>;
   kdvOranlari: KdvOrani[];
   tahsilatHesaplari: KasaBankaHesabi[];
   hesapAdlari: Record<string, string>;
@@ -62,19 +75,18 @@ export function SatisFormu({
   const urunAdla = useMemo(() => new Map(urunler.map((u) => [u.ad.toLocaleLowerCase("tr-TR").trim(), u])), [urunler]);
   const kdvKodu = useMemo(() => new Map(kdvOranlari.map((k) => [Number(k.oran), k.hesaplanan_kod])), [kdvOranlari]);
   const cari = musteriler.find((m) => m.id === cariId);
+  const liste = cari?.fiyat_listesi_id ? fiyatListeleri.find((l) => l.id === cari.fiyat_listesi_id) : undefined;
+  const listeFiyatlari = liste ? fiyatlar[liste.id] ?? {} : {};
+  // Müşteri seçiliyse ürün önerisinde yalnız onun listesindeki ürünler çıkar.
+  const onerilen = liste ? urunler.filter((u) => u.id in listeFiyatlari) : urunler;
 
   function guncelle(anahtar: number, d: Partial<Kalem>) {
     setKalemler((ks) =>
       ks.map((k) => {
         if (k.anahtar !== anahtar) return k;
         const yeni = { ...k, ...d };
-        if (d.urunAdi !== undefined) {
-          const u = urunAdla.get(d.urunAdi.toLocaleLowerCase("tr-TR").trim());
-          if (u) {
-            yeni.kdv = Number(u.kdv_orani);
-            if (!k.fiyat && u.satis_fiyati !== null) yeni.fiyat = String(Number(u.satis_fiyati)).replace(".", ",");
-          }
-        }
+        // Ürün değişince seçili birim yeni üründe olmayabilir; ana birime dön.
+        if (d.urunAdi !== undefined && d.urunAdi !== k.urunAdi) yeni.birim = "";
         return yeni;
       })
     );
@@ -83,22 +95,28 @@ export function SatisFormu({
   // Aynı ürün birden fazla satırdaysa stok uyarısı toplam miktara göre verilir.
   const kullanilan = new Map<string, number>();
   const genelOran = iskontoCoz(genelIsk);
-  // Veritabanındaki satis_kaydet ile aynı hesap: net = miktar × fiyat × (1 − satır%) × (1 − genel%).
+  // Veritabanındaki satis_kaydet ile aynı hesap: ana birim miktarı = girilen × katsayı (3 hane),
+  // net = miktar × liste fiyatı × (1 − satır%) × (1 − genel%), KDV stok kartındaki oranla.
   const hesaplanan = kalemler.map((k) => {
     const urun = urunAdla.get(k.urunAdi.toLocaleLowerCase("tr-TR").trim());
-    const miktar = sayiCoz(k.miktar);
-    const fiyat = sayiCoz(k.fiyat);
+    const birim = urun ? k.birim || urun.birim : "";
+    const katsayi = !urun ? NaN : birim === urun.birim ? 1 : urun.donusumler.find((d) => d.birim === birim)?.katsayi ?? NaN;
+    const girilen = sayiCoz(k.miktar);
+    const miktar = Number.isFinite(girilen) && Number.isFinite(katsayi) ? yuvarla3(girilen * katsayi) : NaN;
+    const listedeYok = !!urun && !!liste && !(urun.id in listeFiyatlari);
+    const fiyat = urun && liste && !listedeYok ? listeFiyatlari[urun.id] : NaN;
+    const kdv = urun ? Number(urun.kdv_orani) : 0;
     const isk = iskontoCoz(k.isk);
     const gecerli = Number.isFinite(miktar) && Number.isFinite(fiyat);
     const brut = gecerli ? yuvarla(miktar * fiyat) : 0;
     const tutar = gecerli && Number.isFinite(isk) && Number.isFinite(genelOran) ? yuvarla(miktar * fiyat * (1 - isk / 100) * (1 - genelOran / 100)) : brut;
     const iskonto = yuvarla(brut - tutar);
-    const kdvTutari = yuvarla((tutar * k.kdv) / 100);
+    const kdvTutari = yuvarla((tutar * kdv) / 100);
     const onceki = urun ? kullanilan.get(urun.id) ?? 0 : 0;
     if (urun && Number.isFinite(miktar)) kullanilan.set(urun.id, onceki + miktar);
     const yetersiz = urun && Number.isFinite(miktar) ? onceki + miktar > urun.stok : false;
     const maliyet = urun && Number.isFinite(miktar) ? yuvarla(urun.ortalama * miktar) : 0;
-    return { k, urun, miktar, fiyat, isk, brut, tutar, iskonto, kdvTutari, yetersiz, maliyet };
+    return { k, urun, birim, girilen, miktar, fiyat, kdv, listedeYok, isk, brut, tutar, iskonto, kdvTutari, yetersiz, maliyet };
   });
   const iskontoToplam = yuvarla(hesaplanan.reduce((t, h) => t + h.iskonto, 0));
   const brutToplam = yuvarla(hesaplanan.reduce((t, h) => t + h.brut, 0));
@@ -113,7 +131,7 @@ export function SatisFormu({
   if (brutToplam > 0) onizleme.push({ kod: "600.01", borc: 0, alacak: brutToplam });
   const kdvMap = new Map<string, number>();
   for (const h of hesaplanan) {
-    const kk = kdvKodu.get(h.k.kdv);
+    const kk = kdvKodu.get(h.kdv);
     if (kk && h.kdvTutari > 0) kdvMap.set(kk, yuvarla((kdvMap.get(kk) ?? 0) + h.kdvTutari));
   }
   for (const [kod, t] of kdvMap) onizleme.push({ kod, borc: 0, alacak: t });
@@ -130,7 +148,12 @@ export function SatisFormu({
 
   function kaydet() {
     if (!cariId) return setSonuc({ hata: "Müşteri seçin." });
-    if (genel <= 0) return setSonuc({ hata: "En az bir üründe miktar ve birim fiyat girin." });
+    if (!liste) return setSonuc({ hata: `${cari?.unvan} için fiyat listesi tanımlı değil. Müşteri kartından bir fiyat listesi seçilmeli.` });
+    const yok = hesaplanan.findIndex((h) => h.listedeYok);
+    if (yok !== -1) {
+      return setSonuc({ hata: `${yok + 1}. satır: ${hesaplanan[yok].urun!.ad} müşterinin fiyat listesinde (${liste.ad}) bulunamadı.` });
+    }
+    if (genel <= 0) return setSonuc({ hata: "En az bir üründe miktar girin." });
     if (!Number.isFinite(genelOran)) return setSonuc({ hata: "Genel iskonto 0 ile 99 arasında bir yüzde olmalı." });
     const yanlisIsk = hesaplanan.findIndex((h) => !Number.isFinite(h.isk));
     if (yanlisIsk !== -1) return setSonuc({ hata: `${yanlisIsk + 1}. satırdaki iskonto 0 ile 99 arasında bir yüzde olmalı.` });
@@ -151,9 +174,8 @@ export function SatisFormu({
         kalemler: hesaplanan.map((h) => ({
           stok_karti_id: h.urun!.id,
           lot_no: h.k.lot || undefined,
-          miktar: h.miktar,
-          birim_fiyat: h.fiyat,
-          kdv_orani: h.k.kdv,
+          girilen_miktar: h.girilen,
+          birim: h.birim,
           iskonto_orani: h.isk,
         })),
       });
@@ -190,6 +212,17 @@ export function SatisFormu({
             <input id="vade" type="date" value={vade} onChange={(e) => setVade(e.target.value)} />
           </div>
         </div>
+        {cari && !liste && (
+          <p className="amber" style={{ margin: "-8px 0 0", fontSize: 13.5 }}>
+            {cari.unvan} için fiyat listesi tanımlı değil; satış yapılamaz. Müşteri kartından (Bilgileri düzenle → Fiyat listesi) bir liste
+            seçilmeli.
+          </p>
+        )}
+        {liste && (
+          <p className="soluk" style={{ margin: "-8px 0 0", fontSize: 13 }}>
+            Fiyatlar <b>{liste.ad}</b> listesinden gelir (KDV hariç, ana birim başına); KDV stok kartındaki orandır.
+          </p>
+        )}
         {cari && !odeme && !vade && cari.vade_gun > 0 && (
           <p className="soluk" style={{ margin: "-8px 0 0", fontSize: 13 }}>
             Vade boş bırakılırsa müşterinin vadesi kullanılır: {cari.vade_gun} gün.
@@ -213,23 +246,41 @@ export function SatisFormu({
                     style={h.k.urunAdi && !h.urun ? { borderColor: "var(--amber)" } : undefined}
                   />
                 </div>
-                <div className="alan" style={{ flex: "1 1 100px" }}>
-                  <label>Miktar {h.urun && `(${h.urun.birim})`}</label>
+                <div className="alan" style={{ flex: "1 1 90px" }}>
+                  <label>Miktar</label>
                   <input inputMode="decimal" value={h.k.miktar} onChange={(e) => guncelle(h.k.anahtar, { miktar: e.target.value })} placeholder="0" />
+                  {h.urun && h.birim !== h.urun.birim && Number.isFinite(h.miktar) && (
+                    <span className="soluk num" style={{ fontSize: 12.5 }}>
+                      = {sayi(h.miktar)} {h.urun.birim}
+                    </span>
+                  )}
                 </div>
-                <div className="alan" style={{ flex: "1 1 110px" }}>
-                  <label>Birim fiyat (KDV hariç)</label>
-                  <input inputMode="decimal" value={h.k.fiyat} onChange={(e) => guncelle(h.k.anahtar, { fiyat: e.target.value })} placeholder="0,00" />
+                <div className="alan" style={{ flex: "0 1 110px" }}>
+                  <label>Birim</label>
+                  {h.urun && h.urun.donusumler.length > 0 ? (
+                    <select value={h.birim} onChange={(e) => guncelle(h.k.anahtar, { birim: e.target.value })}>
+                      <option value={h.urun.birim}>{h.urun.birim}</option>
+                      {h.urun.donusumler.map((d) => (
+                        <option key={d.birim} value={d.birim}>
+                          {d.birim} ({sayi(d.katsayi)} {h.urun!.birim})
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <b style={{ minHeight: 42, display: "flex", alignItems: "center" }}>{h.urun?.birim ?? "—"}</b>
+                  )}
                 </div>
-                <div className="alan" style={{ flex: "0 1 90px" }}>
+                <div className="alan" style={{ flex: "1 1 120px" }}>
+                  <label>Liste fiyatı (KDV hariç)</label>
+                  <b className="num" style={{ minHeight: 42, display: "flex", alignItems: "center" }}>
+                    {Number.isFinite(h.fiyat) ? `${tl(h.fiyat)} / ${h.urun!.birim}` : "—"}
+                  </b>
+                </div>
+                <div className="alan" style={{ flex: "0 1 60px" }}>
                   <label>KDV</label>
-                  <select value={h.k.kdv} onChange={(e) => guncelle(h.k.anahtar, { kdv: Number(e.target.value) })}>
-                    {kdvOranlari.map((k) => (
-                      <option key={k.oran} value={Number(k.oran)}>
-                        %{Number(k.oran)}
-                      </option>
-                    ))}
-                  </select>
+                  <b className="num" style={{ minHeight: 42, display: "flex", alignItems: "center" }}>
+                    {h.urun ? `%${h.kdv}` : "—"}
+                  </b>
                 </div>
                 <div className="alan mobil-ek" style={{ flex: "0 1 90px" }}>
                   <label>İskonto %</label>
@@ -258,8 +309,10 @@ export function SatisFormu({
                 </div>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 13 }} className={h.yetersiz ? "amber" : "soluk"}>
-                  {h.urun
+                <span style={{ fontSize: 13 }} className={h.yetersiz || h.listedeYok ? "amber" : "soluk"}>
+                  {h.listedeYok
+                    ? `Bu ürün müşterinin fiyat listesinde (${liste?.ad}) bulunamadı; satılamaz.`
+                    : h.urun
                     ? h.yetersiz
                       ? `Stokta ${sayi(h.urun.stok)} ${h.urun.birim} görünüyor — satış yine kaydedilir, stok eksiye düşer (üretim girişi henüz yoksa normal).`
                       : `Stokta ${sayi(h.urun.stok)} ${h.urun.birim}`
@@ -281,7 +334,7 @@ export function SatisFormu({
             </div>
           ))}
           <datalist id="satis-urunleri">
-            {urunler.map((u) => (
+            {onerilen.map((u) => (
               <option key={u.id} value={u.ad} />
             ))}
           </datalist>

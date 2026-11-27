@@ -7,6 +7,13 @@ import type { CariTuru } from "@/types/database";
 
 export type FormSonucu = { hata?: string; basarili?: string };
 
+// Fiyat listesi alanı yalnız formda varsa yazılır: yetkisi olmayanın formunda alan yoktur
+// (göndermezse mevcut liste korunur; veritabanı da yetkisizin değiştirmesini engeller).
+function fiyatListesiAlani(formData: FormData, tur: CariTuru): { fiyat_listesi_id?: string | null } {
+  if (tur !== "musteri" || !formData.has("fiyat_listesi_id")) return {};
+  return { fiyat_listesi_id: metin(formData, "fiyat_listesi_id") };
+}
+
 export async function cariEkle(formData: FormData): Promise<FormSonucu> {
   const tur = metin(formData, "tur") as CariTuru | null;
   const unvan = metin(formData, "unvan");
@@ -29,6 +36,7 @@ export async function cariEkle(formData: FormData): Promise<FormSonucu> {
       iban: metin(formData, "iban"),
       vade_gun: vadeGun !== null && vadeGun >= 0 ? Math.round(vadeGun) : 0,
       notlar: metin(formData, "notlar"),
+      ...fiyatListesiAlani(formData, tur),
     })
     .select("kod")
     .single();
@@ -74,6 +82,7 @@ export async function cariGuncelle(id: string, formData: FormData): Promise<Form
       vade_gun: vadeGun !== null && vadeGun >= 0 ? Math.round(vadeGun) : 0,
       notlar: metin(formData, "notlar"),
       aktif,
+      ...fiyatListesiAlani(formData, cari.tur as CariTuru),
     })
     .eq("id", id)
     .select("id");

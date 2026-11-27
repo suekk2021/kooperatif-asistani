@@ -100,6 +100,11 @@ export default async function SatisDetayPage({ params }: { params: Promise<{ id:
                     <td data-label="Lot">{k.lot_no}</td>
                     <td data-label="Miktar" className="sag num">
                       {sayi(k.miktar)} {u?.birim}
+                      {k.girilen_birim && k.girilen_birim !== u?.birim && k.girilen_miktar !== null && (
+                        <div className="soluk" style={{ fontSize: 12 }}>
+                          {sayi(k.girilen_miktar)} {k.girilen_birim} olarak girildi
+                        </div>
+                      )}
                     </td>
                     <td data-label="Birim fiyat" className="sag num">
                       {tl(k.birim_fiyat)}

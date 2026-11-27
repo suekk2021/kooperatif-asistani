@@ -77,6 +77,11 @@ export function stokGrubuYetkiliMi(rol: KullaniciRolu | null | undefined): boole
   return rol === "operasyon" || rol === "bilgi_islem" || rol === "destek";
 }
 
+/** Fiyat listelerini düzenleyen ve müşteriye liste atayan roller (Fatih Bey, 27 Kas 2026; veritabanında fiyat_yetkili() ile aynı). */
+export function fiyatYetkiliMi(rol: KullaniciRolu | null | undefined): boolean {
+  return rol === "baskan" || rol === "operasyon" || rol === "on_muhasebe" || rol === "bilgi_islem" || rol === "destek";
+}
+
 /** Personel/puantaj/maaş ekranlarını gören ve yazan roller (veritabanında maas_gorur() ile aynı). */
 export function maasGorurMu(rol: KullaniciRolu | null | undefined): boolean {
   return rol === "baskan" || rol === "operasyon" || rol === "on_muhasebe" || rol === "bilgi_islem";

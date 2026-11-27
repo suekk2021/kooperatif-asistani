@@ -23,8 +23,13 @@ const BOLUMLER: Bolum[] = [
           <b>Müşteri</b>yi seçin. Listede yoksa önce müşteriyi açın (aşağıda &quot;Yeni müşteri / tedarikçi&quot;).
         </li>
         <li>
-          Ürün adını yazmaya başlayın, listeden seçin. <b>Miktar</b> ve <b>Birim fiyat (KDV hariç)</b> girin. KDV oranı
-          üründen gelir.
+          Ürün adını yazmaya başlayın, listeden seçin (yalnız müşterinin fiyat listesindeki ürünler çıkar). <b>Miktar</b>ı
+          yazın, ürünün paketi/kolisi tanımlıysa <b>Birim</b>den seçin: &quot;3 paket&quot; yazarsınız, program kg&apos;ını kendisi
+          hesaplar; fatura ve stok her zaman ana birimle (ör. kg) olur.
+        </li>
+        <li>
+          Fiyat yazılmaz: müşterinin <b>fiyat listesinden</b> gelir, KDV oranı stok kartından. İndirim gerekiyorsa{" "}
+          <b>İskonto %</b> alanı kullanılır. Müşterinin listesi yoksa ya da ürün listede yoksa satış kaydedilmez.
         </li>
         <li>
           Birden fazla ürün varsa <B>+ Ürün ekle</B>.
@@ -34,6 +39,28 @@ const BOLUMLER: Bolum[] = [
         </li>
         <li>
           <B>Kaydet</B>.
+        </li>
+      </ol>
+    ),
+  },
+  {
+    baslik: "Fiyat listesi ve paket/koli tanımı",
+    alt: "Satıştan önce bir kez yapılır; fiyat değişince güncellenir",
+    icerik: (
+      <ol>
+        <li>
+          <B>Satış</B> → <B>Fiyat listeleri</B> → <B>+ Fiyat listesi oluştur</B>. Adını verin (ör. Toptan, Bayi, Perakende).
+        </li>
+        <li>
+          Açılan listede her ürünün <b>ana birim fiyatını (KDV hariç)</b> yazın, <B>Kaydet</B>. Fiyatı boş bırakılan ürün o
+          listede yoktur. Listeyi başkan, operasyon, ön muhasebe ve bilgi işlem düzenler.
+        </li>
+        <li>
+          Her müşteri kartında <B>Bilgileri düzenle</B> → <b>Fiyat listesi</b> seçin. Listesi olmayan müşteriye satış yapılamaz.
+        </li>
+        <li>
+          Paket / koli: ürünün stok kartında <b>Birim dönüşümleri</b> bölümünde ekleyin (ör. Mantı, ana birim kg: 1 paket = 0,410
+          kg, 1 koli = 4,920 kg). Ana birimi adet olan üründe karşılık adet olarak yazılır.
         </li>
       </ol>
     ),
